@@ -1,0 +1,16 @@
+{
+  "name": "mind-plugins-core",
+  "version": "1.0.4",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@meta2d/core": "^1.0.32",
+    "mind-diagram": "file:../meta2d.js/dist/mind-diagram/"
+  }
+}

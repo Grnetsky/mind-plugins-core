@@ -161,7 +161,7 @@ export class ToolBox {
           justifyContent: 'center',
           position:'absolute',
           visibility:'hidden',
-          top:'38px',
+          top:'50px',
           backgroundColor:'#fff',
           borderRadius:'5px',
           padding:'3px',

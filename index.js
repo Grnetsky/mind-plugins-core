@@ -1,8 +1,10 @@
-import {  pluginsMessageChannels, setLifeCycleFunc } from "mind-diagram";
+import { setLifeCycleFunc } from "mind-diagram";
 import {disconnectLine} from "@meta2d/core";
 import {ToolBox} from "./src/dom";
 import {defaultFuncList, generateColor} from "./src/default";
 
+export * from './src/default'
+export * from './src/dom'
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -130,7 +132,7 @@ export let toolBoxPlugin = {
             const child = children[i];
             let line = meta2d.findOne(child.connectedLines?.[0].lineId);
             if(line){
-                meta2d.updateLineType(line,meta2d.findOne(pen.mindManager.rootId).mind.lineStyle);
+                meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
             }
             if(recursion){
                 toolBoxPlugin.resetLineStyle(child,true);
@@ -139,7 +141,7 @@ export let toolBoxPlugin = {
     },
     // 重新设置连线的位置
     resetLinePos(pen,recursion = true){
-        console.log('执行resetLien');
+        console.pen.mind('执行resetLien');
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
@@ -216,17 +218,34 @@ export let toolBoxPlugin = {
 
         // 删除meta2d数据
         await meta2d.delete(pen.mind.children);
-        toolBoxPlugin.update(meta2d.findOne(pen.mindManager.rootId));
+        toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
     },
-    install:(manager, pen, args)=>{
+    install:()=>{
         let toolbox = null;
         if(!globalThis.toolbox){
             toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,{
             });
             globalThis.toolbox = toolbox;
         }
-        // 跟随移动
-        toolBoxPlugin.combineLifeCycle(pen);
+        meta2d.on('add',(pens)=>{
+            if(pens && pens.length === 1 && pens[0].name === 'mindNode2' && !pens[0].mind){
+                let pen = pens[0]
+                pen.mind = {
+                    isRoot: true,
+                    preNodeId:null,
+                    rootId: pen.id,
+                    children: [],
+                    width: 0, // 包含了自己和子节点的最大宽度
+                    height: 0, // 包含了自己和子节点的最大高度
+                    direction:'right',
+                    lineStyle: 'polyline',
+                    childrenVisible: true,
+                    visible: true,
+                };
+                // 跟随移动
+                toolBoxPlugin.combineLifeCycle(pen);
+            }
+        })
         meta2d.on('inactive',(targetPen)=>{
             globalThis.toolbox.hide();
         });
@@ -236,11 +255,16 @@ export let toolBoxPlugin = {
     },
 
     funcList: defaultFuncList,
-
+    setFuncList(funcList){
+        if(Object.prototype.toString.call(funcList) !== '[object Object]'){
+            throw new Error('The setFuncList function must take function arguments\n')
+        }
+        this.funcList = funcList;
+    },
     calcChildWandH(pen,position = 'right'){
         let children = pen.mind.children || [];
         let worldRect = meta2d.getPenRect(pen);
-        if(children.length ===0 || !pen.mind.childrenVisible){
+        if(children.length === 0 || !pen.mind.childrenVisible){
             pen.mind.maxHeight = worldRect.height;
             pen.mind.maxWidth = worldRect.width;
             return {
@@ -284,7 +308,23 @@ export let toolBoxPlugin = {
             };
         }
     },
-
+    /**
+     * @param target 当前pen图元*/
+    getFuncList(target){
+        // 手写funclist返回功能列表的校验规则  可被重写
+        return target.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']
+    },
+    appendFuncList(kind,func){
+        if(typeof kind !=="string" || typeof func !== "function"){
+            throw new Error('appendFuncList error: appendFuncList parma error ')
+        }
+        let funcList = this.funcList[kind]
+        if(Object.prototype.toString.call(funcList) === '[object Array]' ){
+            funcList.push(func)
+        }else {
+            throw new Error('appendFuncList error: no such kind')
+        }
+        },
     combineLifeCycle(target){
         let toolbox = globalThis.toolbox;
         setLifeCycleFunc(target,'onMove',(targetPen)=>{
@@ -296,7 +336,7 @@ export let toolBoxPlugin = {
         });
         setLifeCycleFunc(target,'onMouseUp',(targetPen)=>{
             toolbox.bindPen(targetPen);
-            toolbox.setFuncList(target.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']);
+            toolbox.setFuncList(this.getFuncList(target));
             toolbox.translatePosition(targetPen);
         });
         setLifeCycleFunc(target,'onMouseDown',(targetPen)=>{
@@ -314,11 +354,14 @@ export let toolBoxPlugin = {
             name:type,
             mind:{
                 isRoot: false,
+                rootId: pen.mind.rootId,
                 preNodeId:pen.id,
                 children: [],
                 width: 0, // 包含了自己和子节点的最大宽度
                 height: 0, // 包含了自己和子节点的最大高度
-                direction:pen.mind.direction
+                direction:pen.mind.direction,
+                childrenVisible: true,
+                visible: true
             },
             x:pen.x ,
             y:pen.y ,
@@ -339,17 +382,16 @@ export let toolBoxPlugin = {
             pen.mind.children.push(newPen);
         }
         toolBoxPlugin.combineLifeCycle(newPen); // 重写生命周期
-        let rootNode = meta2d.findOne(pen.mindManager.rootId);
+        let rootNode = meta2d.findOne(pen.mind.rootId);
         // 连线
         toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
 
         // 从根节点更新
         toolBoxPlugin.update(rootNode,true);
-        // toolBoxPlugin.calChildrenPosition(pen);
         globalThis.toolbox.bindPen(newPen);
-        globalThis.toolbox.setFuncList(toolBoxPlugin.funcList['leaf']);
+        globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
-        pluginsMessageChannels.publish('addNode',newPen);
+        window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
     },
     update(pen,recursion = true){
         if(!pen)return;

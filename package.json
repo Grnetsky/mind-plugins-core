@@ -1,6 +1,6 @@
 {
   "name": "mind-plugins-core",
-  "version": "1.0.4",
+  "version": "1.1.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "@meta2d/core": "^1.0.32",
-    "mind-diagram": "file:../meta2d.js/dist/mind-diagram/"
+    "mind-diagram": "file:C:\\Users\\Andy\\Desktop\\大屏\\meta2d.js\\dist\\mind-diagram"
   }
 }

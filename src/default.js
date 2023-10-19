@@ -1,129 +1,191 @@
 import {createDom} from "./dom";
 import {toolBoxPlugin} from "../index";
 
-
+let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
+  '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
-  const colorList = ['#FF2318','#9C64A2','#B4C926','#0191B3',
-    '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'
-  ];let index = 0;
+  let index = 0;
   while(true) {
     yield colorList[index];
     index = (index + 1) % colorList.length;
   }
 }
-export let defaultFuncList = {
-  'root':[
-    {
-      name: '新增子级节点',
-      event: 'click',
-      func: async (self,pen)=>{
-        toolBoxPlugin.addNode(pen,0);
-      },
-      icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
-      /**
-       * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
-       * @param self 此配置项自身
-       * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
-       * @return string dom字符串
-       * */
-    },
-    {
-      name:'重新布局',
-      event:'click',
-      func(self,pen){
-        let children = pen.mind?.children || [];
-        if(children.length >0){
-          toolBoxPlugin.update(pen,true);
-        }
-      },
-      setDom(self,dom){
-        // draw your dom freeDom！！！
-        let result =  `<span>${self.name}</span>`;
-        return result;
-      }
-    },
-    {
-      name:'仅计算子节点',
-      event:'click',
-      func(self,pen){
-        let children = pen.mind?.children || [];
-        if(children.length >0){
-          toolBoxPlugin.update(pen,false);
-        }
-      }
-    },
-    {
-      name:'线条颜色',
-      setChildrenDom(self, pen){
-        let HTML = `<div class="container">
-            颜色选择器
-        </div>`;
-        let CSS = `<style>
-        .container {
-        display: flex;
-        justify-content: center;
-        align-content: center;
-        visibility: hidden;
-        color: skyblue;
-        background-color:#fff;
-        }
-        </style>`;
-        return HTML + CSS;
-      }
-    },{
-      name:'连线方式',
-      children:[
-        {
-          name:'脑图曲线',
-          event:'click',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.lineStyle = 'curve';
-            toolBoxPlugin.resetLineStyle(root);
-            toolBoxPlugin.update(root);
-          }
-        },
-        {
-          name:'折线',
-          event:'click',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.lineStyle = 'polyline';
-            toolBoxPlugin.resetLineStyle(root);
-            toolBoxPlugin.update(root);
-          }
-        }
-      ]
-    },
-    {
-      name:'布局方式',
-      event: 'click',
-      func(self,pen,dom){
-        let root = dom.shadowRoot.querySelector('.root');
-        let divs = root.querySelectorAll('div');
-        let index = self.children.findIndex(i=>i.key === pen.mind.direction);
-        divs.forEach(i=>{
-          i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
-            i.setAttribute('fill','#DDDDE1');
-          });
-          i.querySelectorAll('.toolbox_direction_svg_base').forEach(i=>{
-            i.setAttribute('fill','#F8F8FC');
-          });
-          i.querySelectorAll('.toolbox_direction_svg_line').forEach(i=>{
-            i.setAttribute('stroke','#818187');
-          });
-        });
 
-        divs[index].querySelector('.toolbox_direction_svg_base').setAttribute('fill','#CDCDFC');
-        divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
-        divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
+let funcList =
+        [
+  {
+    name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
+    // 监听事件名
+    event: 'click',
+    /**
+     * @description 事件对应的回调函数
+     * @param self 返回该选项自身
+     * @param pen 返回当前操作的pen对象
+     * */
+    func: async (self,pen)=>{
+      toolBoxPlugin.addNode(pen,0);
+    },
+    // 显示的图标
+    img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
+    /**
+     * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
+     * @param self 此配置项自身
+     * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
+     * @return string dom字符串
+     * */
+  },
+  {
+    name:'重新布局',
+    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+        '    <title>重新布局</title>\n' +
+        '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+        '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
+        '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+        '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' +
+        '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
+        '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+        '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+        '                </g>\n' +
+        '            </g>\n' +
+        '        </g>\n' +
+        '    </g>\n' +
+        '</svg>',
+    event:'click',
+    func(self,pen){
+      let children = pen.mind?.children || [];
+      if(children.length >0){
+        toolBoxPlugin.update(pen,true);
+      }
+    },
+    // setDom(self,dom){
+    //   // draw your dom freeDom！！！
+    //   let result =  `<span>${self.name}</span>`;
+    //   return result;
+    // }
+  },
+  {
+    name:'重新布局下一级',
+    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+        '    <title>重新布局下一级</title>\n' +
+        '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+        '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
+        '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+        '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
+        '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
+        '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+        '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
+        '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
+        '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+        '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
+        '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
+        '                </g>\n' +
+        '            </g>\n' +
+        '        </g>\n' +
+        '    </g>\n' +
+        '</svg>',
+    event:'click',
+    func(self,pen){
+      let children = pen.mind?.children || [];
+      if(children.length >0){
+        toolBoxPlugin.update(pen,false);
+      }
+    }
+  },
+  {
+    name:'线条颜色',
+    /**
+     * @description 设置下拉框的样式，你也可以使用webComponent，或者将vue组件转换为webComponent
+     * @param self 本配置对象
+     * @param pen 返回当前pen对象
+     * @param dom 返回此容器dom
+     * */
+    children: [
+      {
+        name: '红色'
+      },{
+      name:'绿色'
+      }
+    ],
+    setChildrenDom(self, pen){
+      let dom = createDom('div',{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        position:'absolute',
+        visibility:'hidden',
+        top:'50px',
+        backgroundColor:'#fff',
+        borderRadius:'5px',
+        padding:'3px',
+        width: '185px',
+        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+      });
+
+      return dom ;
+    }
+  },{
+    name:'连线方式',
+    // 隐藏下拉列表是触发
+    onHideChildDom(){
+      return false
+    },
+    // 下拉框元素列表  可通过setDom方法改变自身
+    children:[
+      {
+        name:'脑图曲线',
+        event:'click',
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.lineStyle = 'curve';
+          toolBoxPlugin.resetLineStyle(root);
+          toolBoxPlugin.update(root);
+        }
       },
-      children:[
-        {
-          key:'right',
-          name:'',
-          event:'click',
-          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
+      {
+        name:'折线',
+        event:'click',
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.lineStyle = 'polyline';
+          toolBoxPlugin.resetLineStyle(root);
+          toolBoxPlugin.update(root);
+        }
+      }
+    ]
+  },
+  {
+    name:'布局方式',
+    event: 'click',
+    onHideChildDom(){
+      console.log('hide')
+    },
+    func(self,pen,dom){
+      let root = dom.shadowRoot.querySelector('.root');
+      let divs = root.querySelectorAll('div');
+      let index = self.children.findIndex(i=>i.key === pen.mind.direction);
+      divs.forEach(i=>{
+        i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
+          i.setAttribute('fill','#DDDDE1');
+        });
+        i.querySelectorAll('.toolbox_direction_svg_base').forEach(i=>{
+          i.setAttribute('fill','#F8F8FC');
+        });
+        i.querySelectorAll('.toolbox_direction_svg_line').forEach(i=>{
+          i.setAttribute('stroke','#818187');
+        });
+      });
+
+      divs[index].querySelector('.toolbox_direction_svg_base').setAttribute('fill','#CDCDFC');
+      divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
+      divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
+    },
+    children:[
+      {
+        key:'right',
+        name:'',
+        event:'click',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
             '    <title>向右布局 9</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-633.000000, -684.000000)">\n' +
@@ -143,18 +205,18 @@ export let defaultFuncList = {
             '        </g>\n' +
             '    </g>\n' +
             '</svg>',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.direction = 'right';
-            toolBoxPlugin.resetDirection(root,'right',true);
-            toolBoxPlugin.update(root);
-          }
-        },
-        {
-          name:'',
-          key:'left',
-          event:'click',
-          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.direction = 'right';
+          toolBoxPlugin.resetDirection(root,'right',true);
+          toolBoxPlugin.update(root);
+        }
+      },
+      {
+        name:'',
+        key:'left',
+        event:'click',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
             '    <title>布局备份 8</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-541.000000, -684.000000)">\n' +
@@ -174,19 +236,19 @@ export let defaultFuncList = {
             '        </g>\n' +
             '    </g>\n' +
             '</svg>',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.direction = 'left';
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.direction = 'left';
 
-            toolBoxPlugin.resetDirection(root,'left',true);
-            toolBoxPlugin.update(root);
-          }
-        },
-        {
-          name:'',
-          key:'top',
-          event:'click',
-          icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
+          toolBoxPlugin.resetDirection(root,'left',true);
+          toolBoxPlugin.update(root);
+        }
+      },
+      {
+        name:'',
+        key:'top',
+        event:'click',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
             '    <title>布局备份 7</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-633.000000, -616.000000)">\n' +
@@ -206,17 +268,17 @@ export let defaultFuncList = {
             '        </g>\n' +
             '    </g>\n' +
             '</svg>',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.direction = 'top';
-            toolBoxPlugin.resetDirection(root,'top',true);
-            toolBoxPlugin.update(root);
-          }
-        },
-        {
-          name:'',
-          key:'bottom',
-          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.direction = 'top';
+          toolBoxPlugin.resetDirection(root,'top',true);
+          toolBoxPlugin.update(root);
+        }
+      },
+      {
+        name:'',
+        key:'bottom',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
             '    <title>布局备份 2</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-725.000000, -480.000000)">\n' +
@@ -236,33 +298,33 @@ export let defaultFuncList = {
             '        </g>\n' +
             '    </g>\n' +
             '</svg>',
-          event:'click',
-          func(self,pen){
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.direction = 'bottom';
-            toolBoxPlugin.resetDirection(root,'bottom',true);
-            toolBoxPlugin.update(root);
-          }
-        },
-      ],
-      // 设置下拉列表的样式和子元素布局
-      setChildrenDom(self,pen){
-        let dom = createDom('div',{
-          display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-start',
-          position:'absolute',
-          visibility:'hidden',
-          top:'50px',
-          backgroundColor:'#fff',
-          borderRadius:'5px',
-          padding:'3px',
-          zIndex: 999,
-          width: '185px',
-          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-        },'',undefined,'root');
-         dom.innerHTML = `
+        event:'click',
+        func(self,pen){
+          let root = (window).meta2d.findOne(pen.mind.rootId);
+          root.mind.direction = 'bottom';
+          toolBoxPlugin.resetDirection(root,'bottom',true);
+          toolBoxPlugin.update(root);
+        }
+      },
+    ],
+    // 设置下拉列表的样式和子元素布局
+    setChildrenDom(self,pen){
+      let dom = createDom('div',{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        position:'absolute',
+        visibility:'hidden',
+        top:'50px',
+        backgroundColor:'#fff',
+        borderRadius:'5px',
+        padding:'3px',
+        zIndex: 999,
+        width: '185px',
+        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+      },'',undefined,'root');
+      dom.innerHTML = `
         <style>
          .active {
           border-color: red;
@@ -270,18 +332,20 @@ export let defaultFuncList = {
         }
         </style>
        `;
-        dom.addEventListener('click',(e)=>{
-          dom.childNodes.forEach((i)=>{
-            if(i.tagName !== 'style' && i.nodeType == 1){
-              i.classList.remove('active');
-            }
-          });
-          e.target.classList.add('active');
+      dom.addEventListener('click',(e)=>{
+        dom.childNodes.forEach((i)=>{
+          if(i.tagName !== 'style' && i.nodeType == 1){
+            i.classList.remove('active');
+          }
         });
-        return dom ;
-      }
+        e.target.classList.add('active');
+      });
+      return dom ;
     }
-  ],
+  }
+]
+export let defaultFuncList = {
+  'root':funcList,
     'leaf':[
     {
       name: '新增同级节点',
@@ -291,7 +355,7 @@ export let defaultFuncList = {
         let index = parent.mind.children.indexOf(pen);
         await toolBoxPlugin.addNode(parent,index+1);
       },
-      icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
+      img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
     },
     {
       name: '新增子级节点',
@@ -299,16 +363,34 @@ export let defaultFuncList = {
       func: async (self,pen)=>{
         await toolBoxPlugin.addNode(pen,0);
       },
-      icon:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
+      img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
     },
     {
-      name:'仅计算子节点',
+      name:'重新布局下一级',
       event:'click',
       func(self,pen){
         if(pen.mind.children.length >0){
           toolBoxPlugin.update(pen,false);
         }
-      }
+      },
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+          '    <title>重新布局下一级</title>\n' +
+          '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+          '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
+          '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+          '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
+          '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
+          '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+          '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
+          '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
+          '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+          '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
+          '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
+          '                </g>\n' +
+          '            </g>\n' +
+          '        </g>\n' +
+          '    </g>\n' +
+          '</svg>'
     },{
       name:'连线方式',
       children:[
@@ -332,7 +414,7 @@ export let defaultFuncList = {
             // toolBoxPlugin.update(root);
           }
         }
-      ]
+      ],
     },
     {
       name:'布局方式',
@@ -366,6 +448,15 @@ export let defaultFuncList = {
             toolBoxPlugin.resetDirection(root,'right',true);
             toolBoxPlugin.resetLinePos(root,true)
             toolBoxPlugin.update(root);
+          },
+          /**
+           * @description 设置子元素的样式
+           * @param self 该配置项自身
+           * @param dom 返回该子元素所在的外部container容器
+           * */
+          setDom(self,dom){
+            console.log(self,dom)
+            return '5666'
           }
         },
         {
@@ -470,7 +561,7 @@ export let defaultFuncList = {
           justifyContent: 'flex-start',
           position:'absolute',
           visibility:'hidden',
-          top:'38px',
+          top:'50px',
           backgroundColor:'#fff',
           borderRadius:'5px',
           padding:'3px',

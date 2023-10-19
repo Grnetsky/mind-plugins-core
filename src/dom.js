@@ -70,6 +70,7 @@ export class ToolBox {
     this.box.style.display = 'flex';
     this.box.style.flexDirection = 'row';
   }
+  curItem = null
   translatePosition(pen){
     this.hide();
     const store = pen.calculative.canvas.store;
@@ -116,7 +117,7 @@ export class ToolBox {
           throw new Error('function setDom must return string or node object');
       }
     }else {
-      dom.attachShadow({mode: "open"}).innerHTML = (item.icon? `<img/ src="${item.icon}" title="${item.name}">` : item.name);
+      dom.attachShadow({mode: "open"}).innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name));
     }
 
     // 设置style样式
@@ -129,23 +130,28 @@ export class ToolBox {
       dom.addEventListener(item.event,eventFunc.bind(pen));
     }
     if(item.children || item.setChildrenDom){
+
+      // TODO 这里触发隐藏事件有问题
       dom.addEventListener('click',()=>{
-        //TODO 此处 container显示和隐藏 应当实现
-        // e.stopPropagation();
-        (dom).childrenDom.style.visibility === 'visible'? (dom).childrenDom.style.visibility = 'hidden' : (dom).childrenDom.style.visibility = 'visible';
+        // TODO 应当关闭其他的菜单项
+        this.funcList.filter(i=>i !== item).forEach(i=>{
+          if(i.dom.childrenDom){
+            // onHideChildDom 返回true为手动关闭，否则将自动关闭
+            (this.curItem?.onHideChildDom?.()) || ( i.dom.childrenDom.style.visibility = 'hidden' )
+          }
+        })
+        dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
       });
     }
     let containerDom = null;
     if(item.children && item.children.length > 0 || item.setChildrenDom){
       // 是否重写dom
-
-      // TODO setChildrenDom是否也需要实现影子dom
       if(
         typeof item.setChildrenDom === 'function'
       ){
         // 重新childDom
 
-        let childDom = item.setChildrenDom(item,pen,dom);
+        let childDom = item.setChildrenDom(item,pen);
         if(typeof childDom === 'string'){
           let div = document.createElement('div');
           div.innerHTML = childDom;
@@ -198,10 +204,11 @@ export class ToolBox {
       containerDom?.appendChild(fragment);
       containerDom.style.position = 'absolute';
       dom.shadowRoot.appendChild(containerDom);
-      (dom).childrenDom = containerDom;
+      dom.childrenDom = containerDom;
 
 // 添加样式到元素
     }
+    item.dom = dom
     return dom;
   }
   setFuncList(funcList){
@@ -213,3 +220,4 @@ export class ToolBox {
   }
 }
 
+// 隐藏dom逻辑

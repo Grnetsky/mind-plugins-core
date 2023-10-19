@@ -1,4 +1,4 @@
-import { setLifeCycleFunc } from "mind-diagram";
+import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine} from "@meta2d/core";
 import {ToolBox} from "./src/dom";
 import {defaultFuncList, generateColor} from "./src/default";
@@ -8,8 +8,8 @@ export * from './src/dom'
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
-    childrenGap: 20,
-    levelGap: 200,
+    childrenGap: 20, // 子节点间的间距
+    levelGap: 200, // 子级间的间距
     // 计算子节点的颜色和位置
     calChildrenPosAndColor(pen,recursion = true, position='right'){
         if(!pen)return;
@@ -141,7 +141,6 @@ export let toolBoxPlugin = {
     },
     // 重新设置连线的位置
     resetLinePos(pen,recursion = true){
-        console.pen.mind('执行resetLien');
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
@@ -242,6 +241,7 @@ export let toolBoxPlugin = {
                     childrenVisible: true,
                     visible: true,
                 };
+                window.MindManager.rootIds.push(pen)
                 // 跟随移动
                 toolBoxPlugin.combineLifeCycle(pen);
             }
@@ -252,6 +252,19 @@ export let toolBoxPlugin = {
     },
     uninstall(){
         globalThis.toolbox = null;
+        // 解绑生命周期
+        window.MindManager.rootIds?.forEach(i=>{
+            let root = meta2d.findOne(i)
+            this.unCombineLifeCycle(root)
+        })
+    },
+
+    unCombineLifeCycle(pen){
+        if(!pen.mind.children || pen.mind.children.length === 0)return;
+        this.combineLifeCycle(pen,true)
+        pen.mind.children.forEach(i=>{
+            this.unCombineLifeCycle(i)
+        })
     },
 
     funcList: defaultFuncList,
@@ -324,24 +337,28 @@ export let toolBoxPlugin = {
         }else {
             throw new Error('appendFuncList error: no such kind')
         }
-        },
-    combineLifeCycle(target){
+    },
+    combineLifeCycle(target,del = false){
         let toolbox = globalThis.toolbox;
-        setLifeCycleFunc(target,'onMove',(targetPen)=>{
+        const onMove = (targetPen)=>{
             toolbox.hide();
-        });
-        setLifeCycleFunc(target,'onDestroy',(targetPen)=>{
+        };
+        const onDestroy = (targetPen)=>{
             toolbox.hide();
             toolBoxPlugin.deleteNode(targetPen);
-        });
-        setLifeCycleFunc(target,'onMouseUp',(targetPen)=>{
+        };
+        const onMouseUp = (targetPen)=>{
             toolbox.bindPen(targetPen);
             toolbox.setFuncList(this.getFuncList(target));
             toolbox.translatePosition(targetPen);
-        });
-        setLifeCycleFunc(target,'onMouseDown',(targetPen)=>{
+        }
+        const onMouseDown = (targetPen)=>{
             toolbox.hide();
-        });
+        }
+        setLifeCycleFunc(target,'onMove',onMove,del);
+        setLifeCycleFunc(target,'onDestroy',onDestroy,del);
+        setLifeCycleFunc(target,'onMouseUp',onMouseUp,del);
+        setLifeCycleFunc(target,'onMouseDown',onMouseDown,del);
     },
 
     // setDirection(pen,direction){
@@ -374,7 +391,7 @@ export let toolBoxPlugin = {
             fontSize:16,
             borderRadius: pen.borderRadius,
         });
-
+        window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen);
@@ -391,7 +408,6 @@ export let toolBoxPlugin = {
         globalThis.toolbox.bindPen(newPen);
         globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
-        window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
     },
     update(pen,recursion = true){
         if(!pen)return;
@@ -399,8 +415,10 @@ export let toolBoxPlugin = {
         toolBoxPlugin.reSetLinesColor(pen,recursion);
         toolBoxPlugin.resetLineStyle(pen,recursion);
         toolBoxPlugin.render();
+        pluginsMessageChannels.publish('update')
     },
     render(){
         meta2d.render();
+        pluginsMessageChannels.publish('render')
     }
 };

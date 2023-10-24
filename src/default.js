@@ -101,7 +101,21 @@ let funcList =
      * */
     children: [
       {
-        name: '红色'
+        name: '红色',
+        setDom(self,pen){
+          let html = `<span>${self.name}</span>`
+          let css = `
+            <style>
+            span{
+            color:red;
+            font-size: 30px;
+            }
+</style
+          `;
+          let dom = createDom('span',{color:'red',fontSize:'30px'})
+          dom.attachShadow({mode:"open"}).innerHTML = html+css
+          return dom
+        }
       },{
       name:'绿色'
       }
@@ -121,7 +135,11 @@ let funcList =
         width: '185px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       });
-
+      dom.innerHTML = `<style>
+.toolbox_item:hover{
+    background-color:#6b6b6b;
+}
+</style>`
       return dom ;
     }
   },{

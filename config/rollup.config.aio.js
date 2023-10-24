@@ -15,6 +15,7 @@ module.exports = {
         name: common.name,
         banner: common.banner,
     },
+    external: ['mind-diagram','@meta2d/core'],
     plugins: [
         nodeResolve({
             main: true,

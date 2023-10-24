@@ -14,8 +14,7 @@
   "author": "",
   "license": "ISC",
   "peerDependencies": {
-    "@meta2d/core": "^1.0.32",
-    "mind-diagram": "file:C:\\Users\\Andy\\Desktop\\大屏\\meta2d.js\\dist\\mind-diagram"
+    "@meta2d/core": "^1.0.32"
   },
 
   "devDependencies": {
@@ -33,6 +32,7 @@
   "dependencies": {
     "@babel/runtime-corejs2": "^7.12.5",
     "@babel/runtime-corejs3": "^7.12.5",
-    "core-js": "^3.7.0"
+    "core-js": "^3.7.0",
+    "mind-diagram": "file:C:\\Users\\Andy\\Desktop\\大屏\\meta2d.js\\dist\\mind-diagram"
   }
 }

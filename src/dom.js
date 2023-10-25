@@ -94,7 +94,6 @@ export class ToolBox {
     });
     this.box.appendChild(fragmentChild);
   }
-
   /**
    * @description 创造子节点  设置样式 配置事件函数等；
    * @param pen 操作的图元
@@ -152,11 +151,15 @@ export class ToolBox {
         // 重新childDom
 
         let childDom = item.setChildrenDom(item,pen);
+
+        /**
+         * @description 若返回的是字符串，则在外部包裹一层div作为其container
+         * */
         if(typeof childDom === 'string'){
           let div = document.createElement('div');
           div.innerHTML = childDom;
           dom.shadowRoot.appendChild(div);
-          containerDom = div.childNodes[0];
+          containerDom = div
         }else{
           containerDom = childDom;
         }
@@ -181,7 +184,7 @@ export class ToolBox {
           {
             padding: '5px 8px'
           },i.event,function(){
-            i.func(i,this);
+            i.func(i, this, dom, item);
           }.bind(pen),'toolbox_item');
         if(i.setDom){
           let re = i.setDom(i,node);

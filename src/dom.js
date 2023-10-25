@@ -132,15 +132,12 @@ export class ToolBox {
     }
     if(item.children || item.setChildrenDom){
 
-      // TODO 这里触发隐藏事件有问题
       dom.addEventListener('click',()=>{
-        // TODO 应当关闭其他的菜单项
-        this.funcList.filter(i=>i !== item).forEach(i=>{
-          if(i.dom.childrenDom){
-            // onHideChildDom 返回true为手动关闭，否则将自动关闭
-            (this.curItem?.onHideChildDom?.()) || ( i.dom.childrenDom.style.visibility = 'hidden' )
-          }
-        })
+        // 关闭其他的菜单项
+        this.curItem?.onHideChildDom?.()
+        if(this.curItem !== item && this.curItem){
+          ( this.curItem.dom.childrenDom.style.visibility = 'hidden' )
+        }
         dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
       });
     }

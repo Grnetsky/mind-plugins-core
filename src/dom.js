@@ -100,9 +100,11 @@ export class ToolBox {
    * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
    * */
   setChildDom(pen, item ){
-    // 是否应该在这设置为WebComponent？
+    // 列表子元素的包含块
     const dom = document.createElement('div');
-    // TODO 影子DOM 实现 自定义工具栏item样式
+    // 执行初始化函数
+    item.init?.(item,pen,dom)
+
     if(typeof item.setDom === 'function'){
       let re = item.setDom(item,dom);
       switch (typeof re) {
@@ -186,6 +188,10 @@ export class ToolBox {
           },i.event,function(){
             i.func(i, this, dom, item);
           }.bind(pen),'toolbox_item');
+
+        //TODO 执行时机是否正确？？？
+        i.init?.(i,pen,node)
+
         if(i.setDom){
           let re = i.setDom(i,node);
           switch (typeof re) {

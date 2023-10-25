@@ -1,4 +1,4 @@
-import {createDom} from "./dom";
+import {createDom, ToolBox} from "./dom";
 import {toolBoxPlugin} from "../index";
 
 let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
@@ -51,7 +51,7 @@ let funcList =
         '    </g>\n' +
         '</svg>',
     event:'click',
-    func(self,pen){
+    func(self,pen,dom,father){
       let children = pen.mind?.children || [];
       if(children.length >0){
         toolBoxPlugin.update(pen,true);
@@ -92,7 +92,81 @@ let funcList =
     }
   },
   {
-    name:'线条颜色',
+    name:'边框样式',
+    color:'#4D4DFF',
+    dash:'5,5',
+    width:4,
+    /**
+     * @description 初始化函数
+     * @param self 配置项本身
+     * @param pen 木匾画笔
+     */
+    init(self,pen){
+      console.log("执行init",pen)
+      console.log(pen.lineDash,'lineDash')
+      self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
+    },
+    setDom(self){
+      let color = self.color
+      let dash = self.dash;
+      let width = self.width;
+      let HTML = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
+                    <title>边框样式</title>
+                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="未固定" transform="translate(-628.000000, -138.000000)">
+                            <g id="编组-2" transform="translate(253.000000, 135.000000)">
+                                <g id="边框颜色" transform="translate(375.000000, 3.000000)">
+                                    <rect id="透明底图" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="34" height="34"/>
+                                    <circle id="椭圆形" stroke="${color}" stroke-width="${width}" cx="17" cy="17" r="8" stroke-dasharray="${dash}"/>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>`
+      return HTML
+    },
+    children: [
+      {
+        name:'直线',
+        event: 'click',
+        func(self, pen, dom, father) {
+          meta2d.setValue({id:pen.id,lineDash:[0,0]})
+          father.dash = '0,0';
+          toolbox.renderChildren()
+        }
+      },
+      {
+        name:'虚线',
+        event: 'click',
+        func(self, pen, dom, father) {
+          meta2d.setValue({id:pen.id,lineDash:[5,5]})
+          father.dash = '5,5';
+          toolbox.renderChildren()
+        }
+      }
+    ]
+  },
+  {
+    name:'线条样式',
+    color:'#4D4DFF',
+    dash: '0,0',
+    width: 4,
+    setDom(self) {
+      let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
+        <title>连线样式</title>
+        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g id="未固定" transform="translate(-674.000000, -138.000000)">
+            <g id="编组-2" transform="translate(253.000000, 135.000000)">
+              <g id="连线颜色" transform="translate(421.000000, 3.000000)">
+                <rect id="透明底图" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="34" height="34"/>
+                <line x1="7.5" y1="17.5" x2="27.5" y2="17.5" id="直线-9" stroke="${self.color}" stroke-dasharray="${self.dash}" stroke-width="${self.width}" stroke-linecap="round"/>
+              </g>
+            </g>
+          </g>
+        </g>
+      </svg>`
+      return html
+    },
     /**
      * @description 设置下拉框的样式，你也可以使用webComponent，或者将vue组件转换为webComponent
      * @param self 本配置对象
@@ -102,6 +176,12 @@ let funcList =
     children: [
       {
         name: '红色',
+        event: 'click',
+        func(self,pen,dom,father){
+          father.color = 'red';
+          father.dash = '5,5'
+          toolbox.renderChildren()
+        },
         setDom(self,pen){
           let html = `<span>${self.name}</span>`
           let css = `

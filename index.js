@@ -43,7 +43,7 @@ export let toolBoxPlugin = {
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'left':
-                    child.mind.x = worldReact.x - child.width- toolBoxPlugin.levelGap;
+                    child.mind.x = worldReact.x - penRects[i].width - toolBoxPlugin.levelGap;
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'bottom':
@@ -167,7 +167,6 @@ export let toolBoxPlugin = {
                 case 'left':
                     penAnchor = pen.anchors[3];
                     childAnchor = child.anchors[1];
-
                     disconnectLine(child,childAnchor,line,lineAnchor1);
                     disconnectLine(pen,penAnchor,line,lineAnchor2);
                     break;

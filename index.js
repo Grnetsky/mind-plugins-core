@@ -1,5 +1,5 @@
 import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
-import {disconnectLine} from "@meta2d/core";
+import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./src/dom";
 import {defaultFuncList, generateColor} from "./src/default";
 
@@ -130,7 +130,7 @@ export let toolBoxPlugin = {
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
             const child = children[i];
-            let line = meta2d.findOne(child.connectedLines?.[0].lineId);
+            let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
                 meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
             }
@@ -139,58 +139,102 @@ export let toolBoxPlugin = {
             }
         }
     },
-    // 重新设置连线的位置
-    resetLinePos(pen,recursion = true){
+    // 重新设置连线的位置 TODO 有问题
+    resetLinePos(pen,pos,recursion = true){
         let children = pen.mind.children;
-        if(!children || children.length === 0 )return;
+        if(!children || children.length === 0 ){
+            pen.mind.direction = pos;
+            return;
+        };
         for(let i = 0 ;i<children.length;i++){
             const child = children[i];
             if(!child.connectedLines || child.connectedLines.length === 0)return;
-            let line = meta2d.findOne(child.connectedLines[0].lineId);
-            let prePen = meta2d.findOne(child.mind.preNodeId);
-            let prePenAnchor = null;
-            let lineAnchor1 = line.anchors[0];
+            let line = meta2d.findOne(child.connectedLines[0]?.lineId);
             let penAnchor = null;
+            let lineAnchor1 = line.anchors[0];
+            let childAnchor = null;
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
-            switch (prePen.mind.direction) {
+
+            // 改变之前是什么方向 来按要求断开
+            switch (pen.mind.direction) {
                 case 'right':
-                    prePenAnchor = prePen.anchors[1];
-                    penAnchor = pen.anchors[3];
+                    penAnchor = pen.anchors[1];
+                    childAnchor = child.anchors[3];
+
+                    disconnectLine(child,childAnchor,line,lineAnchor2);
+                    disconnectLine(pen,penAnchor,line,lineAnchor1);
                     break;
                 case 'left':
-                    prePenAnchor = prePen.anchors[3];
-                    penAnchor = pen.anchors[1];
+                    penAnchor = pen.anchors[3];
+                    childAnchor = child.anchors[1];
+
+                    disconnectLine(child,childAnchor,line,lineAnchor1);
+                    disconnectLine(pen,penAnchor,line,lineAnchor2);
                     break;
                 case 'bottom':
-                    prePenAnchor = prePen.anchors[2];
-                    penAnchor = pen.anchors[0];
+                    penAnchor = pen.anchors[2];
+                    childAnchor = child.anchors[0];
+
+                    disconnectLine(child,childAnchor,line,lineAnchor2);
+                    disconnectLine(pen,penAnchor,line,lineAnchor1);
                     break;
                 case 'top':
-                    prePenAnchor = prePen.anchors[0];
-                    penAnchor = pen.anchors[2];
+                    penAnchor = pen.anchors[0];
+                    childAnchor = child.anchors[2];
+
+                    disconnectLine(child,childAnchor,line,lineAnchor1);
+                    disconnectLine(pen,penAnchor,line,lineAnchor2);
                     break;
             }
-            // debugger
-            disconnectLine(pen,penAnchor,line,lineAnchor2);
-            disconnectLine(prePen,prePenAnchor,line,lineAnchor1);
-            console.log('disconnectLine');
+
+            switch (pos){
+                case 'right':
+                    penAnchor = pen.anchors[1];
+                    childAnchor = child.anchors[3];
+                    connectLine(pen,penAnchor,line,lineAnchor1)
+                    connectLine(child,childAnchor,line,lineAnchor2)
+                    break;
+                case 'left':
+                    penAnchor = pen.anchors[3];
+                    childAnchor = child.anchors[1];
+                    connectLine(pen,penAnchor,line,lineAnchor2)
+                    connectLine(child,childAnchor,line,lineAnchor1)
+                    break;
+                case 'bottom':
+                    penAnchor = pen.anchors[2];
+                    childAnchor = child.anchors[0];
+                    connectLine(pen,penAnchor,line,lineAnchor1)
+                    connectLine(child,childAnchor,line,lineAnchor2)
+                    break;
+                case 'top':
+                    penAnchor = pen.anchors[0];
+                    childAnchor = child.anchors[2];
+                    connectLine(pen,penAnchor,line,lineAnchor2)
+                    connectLine(child,childAnchor,line,lineAnchor1)
+                    break;
+            }
+
             if(recursion){
-                toolBoxPlugin.resetLinePos(child,true);
+                toolBoxPlugin.resetLinePos(child,pos,true);
+                child.mind.direction = pos
             }
         }
+        pen.mind.direction = pos
+        meta2d.canvas.updateLines(pen)
     },
     // 递归修改子节点的direction属性
-    resetDirection(pen,direction,recursion = true){
-        let children = pen.mind.children;
-        if(!children || children.length === 0 )return;
-        for(let i = 0 ;i<children.length;i++){
-            const child = children[i];
-            child.mind.direction = direction;
-            if(recursion){
-                toolBoxPlugin.resetDirection(child,direction,true);
-            }
-        }
-    },
+    // resetDirection(pen,direction,recursion = true){
+    //     let children = pen.mind.children;
+    //     if(!children || children.length === 0 )return;
+    //     for(let i = 0 ;i<children.length;i++){
+    //         const child = children[i];
+    //         child.mind.direction = direction;
+    //         this.connectLine()
+    //         if(recursion){
+    //             toolBoxPlugin.resetDirection(child,direction,true);
+    //         }
+    //     }
+    // },
     // 删除连线
     deleteLines(pen){
         if(!pen)return;
@@ -327,7 +371,13 @@ export let toolBoxPlugin = {
         // 手写funclist返回功能列表的校验规则  可被重写
         return target.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']
     },
-    appendFuncList(kind,func){
+    /**
+     * @description 动态添加方法函数
+     * @param kind 添加到目标种类上
+     * @param func 方法函数
+     * */
+    appendFuncList(kind,
+                   ){
         if(typeof kind !=="string" || typeof func !== "function"){
             throw new Error('appendFuncList error: appendFuncList parma error ')
         }

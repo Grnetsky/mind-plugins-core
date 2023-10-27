@@ -1770,6 +1770,7 @@
       }
     },
     /**
+     * @description 自定义获取功能列表函数  返回值为最终展示的列表
      * @param target 当前pen图元*/
     getFuncList: function getFuncList(target) {
       // 手写funclist返回功能列表的校验规则  可被重写

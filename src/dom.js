@@ -102,6 +102,7 @@ export class ToolBox {
   setChildDom(pen, item ){
     // 列表子元素的包含块
     const dom = document.createElement('div');
+    let title = createDom('div',{},undefined,undefined,'toolbox_title')
     // 执行初始化函数
     item.init?.(item,pen,dom)
 
@@ -109,38 +110,31 @@ export class ToolBox {
       let re = item.setDom(item,dom);
       switch (typeof re) {
         case "string":
-          dom.attachShadow({mode: "open"}).innerHTML = re;
+          title.innerHTML = re
+          dom.attachShadow({mode: "open"}).appendChild(title);
           break;
         case "object":
-          dom.attachShadow({mode: "open"}).appendChild(re);
+          title.appendChild(re)
+          dom.attachShadow({mode: "open"}).appendChild(title);
           break;
         default:
           throw new Error('function setDom must return string or node object');
       }
     }else {
-      dom.attachShadow({mode: "open"}).innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name));
+      title.innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name))
+      dom.attachShadow({mode: "open"}).appendChild(title);
     }
 
     // 设置style样式
     typeof item.style === 'object' && this.setStyle(dom, item.style);
     if(item.event){
-      let eventFunc = function (){
+      let eventFunc = function (e){
         // 绑定事件
         item.func(item,this,dom);
       };
       dom.addEventListener(item.event,eventFunc.bind(pen));
     }
-    if(item.children || item.setChildrenDom){
 
-      dom.addEventListener('click',()=>{
-        // 关闭其他的菜单项
-        this.curItem?.onHideChildDom?.()
-        if(this.curItem !== item && this.curItem){
-          ( this.curItem.dom.childrenDom.style.visibility = 'hidden' )
-        }
-        dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
-      });
-    }
     let containerDom = null;
     if(item.children && item.children.length > 0 || item.setChildrenDom){
       // 是否重写dom
@@ -156,6 +150,7 @@ export class ToolBox {
          * */
         if(typeof childDom === 'string'){
           let div = document.createElement('div');
+          item.closeChildDom?.() || (div.style.visibility = 'hidden');
           div.innerHTML = childDom;
           dom.shadowRoot.appendChild(div);
           containerDom = div
@@ -182,8 +177,10 @@ export class ToolBox {
         let node = createDom('div',
           {
             padding: '5px 8px'
-          },i.event,function(){
-            i.func(i, this, dom, item);
+          },i.event,function(e){
+              console.log(i.stopPropagation,'xxxxxxxx')
+              i.stopPropagation?e.stopPropagation():'';
+              i.func(i, this, dom, item);
           }.bind(pen),'toolbox_item');
 
         //TODO 执行时机是否正确？？？
@@ -208,6 +205,7 @@ export class ToolBox {
       }
       dom.style.position = 'relative';
       containerDom?.appendChild(fragment);
+      containerDom.classList.add('toolbox_container')
       containerDom.style.position = 'absolute';
       dom.shadowRoot.appendChild(containerDom);
       dom.childrenDom = containerDom;
@@ -215,6 +213,48 @@ export class ToolBox {
 // 添加样式到元素
     }
     item.dom = dom
+
+
+    // 事件处理
+    if(item.children || item.setChildrenDom || item.closeOther){
+
+      // 打开下拉菜单事件
+      title.addEventListener((item.openChildDomEvent || 'click'),()=>{
+        // 关闭其他选项
+        console.log('打开',item.openChildDomEvent)
+        if(this.curItem !== item && this.curItem){
+          item.closeChildDom?.() || (this.curItem.dom.childrenDom && ( this.curItem.dom.childrenDom.style.visibility = 'hidden' ))
+        }
+        // 将打开逻辑交给用户 或者
+        item.openChildDom?.(dom) || (dom.childrenDom && (dom.childrenDom.style.visibility = 'visible'));
+
+        // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+        item.onOpenChildDom?.()
+        this.curItem = item
+      })
+
+      // 关闭下拉菜单
+      !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
+        // 可手动派发隐藏函数
+        this.curItem?.onHideChildDom?.()
+        console.log('隐藏',item.closeChildDomEvent)
+        item.closeChildDom?.() || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
+        this.curItem = null
+      })
+
+      // 原打开关闭下来列表 事件
+      // dom.addEventListener((item.childVisibleEvent || 'click'),(e)=>{
+      //   console.log('触发dom click')
+      //   // 关闭其他的菜单项
+      //   this.curItem?.onHideChildDom?.()
+      //   if(this.curItem !== item && this.curItem){
+      //     ( this.curItem.dom.childrenDom.style.visibility = 'hidden' )
+      //   }
+      //   dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
+      // });
+
+    }
+
     return dom;
   }
   setFuncList(funcList){
@@ -225,5 +265,3 @@ export class ToolBox {
     this.setFuncList([]);
   }
 }
-
-// 隐藏dom逻辑

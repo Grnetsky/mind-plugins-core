@@ -143,7 +143,7 @@ export class ToolBox {
       ){
         // 重新childDom
 
-        let childDom = item.setChildrenDom(item,pen);
+        let childDom = item.setChildrenDom(item,pen,dom);
 
         /**
          * @description 若返回的是字符串，则在外部包裹一层div作为其container
@@ -178,7 +178,6 @@ export class ToolBox {
           {
             padding: '5px 8px'
           },i.event,function(e){
-              console.log(i.stopPropagation,'xxxxxxxx')
               i.stopPropagation?e.stopPropagation():'';
               i.func(i, this, dom, item);
           }.bind(pen),'toolbox_item');

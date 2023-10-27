@@ -131,26 +131,82 @@ let funcList =
                 </svg>`
       return HTML
     },
-    children: [
-      {
-        name:'直线',
-        event: 'click',
-        func(self, pen, dom, father) {
-          meta2d.setValue({id:pen.id,lineDash:[0,0]})
-          father.dash = '0,0';
-          toolbox.renderChildren()
+    setChildrenDom(self, pen) {
+      let dom = createDom('div',{
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        position:'absolute',
+        visibility:'hidden',
+        top:'50px',
+        backgroundColor:'#fff',
+        borderRadius:'5px',
+        padding:'3px',
+        width: '185px',
+        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+      });
+      dom.attachShadow({mode:'open'})
+
+      let css = `          
+      <style>
+        .title {
+            font-size: 30px;
         }
-      },
-      {
-        name:'虚线',
-        event: 'click',
-        func(self, pen, dom, father) {
-          meta2d.setValue({id:pen.id,lineDash:[5,5]})
-          father.dash = '5,5';
-          toolbox.renderChildren()
-        }
+      </style>`
+
+
+      let html = `
+      <div>
+        <div class="style">
+          <div class="title">边框粗细</div>
+          <div class="main">
+            <input type="range" max="20" onchange="MindManager.transfer.sliderChange(this.value)" id="width">
+          </div>
+        </div>
+      </div>`
+
+      // 直接通过innerHTML会把script标签当做字符串解析，不会执行 应当使用appendChild
+      // // TODO 问题：text无法传递上下文使得 无法去修改self的值从而无法进行功能操作。
+      // script.textContent =  `
+      //   function sliderChange(e) {
+      //   }
+      //  `
+      MindManager.transfer.sliderChange = (value)=>{
+        self.width = value
+        toolbox.renderChildren()
+        meta2d.setValue({
+          id:pen.id,
+          lineWidth: value
+        })
       }
-    ]
+      dom.shadowRoot.innerHTML = html + css
+      // dom.shadowRoot.appendChild(script)
+      return dom
+      },
+
+    closeChildDomEvent: 'none'
+
+    // children: [
+    //   {
+    //     name:'直线',
+    //     event: 'click',
+    //     func(self, pen, dom, father) {
+    //       meta2d.setValue({id:pen.id,lineDash:[0,0]})
+    //       father.dash = '0,0';
+    //       toolbox.renderChildren()
+    //     }
+    //   },
+    //   {
+    //     name:'虚线',
+    //     event: 'click',
+    //     func(self, pen, dom, father) {
+    //       meta2d.setValue({id:pen.id,lineDash:[5,5]})
+    //       father.dash = '5,5';
+    //       toolbox.renderChildren()
+    //     }
+    //   }
+    // ]
   },
   {
     key:'lineStyle',
@@ -274,6 +330,27 @@ let funcList =
   {
     key:'layoutDirection ',
     name:'布局方式',
+    openChildDom(dom){
+      dom.classList.add('animate')
+      return true
+    },
+    closeChildDom(dom){
+      dom.style.top = 0
+      dom.style.opacity = 0
+
+      return true
+    },
+    setDom(self) {
+      let css = `<style>
+        .animate {
+            top: 0;
+            opacity: 1;
+            visibility: visible;
+           transition: all 1s ease;
+        }
+</style>`
+      return self.name + css
+    },
     event: 'click',
     onHideChildDom(){
       console.log('hide')

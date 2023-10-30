@@ -475,3 +475,4 @@ export let toolBoxPlugin = {
         pluginsMessageChannels.publish('render')
     }
 };
+

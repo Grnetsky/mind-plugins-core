@@ -1,6 +1,6 @@
 import {createDom, ToolBox} from "./dom";
 import {toolBoxPlugin} from "../index";
-
+import {template} from "./parse";
 let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
@@ -102,6 +102,8 @@ let funcList =
     color:'#4D4DFF',
     dash:'5,5',
     width:4,
+    colorList:['#FF2318','#9C64A2','#B4C926','#0191B3',
+      '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'],
     /**
      * @description 初始化函数
      * @param self 配置项本身
@@ -111,6 +113,8 @@ let funcList =
       console.log("执行init",pen)
       console.log(pen.lineDash,'lineDash')
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
+      self.width = pen.lineWidth;
+      self.color = pen.color || '#000'
     },
     setDom(self){
       let color = self.color
@@ -142,49 +146,171 @@ let funcList =
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
-        padding:'3px',
-        width: '185px',
+        padding:'16px',
+        width: '140px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       });
       dom.attachShadow({mode:'open'})
+     let str = template(self,{
+       template:`
+          <div class="container">
+              <div class="item">
+                <div class="title">边框粗细</div>
+                <div class="main">
+                  <input type="range" max="10" style="width: 100px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="vertical-align: top;margin-left: 10px">${self.width}</span>
+                </div>
+              </div>
+                  <div class="item">
+                <div class="title">边框样式</div>
+                <div class="main_style ">
+                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" onclick="setLineStyle(true)">
+                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
+                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
+                            <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
+                                <line x1="403" y1="307" x2="479" y2="307" id="直线-12备份-9"/>
+                            </g>
+                        </g>
+                    </svg>
+                  </div>
+                  <div class="style_item" ${self.dash !== '0,0'?'style_active':''} data-style="虚线" onclick="setLineStyle(false)">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
+                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
+                            <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
+                                <line x1="403" y1="307" x2="479" y2="307" id="直线-12备份-9"/>
+                            </g>
+                        </g>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="title">边框颜色                     
+                <label for="color">
+                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698652989707" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="14230" width="20" height="20"><path d="M716.288 140.501333a42.666667 42.666667 0 0 1 60.373333 0l90.496 90.496a42.666667 42.666667 0 0 1 0 60.330667l-120.661333 120.704L595.626667 261.12l120.661333-120.661333zM520.192 185.770667l301.696 301.653333-60.330667 60.373333-301.653333-301.696 60.288-60.330666z" fill="#7d7878" p-id="14231"/><path d="M580.565333 366.762667l-60.373333-60.330667-362.026667 362.026667V853.333333l181.034667-3.84 362.026667-362.026666-60.330667-60.373334-331.861333 331.904-60.373334-60.373333 331.904-331.861333z" fill="#7d7878" p-id="14232"/></svg></div>
+                  <input id="color" style="display: none" type="color" onchange="setColor(event,this.value)" value="${self.color}">
+                </label>                
+                     <div class="main">
 
-      let css = `          
-      <style>
-        .title {
-            font-size: 30px;
+                     <div class="colorList" onclick="setColor(event)">
+                     ${self.colorList.map((i,index)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
+                     </div>
+                </div>
+              </div>
+          </div>`,
+       scripts:{
+         mounted(){ // 生命周期函数
+         },
+         setLineStyle(style){
+           console.log(style)
+           let res = style?[0,0]:[5,5]
+           meta2d.setValue({
+             id:pen.id,
+             lineDash: res
+           })
+         },
+          sliderChange: (value)=>{
+           dom.shadowRoot.querySelector('#t').innerHTML = value
+            self.width = value
+            // toolbox.renderChildren()
+            meta2d.setValue({
+              id:pen.id,
+              lineWidth: value
+            })
+          },
+         setColor(e,value){
+            let color = ''
+            if(!value){
+              let t = e.target
+              let list = dom.shadowRoot.querySelector('.colorList')
+              if(t === list)return
+              Array.from(list.children).forEach(i=>i.classList.remove('active'))
+              t.classList.add('active')
+              color = t.dataset.color
+            }else {
+              color = value
+            }
+           meta2d.setValue({
+             id:pen.id,
+             color
+           })
+         }
+        },
+       style:`<style>
+        .container {
+            overflow: hidden;
         }
-      </style>`
-
-
-      let html = `
-      <div>
-        <div class="style">
-          <div class="title">边框粗细</div>
-          <div class="main">
-            <input type="range" max="20" onchange="MindManager.transfer.sliderChange(this.value)" id="width">
-          </div>
-        </div>
-      </div>`
-
-      // 直接通过innerHTML会把script标签当做字符串解析，不会执行 应当使用appendChild
-      // // TODO 问题：text无法传递上下文使得 无法去修改self的值从而无法进行功能操作。
-      // script.textContent =  `
-      //   function sliderChange(e) {
-      //   }
-      //  `
-      MindManager.transfer.sliderChange = (value)=>{
-        self.width = value
-        toolbox.renderChildren()
-        meta2d.setValue({
-          id:pen.id,
-          lineWidth: value
-        })
-      }
-      dom.shadowRoot.innerHTML = html + css
-      // dom.shadowRoot.appendChild(script)
+        .main {
+        
+        }
+        .style_active{
+            width: 30%;
+            background-color:#fff;
+            height: 20px;
+            box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+        .active{
+            border: 3px solid deepskyblue !important;
+        }
+        .colorList {
+            display: flex;
+            justify-content: space-between;
+            align-content: space-between;
+            flex-wrap: wrap;
+        }       
+        .main_style {
+            display: flex;
+            width: 100%;
+            height: 26px;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 5px;
+            background-color:#f7f7f9;
+        }
+        .style_item {
+            width:40%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            justify-content: center;
+        }
+        .color_item {
+            width: 20px;
+            height: 20px;
+            border: 3px solid;
+            margin: 5px 5px 5px 0;
+            border-radius: 2px;
+        }
+        .color_item:hover {
+            border: 3px solid rgba(128,128,128,0.5) !important;
+        }
+       .item {
+          display:flex;
+          justify-content: flex-start;
+          align-items: flex-start;
+          flex-direction: column;
+          margin-bottom: 14px;
+       }
+       .title {
+          width: 100%;
+          height: 17px;
+          font-size: 16px;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          font-family: PingFang SC, PingFang SC-Regular;
+          font-weight: 400;
+          text-align: left;
+          color: #7d7878;
+          line-height: 17px;
+          margin-bottom: 14px;
+        }
+    </style> 
+        `
+     })
+      dom.shadowRoot.innerHTML = str
       return dom
       },
-
     closeChildDomEvent: 'none'
 
     // children: [
@@ -332,13 +458,12 @@ let funcList =
     name:'布局方式',
     openChildDom(dom){
       dom.classList.add('animate')
-      return true
+      return false
     },
     closeChildDom(dom){
-      dom.style.top = 0
-      dom.style.opacity = 0
-
-      return true
+      // dom.style.top = 0
+      // dom.style.opacity = 0
+      return false
     },
     setDom(self) {
       let css = `<style>

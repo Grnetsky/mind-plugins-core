@@ -100,7 +100,9 @@ export class ToolBox {
    * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
    * */
   setChildDom(pen, item ){
+    // console.log('执行rerender',item)
     // 列表子元素的包含块
+    // if(item.dom)item.dom.parentNode.removeChild(item.dom);
     const dom = document.createElement('div');
     let title = createDom('div',{},undefined,undefined,'toolbox_title')
     // 执行初始化函数
@@ -176,11 +178,11 @@ export class ToolBox {
       for(let i of item.children || []){
         let node = createDom('div',
           {
-            padding: '5px 8px'
+            margin: '5px 8px'
           },i.event,function(e){
               i.stopPropagation?e.stopPropagation():'';
               i.func(i, this, dom, item);
-          }.bind(pen),'toolbox_item');
+          }.bind(pen),'children_item');
 
         //TODO 执行时机是否正确？？？
         i.init?.(i,pen,node)
@@ -198,7 +200,7 @@ export class ToolBox {
               throw new Error('function setDom must return string or node object');
           }
         }else {
-          node.innerHTML = (i.icon && i.name)? '<span style="padding-right: 30px">'+ i.icon+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
+          node.innerHTML = (i.icon && i.name)? '<span style="padding-right: 30px;" >'+ i.icon+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
         }
         fragment.appendChild(node);
       }
@@ -262,5 +264,9 @@ export class ToolBox {
   }
   clearFuncList(){
     this.setFuncList([]);
+  }
+
+  reRenderChildDom(){
+    this.curItem.dom.removeChild(this.curItem.dom.childNodes[0])
   }
 }

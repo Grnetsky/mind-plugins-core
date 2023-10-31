@@ -69,9 +69,6 @@ function parse(html){
 
 // 该数据是否为字面量
 function isLiteral(_) {
-
-    console.log(_,'mmmmmmmmmmmmmmmmmmmmm')
-
     // 判断是否为字符串
     if(_.startsWith('"') || _.startsWith("'"))return true
     // 判断是否为数字

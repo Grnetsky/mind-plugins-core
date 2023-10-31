@@ -51,13 +51,13 @@ export let toolBoxPlugin = {
                     child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
                     child.mind.y = worldReact.y - child.height - toolBoxPlugin.levelGap;
             }
-            child.mind.color = nodeColor;
+            if(!child.mind.color)child.mind.color = nodeColor;
             if(child.mind.visible){
                 meta2d.setValue({
                     id: child.id,
                     x: child.mind.x,
                     y: child.mind.y,
-                    color: nodeColor
+                    color: child.mind.color
                 },{render:false});
                 meta2d.setVisible(child,true,false);
             }else{
@@ -97,6 +97,10 @@ export let toolBoxPlugin = {
                 line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
                 break;
         }
+        meta2d.setValue({
+            id:line.id,
+            lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth
+        },{render:false})
         meta2d.updateLineType(line, option.style);
     },
 
@@ -110,7 +114,7 @@ export let toolBoxPlugin = {
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
-                line.mind.color = pen.mind.color || colors.next().value;
+                line.mind.color =pen.mind.lineColor|| pen.mind.color || colors.next().value;
                 meta2d.setValue({
                     id:line.lineId,
                     color: line.mind.color
@@ -123,13 +127,21 @@ export let toolBoxPlugin = {
     },
     // 重新递归设置连线的样式
     resetLineStyle(pen,recursion = true){
+        console.log('reset')
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
+        let root = meta2d.findOne(pen.mind.rootId)
         for(let i = 0 ;i<children.length;i++){
             const child = children[i];
             let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
                 meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
+                meta2d.setValue({
+                    id:line.id,
+                    lineWidth: root.mind.lineWidth
+                },{
+                    render:false
+                })
             }
             if(recursion){
                 toolBoxPlugin.resetLineStyle(child,true);
@@ -277,9 +289,10 @@ export let toolBoxPlugin = {
                     width: 0, // 包含了自己和子节点的最大宽度
                     height: 0, // 包含了自己和子节点的最大高度
                     direction:'right',
-                    lineStyle: 'polyline',
+                    lineStyle: 'curve',
                     childrenVisible: true,
                     visible: true,
+                    lineWidth: 2
                 };
                 window.MindManager.rootIds.push(pen)
                 // 跟随移动

@@ -102,16 +102,16 @@ let funcList =
     color:'#4D4DFF',
     dash:'5,5',
     width:4,
-    colorList:['#FF2318','#9C64A2','#B4C926','#0191B3',
-      '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'],
+    colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
+      '#6ffd97','#efe864','#ff931a','#fa7878'],
+    openChildDomEvent:'mouseenter',
+    closeChildDomEvent: 'mouseleave',
     /**
      * @description 初始化函数
      * @param self 配置项本身
      * @param pen 木匾画笔
      */
     init(self,pen){
-      console.log("执行init",pen)
-      console.log(pen.lineDash,'lineDash')
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
       self.width = pen.lineWidth;
       self.color = pen.color || '#000'
@@ -157,22 +157,22 @@ let funcList =
               <div class="item">
                 <div class="title">边框粗细</div>
                 <div class="main">
-                  <input type="range" max="10" style="width: 100px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="vertical-align: top;margin-left: 10px">${self.width}</span>
+                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
                   <div class="item">
                 <div class="title">边框样式</div>
                 <div class="main_style ">
-                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" onclick="setLineStyle(true)">
+                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" onclick="setOutLineStyle(true)">
                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
-                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
+                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
                                 <line x1="403" y1="307" x2="479" y2="307" id="直线-12备份-9"/>
                             </g>
                         </g>
                     </svg>
                   </div>
-                  <div class="style_item" ${self.dash !== '0,0'?'style_active':''} data-style="虚线" onclick="setLineStyle(false)">
+                  <div class="style_item ${self.dash !== '0,0'?'style_active':''}" data-style="虚线" onclick="setOutLineStyle(false)">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -186,7 +186,23 @@ let funcList =
               <div class="item">
                 <div class="title">边框颜色                     
                 <label for="color">
-                  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698652989707" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="14230" width="20" height="20"><path d="M716.288 140.501333a42.666667 42.666667 0 0 1 60.373333 0l90.496 90.496a42.666667 42.666667 0 0 1 0 60.330667l-120.661333 120.704L595.626667 261.12l120.661333-120.661333zM520.192 185.770667l301.696 301.653333-60.330667 60.373333-301.653333-301.696 60.288-60.330666z" fill="#7d7878" p-id="14231"/><path d="M580.565333 366.762667l-60.373333-60.330667-362.026667 362.026667V853.333333l181.034667-3.84 362.026667-362.026666-60.330667-60.373334-331.861333 331.904-60.373334-60.373333 331.904-331.861333z" fill="#7d7878" p-id="14232"/></svg></div>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="17px" viewBox="0 0 18 17" version="1.1">
+    <title>吸管</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="未固定" transform="translate(-279.000000, -349.000000)" stroke="#818187">
+            <g id="编组-6备份-2" transform="translate(208.000000, 188.000000)">
+                <g id="吸管" transform="translate(72.062370, 161.000000)">
+                    <g id="编组-8" transform="translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)">
+                        <path d="M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z" id="形状结合"/>
+                        <path d="M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z" id="形状结合"/>
+                        <line x1="0.390127879" y1="5.78228307" x2="7.41242971" y2="5.78228307" id="直线-13" stroke-linecap="round"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>                  
+                  </div>
                   <input id="color" style="display: none" type="color" onchange="setColor(event,this.value)" value="${self.color}">
                 </label>                
                      <div class="main">
@@ -198,14 +214,24 @@ let funcList =
               </div>
           </div>`,
        scripts:{
+         // 能在这里面获取到dom
          mounted(){ // 生命周期函数
          },
-         setLineStyle(style){
-           console.log(style)
+         setOutLineStyle(style){
            let res = style?[0,0]:[5,5]
            meta2d.setValue({
              id:pen.id,
              lineDash: res
+           })
+           // toolbox.renderChildren()
+           let c = dom.shadowRoot.querySelectorAll('.style_item')
+           c.forEach(i=>{
+             i.classList.remove('style_active')
+             if(i.dataset.style === '直线' && style){
+                i.classList.add('style_active')
+             }else if(i.dataset.style === '虚线' && !style) {
+                i.classList.add('style_active')
+             }
            })
          },
           sliderChange: (value)=>{
@@ -233,6 +259,7 @@ let funcList =
              id:pen.id,
              color
            })
+           pen.mind.color = color
          }
         },
        style:`<style>
@@ -240,14 +267,17 @@ let funcList =
             overflow: hidden;
         }
         .main {
-        
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
         }
         .style_active{
             width: 30%;
             background-color:#fff;
             height: 20px;
-            box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
+            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
         }
         .active{
             border: 3px solid deepskyblue !important;
@@ -261,14 +291,15 @@ let funcList =
         .main_style {
             display: flex;
             width: 100%;
-            height: 26px;
+            height: 30px;
             justify-content: space-around;
             align-items: center;
-            border-radius: 5px;
+            border-radius: 3px;
             background-color:#f7f7f9;
         }
         .style_item {
-            width:40%;
+            width:47%;
+            height: 22px;
             display: flex;
             align-items: center;
             overflow: hidden;
@@ -311,8 +342,6 @@ let funcList =
       dom.shadowRoot.innerHTML = str
       return dom
       },
-    closeChildDomEvent: 'none'
-
     // children: [
     //   {
     //     name:'直线',
@@ -338,11 +367,12 @@ let funcList =
     key:'lineStyle',
     name:'线条样式',
     color:'#4D4DFF',
-    dash: '0,0',
-    width: 4,
+    lineStyle: 'curve',
+    width: 3,
     init(self,pen){
-      console.log(self,pen)
-      self.color = pen.calculative.color || '#000'
+      self.color = pen.calculative.color || '#000';
+      self.lineStyle = pen.mind.lineStyle;
+      self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
     },
     setDom(self) {
       let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
@@ -366,40 +396,8 @@ let funcList =
      * @param pen 返回当前pen对象
      * @param dom 返回此容器dom
      * */
-    children: [
-      {
-        name: '红色',
-        event: 'click',
-        func(self,pen,dom,father){
-          father.color = 'red';
-          meta2d.setValue({id:pen.id,color:'red'})
-          toolbox.renderChildren()
-        },
-        setDom(self,pen){
-          let html = `<span>${self.name}</span>`
-          let css = `
-            <style>
-            span{
-            color:red;
-            font-size: 30px;
-            }
-</style
-          `;
-          let dom = createDom('span',{color:'red',fontSize:'30px'})
-          dom.attachShadow({mode:"open"}).innerHTML = html+css
-          return dom
-        }
-      },
-      {
-        name:'绿色',
-        event: 'click',
-        func(self,pen,dom,father){
-          father.color = 'green';
-          meta2d.setValue({id:pen.id,color:'green'})
-          toolbox.renderChildren()
-        },
-      }
-    ],
+    colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
+      '#6ffd97','#efe864','#ff931a','#fa7878'],
     setChildrenDom(self, pen){
       let dom = createDom('div',{
         display: 'flex',
@@ -411,50 +409,206 @@ let funcList =
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
-        padding:'3px',
-        width: '185px',
+        padding:'16px',
+        width: '140px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       });
-      dom.innerHTML = `<style>
-.toolbox_item:hover{
-    background-color:#6b6b6b;
-}
-</style>`
+      dom.attachShadow({mode:'open'})
+      let str = template(self,{
+        template:`
+          <div class="container">
+                <div class="item">
+                <div class="title">线条粗细</div>
+                <div class="main">
+                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                </div>
+              </div>
+            <div class="item">
+                <div class="title">连线样式</div>
+                <div class="main_style ">
+                  <div class="style_item ${self.lineStyle === 'curve'?'style_active':''}" data-style="曲线" onclick="setLineStyle(true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50px" height="20px">
+                  <g fill="none" stroke="black" stroke-width="1">
+                    <path d="M0 9 a100,50 0 0,1 85,0"></path>
+                  </g>
+                </svg>
+                  </div>
+                  <div class="style_item ${self.lineStyle === 'polyline'?'style_active':''}" data-style="折线" onclick="setLineStyle(false)">
+                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50px" height="20px">
+                    <g fill="none" stroke="black" stroke-width="1">
+                      <path d="M0 4 l25 0 l0 12 l40 0"></path>
+                    </g>
+                  </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="title">连线颜色                     
+                <label for="color">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="17px" viewBox="0 0 18 17" version="1.1">
+    <title>吸管</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="未固定" transform="translate(-279.000000, -349.000000)" stroke="#818187">
+            <g id="编组-6备份-2" transform="translate(208.000000, 188.000000)">
+                <g id="吸管" transform="translate(72.062370, 161.000000)">
+                    <g id="编组-8" transform="translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)">
+                        <path d="M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z" id="形状结合"/>
+                        <path d="M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z" id="形状结合"/>
+                        <line x1="0.390127879" y1="5.78228307" x2="7.41242971" y2="5.78228307" id="直线-13" stroke-linecap="round"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>                  
+                  </div>
+                  <input id="color" style="display: none" type="color" onchange="setColor(event,this.value)" value="${self.color}">
+                </label>                
+                     <div class="main">
+
+                     <div class="colorList" onclick="setColor(event)">
+                     ${self.colorList.map((i,index)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
+                     </div>
+                </div>
+              </div>
+          </div>`,
+        scripts:{
+          sliderChange: (value)=>{
+            dom.shadowRoot.querySelector('#t').innerHTML = value
+            self.width = value
+            // toolbox.renderChildren()
+            // pen.connectedLines?.forEach(i=>{
+            //   meta2d.setValue({
+            //     id:i.lineId,
+            //     lineWidth: value
+            //   })
+            // })
+            let root = meta2d.findOne(pen.mind.rootId)
+            root.mind.lineWidth = value
+            toolBoxPlugin.resetLineStyle(root);
+          },
+          setLineStyle(value){
+            let res = value?'curve':'polyline'
+            // toolbox.renderChildren()
+            let c = dom.shadowRoot.querySelectorAll('.style_item')
+            c.forEach(i=>{
+              i.classList.remove('style_active')
+              if(i.dataset.style === '曲线' && value){
+                i.classList.add('style_active')
+              }else if(i.dataset.style === '折线' && !value) {
+                i.classList.add('style_active')
+              }
+            })
+            let root = (window).meta2d.findOne(pen.mind.rootId);
+            root.mind.lineStyle = res
+            toolBoxPlugin.resetLineStyle(root);
+            // toolBoxPlugin.update(root);
+          },
+          setColor(e,value){
+            let color = ''
+            if(!value){
+              let t = e.target
+              let list = dom.shadowRoot.querySelector('.colorList')
+              if(t === list)return
+              Array.from(list.children).forEach(i=>i.classList.remove('active'))
+              t.classList.add('active')
+              color = t.dataset.color
+            }else {
+              color = value
+            }
+            pen.connectedLines?.forEach(i=>{
+              meta2d.setValue({
+                id:pen.id,
+                'mind.lineColor':color
+              })
+            })
+            toolBoxPlugin.update(pen)
+          }
+        },
+        style:`<style>
+        .container {
+            overflow: hidden;
+        }
+        .main {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .style_active{
+            width: 30%;
+            background-color:#fff;
+            height: 20px;
+            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        .active{
+            border: 3px solid deepskyblue !important;
+        }
+        .colorList {
+            display: flex;
+            justify-content: space-between;
+            align-content: space-between;
+            flex-wrap: wrap;
+        }       
+        .main_style {
+            display: flex;
+            width: 100%;
+            height: 30px;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 3px;
+            background-color:#f7f7f9;
+        }
+        .style_item {
+            width:47%;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            justify-content: center;
+        }
+        .color_item {
+            width: 20px;
+            height: 20px;
+            border: 3px solid;
+            margin: 5px 5px 5px 0;
+            border-radius: 2px;
+        }
+        .color_item:hover {
+            border: 3px solid rgba(128,128,128,0.5) !important;
+        }
+       .item {
+          display:flex;
+          justify-content: flex-start;
+          align-items: flex-start;
+          flex-direction: column;
+          margin-bottom: 14px;
+       }
+       .title {
+          width: 100%;
+          height: 17px;
+          font-size: 16px;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          font-family: PingFang SC, PingFang SC-Regular;
+          font-weight: 400;
+          text-align: left;
+          color: #7d7878;
+          line-height: 17px;
+          margin-bottom: 14px;
+        }
+    </style> 
+        `
+      })
+      dom.shadowRoot.innerHTML = str
       return dom ;
-    }
-  },{
-    key:'connectMode',
-    name:'连线方式',
-    // 隐藏下拉列表是触发
-    onHideChildDom(){
-      return false
     },
-    // 下拉框元素列表  可通过setDom方法改变自身
-    children:[
-      {
-        name:'脑图曲线',
-        event:'click',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          root.mind.lineStyle = 'curve';
-          toolBoxPlugin.resetLineStyle(root);
-          toolBoxPlugin.update(root);
-        }
-      },
-      {
-        name:'折线',
-        event:'click',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          root.mind.lineStyle = 'polyline';
-          toolBoxPlugin.resetLineStyle(root);
-          toolBoxPlugin.update(root);
-        }
-      }
-    ]
+    closeChildDomEvent: 'none'
   },
   {
-    key:'layoutDirection ',
+    key:'layoutDirection',
     name:'布局方式',
     openChildDom(dom){
       dom.classList.add('animate')
@@ -478,7 +632,6 @@ let funcList =
     },
     event: 'click',
     onHideChildDom(){
-      console.log('hide')
     },
     func(self,pen,dom){
       let root = dom.shadowRoot.querySelector('.root');
@@ -500,13 +653,14 @@ let funcList =
       divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
       divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
     },
+
     children:[
       {
         key:'right',
         name:'',
         event:'click',
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>向右布局 9</title>\n' +
+            '    <title>向右布局</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-633.000000, -684.000000)">\n' +
             '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
@@ -537,7 +691,7 @@ let funcList =
         key:'left',
         event:'click',
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>布局备份 8</title>\n' +
+            '    <title>向左布局</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-541.000000, -684.000000)">\n' +
             '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
@@ -567,7 +721,7 @@ let funcList =
         key:'top',
         event:'click',
         icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>布局备份 7</title>\n' +
+            '    <title>向上布局</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-633.000000, -616.000000)">\n' +
             '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
@@ -596,7 +750,7 @@ let funcList =
         name:'',
         key:'bottom',
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>布局备份 2</title>\n' +
+            '    <title>向下布局</title>\n' +
             '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
             '        <g id="未固定" transform="translate(-725.000000, -480.000000)">\n' +
             '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
@@ -637,14 +791,13 @@ let funcList =
         borderRadius:'5px',
         padding:'3px',
         zIndex: 999,
-        width: '185px',
+        width: '190px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       },'',undefined,'root');
       dom.innerHTML = `
         <style>
-         .active {
-          border-color: red;
-          border-width: 5px;
+        .children_item:hover {
+        outline: 2px solid #8C8CFF;
         }
         </style>
        `;
@@ -670,20 +823,20 @@ let funcList =
   },
   img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
   },
- {
-   name:'button',
-   event: 'click',
-   func(){
-     console.log(9999)
-   },
-   openChildDomEvent:'mouseenter',
-   closeChildDomEvent: 'mouseleave',
-
-  setChildrenDom(){
-    // return '<ele-button></ele-button'
-    return "<my-count name='caicai' onclick='(e)=>{e.stopPropagation()}' ></my-count>"
-  },
- }
+ // {
+ //   name:'button',
+ //   event: 'click',
+ //   func(){
+ //     console.log(9999)
+ //   },
+ //   openChildDomEvent:'mouseenter',
+ //   closeChildDomEvent: 'mouseleave',
+ //
+ //  setChildrenDom(){
+ //    // return '<ele-button></ele-button'
+ //    return "<my-count name='caicai' onclick='(e)=>{e.stopPropagation()}' ></my-count>"
+ //  },
+ // }
 ]
 
 export var defaultFuncs = {

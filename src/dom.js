@@ -102,13 +102,13 @@ export class ToolBox {
   setChildDom(pen, item ){
     const dom = document.createElement('div');
     // 构建update方法 用于局部更新
-    item.update =(target)=> {
+    item.update =(target,keepOpen)=> {
 
       if(target === 'title'){
         renderTitle(item,pen,dom.titleDom)
         return
       }else if(target === 'child'){
-        renderChildDom(item,pen,dom,dom.childrenDom)
+        renderChildDom(item,pen,dom,dom.childrenDom,keepOpen)
         return;
       }
       // 清空列表  初始化列表
@@ -124,46 +124,10 @@ export class ToolBox {
 
       // 渲染下拉列表
       let containerDom = null;
-      containerDom = renderChildDom(item,pen,dom,containerDom)
+      renderChildDom(item,pen,dom,containerDom)
       item.dom = dom
       item.dom.titleDom = title
       // 事件处理
-      if(item.children || item.setChildrenDom || item.closeOther){
-
-        // 打开下拉菜单事件
-        title.addEventListener((item.openChildDomEvent || 'click'),()=>{
-          // 关闭其他选项
-          if(this.curItem !== item && this.curItem){
-            item.closeChildDom?.(item,pen,containerDom) || (this.curItem.dom.childrenDom && ( this.curItem.dom.childrenDom.style.visibility = 'hidden' ))
-          }
-          // 将打开逻辑交给用户 或者
-          item.openChildDom?.(item,pen,containerDom) || (dom.childrenDom && (dom.childrenDom.style.visibility = 'visible'));
-
-          // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-          item.onOpenChildDom?.(item,pen,containerDom)
-          this.curItem = item
-        })
-
-        // 关闭下拉菜单
-        !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
-          // 可手动派发隐藏函数
-          this.curItem?.onHideChildDom?.()
-          item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
-          this.curItem = null
-        })
-
-        // 原打开关闭下来列表 事件
-        // dom.addEventListener((item.childVisibleEvent || 'click'),(e)=>{
-        //   console.log('触发dom click')
-        //   // 关闭其他的菜单项
-        //   this.curItem?.onHideChildDom?.()
-        //   if(this.curItem !== item && this.curItem){
-        //     ( this.curItem.dom.childrenDom.style.visibility = 'hidden' )
-        //   }
-        //   dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
-        // });
-
-      }
     }
     item.update()
     return dom;
@@ -215,11 +179,24 @@ function renderTitle(item,pen,title) {
   }else {
     title.innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name))
   }
+
+  title.addEventListener((item.openChildDomEvent || 'click'),()=>{
+    // 关闭其他选项
+    if(toolbox.curItem !== item && toolbox.curItem){
+      item.closeChildDom?.(item,pen,item.dom.childrenDom) || (toolbox.curItem.dom.childrenDom && ( toolbox.curItem.dom.childrenDom.style.visibility = 'hidden' ))
+    }
+    // 将打开逻辑交给用户 或者
+    item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'));
+
+    // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+    item.onOpenChildDom?.(item,pen,item.dom.childrenDom)
+    toolbox.curItem = item
+  })
   return title
 }
 
-function renderChildDom(item,pen,dom,containerDom) {
-  if(containerDom)containerDom.innerHTML = '';
+function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
+  if(dom.childrenDom)dom.shadowRoot.removeChild(dom.childrenDom)
   if(item.children && item.children.length > 0 || item.setChildrenDom){
     // 是否重写dom
     if(
@@ -234,12 +211,14 @@ function renderChildDom(item,pen,dom,containerDom) {
        * */
       if(typeof childDom === 'string'){
         let div = document.createElement('div');
-        item.closeChildDom?.() || (div.style.visibility = 'hidden');
+        // 默认隐藏节点
+        keepOpen?item.openChildDom?.() ||  (div.style.visibility = 'visible'):item.closeChildDom?.() || (div.style.visibility = 'hidden');
         div.innerHTML = childDom;
         dom.shadowRoot.appendChild(div);
         containerDom = div
       }else{
         containerDom = childDom;
+        keepOpen?item.openChildDom?.() ||  (childDom.style.visibility = 'visible'):item.closeChildDom?.() || (childDom.style.visibility = 'hidden');
       }
     }else{
       containerDom = createDom('div',{
@@ -254,6 +233,8 @@ function renderChildDom(item,pen,dom,containerDom) {
         width:'max-content',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       });
+      keepOpen?item.openChildDom?.() ||  (containerDom.style.visibility = 'visible'):item.closeChildDom?.() || (containerDom.style.visibility = 'hidden');
+
     }
     let fragment = new DocumentFragment();
     for(let i of item.children || []){
@@ -291,6 +272,16 @@ function renderChildDom(item,pen,dom,containerDom) {
     dom.shadowRoot.appendChild(containerDom);
     dom.childrenDom = containerDom;
 // 添加样式到元素
+  }
+
+  if(item.children || item.setChildrenDom || item.closeOther){
+    // 关闭下拉菜单
+    !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
+      // 可手动派发隐藏函数
+      toolbox.curItem?.onHideChildDom?.()
+      item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
+      toolbox.curItem = null
+    })
   }
   return containerDom
 }

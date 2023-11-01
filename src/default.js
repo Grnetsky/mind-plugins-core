@@ -224,20 +224,11 @@ let funcList =
              lineDash: res
            })
            // toolbox.renderChildren()
-           let c = dom.shadowRoot.querySelectorAll('.style_item')
-           c.forEach(i=>{
-             i.classList.remove('style_active')
-             if(i.dataset.style === '直线' && style){
-                i.classList.add('style_active')
-             }else if(i.dataset.style === '虚线' && !style) {
-                i.classList.add('style_active')
-             }
-           })
            self.dash = res.join(',')
            self.update('title')
+           self.update('child',true)
          },
           sliderChange: (value)=>{
-           dom.shadowRoot.querySelector('#t').innerHTML = value
             self.width = value
             // toolbox.renderChildren()
             meta2d.setValue({
@@ -245,6 +236,8 @@ let funcList =
               lineWidth: value
             })
             self.update('title')
+            self.update('child',true)
+
           },
          setColor(e,value){
             let color = ''
@@ -252,8 +245,6 @@ let funcList =
               let t = e.target
               let list = dom.shadowRoot.querySelector('.colorList')
               if(t === list)return
-              Array.from(list.children).forEach(i=>i.classList.remove('active'))
-              t.classList.add('active')
               color = t.dataset.color
             }else {
               color = value
@@ -265,6 +256,8 @@ let funcList =
            pen.mind.color = color
            self.color = color;
            self.update('title');
+           self.update('child',true)
+
          }
         },
        style:`<style>
@@ -496,20 +489,13 @@ let funcList =
           setLineStyle(value){
             let res = value?'curve':'polyline'
             // toolbox.renderChildren()
-            let c = dom.shadowRoot.querySelectorAll('.style_item')
-            c.forEach(i=>{
-              i.classList.remove('style_active')
-              if(i.dataset.style === '曲线' && value){
-                i.classList.add('style_active')
-              }else if(i.dataset.style === '折线' && !value) {
-                i.classList.add('style_active')
-              }
-            })
+
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res
             toolBoxPlugin.resetLineStyle(root);
             // toolBoxPlugin.update(root);
-
+            self.update('title')
+            self.update('child')
           },
           setColor(e,value){
             let color = ''
@@ -624,10 +610,6 @@ let funcList =
     key:'layoutDirection',
     name:'布局方式',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
-    openChildDom(dom){
-      dom.classList.add('animate')
-      return false
-    },
     closeChildDom(dom){
       // dom.style.top = 0
       // dom.style.opacity = 0

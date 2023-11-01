@@ -30,34 +30,34 @@ export let toolBoxPlugin = {
         for(let i = 0;i<children.length;i++){
             // 循环设置每个
             let child = children[i]; // 获取子元素
-            topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(toolBoxPlugin.childrenGap):0) ;
-            topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(toolBoxPlugin.childrenGap):0) ;
+            topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
+            topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
 
             let nodeColor = pen.mind.color || generateColorFunc.next().value;
             switch (position){
                 case 'right':
-                    child.mind.x = worldReact.x + worldReact.width + toolBoxPlugin.levelGap;
+                    child.mind.x = worldReact.x + worldReact.width + +toolBoxPlugin.levelGap;
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'left':
-                    child.mind.x = worldReact.x - penRects[i].width - toolBoxPlugin.levelGap;
+                    child.mind.x = worldReact.x - penRects[i].width - +toolBoxPlugin.levelGap;
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'bottom':
                     child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y + child.height + toolBoxPlugin.levelGap;
+                    child.mind.y = worldReact.y + child.height + +toolBoxPlugin.levelGap;
                     break;
                 case 'top':
                     child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y - child.height - toolBoxPlugin.levelGap;
+                    child.mind.y = worldReact.y - child.height - +toolBoxPlugin.levelGap;
             }
-            child.mind.color = nodeColor;
+            if(!child.mind.color)child.mind.color = nodeColor;
             if(child.mind.visible){
                 meta2d.setValue({
                     id: child.id,
                     x: child.mind.x,
                     y: child.mind.y,
-                    color: nodeColor
+                    color: child.mind.color
                 },{render:false});
                 meta2d.setVisible(child,true,false);
             }else{
@@ -97,6 +97,10 @@ export let toolBoxPlugin = {
                 line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
                 break;
         }
+        meta2d.setValue({
+            id:line.id,
+            lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth
+        },{render:false})
         meta2d.updateLineType(line, option.style);
     },
 
@@ -110,7 +114,7 @@ export let toolBoxPlugin = {
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
-                line.mind.color = pen.mind.color || colors.next().value;
+                line.mind.color =pen.mind.lineColor|| pen.mind.color || colors.next().value;
                 meta2d.setValue({
                     id:line.lineId,
                     color: line.mind.color
@@ -125,11 +129,18 @@ export let toolBoxPlugin = {
     resetLineStyle(pen,recursion = true){
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
+        let root = meta2d.findOne(pen.mind.rootId)
         for(let i = 0 ;i<children.length;i++){
             const child = children[i];
             let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
                 meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
+                meta2d.setValue({
+                    id:line.id,
+                    lineWidth: root.mind.lineWidth
+                },{
+                    render:false
+                })
             }
             if(recursion){
                 toolBoxPlugin.resetLineStyle(child,true);
@@ -267,7 +278,7 @@ export let toolBoxPlugin = {
             globalThis.toolbox = toolbox;
         }
         meta2d.on('add',(pens)=>{
-            if(pens && pens.length === 1 && pens[0].name === 'mindNode2' && !pens[0].mind){
+            if(pens && pens.length === 1 && pens[0].target === 'mind' && !pens[0].mind){
                 let pen = pens[0]
                 pen.mind = {
                     isRoot: true,
@@ -277,9 +288,10 @@ export let toolBoxPlugin = {
                     width: 0, // 包含了自己和子节点的最大宽度
                     height: 0, // 包含了自己和子节点的最大高度
                     direction:'right',
-                    lineStyle: 'polyline',
+                    lineStyle: 'curve',
                     childrenVisible: true,
                     visible: true,
+                    lineWidth: 2
                 };
                 window.MindManager.rootIds.push(pen)
                 // 跟随移动
@@ -336,7 +348,7 @@ export let toolBoxPlugin = {
                 maxHeight += maxObj.maxHeight;
                 maxWidth = maxWidth > maxObj.maxWidth? maxWidth : maxObj.maxWidth;
             }
-            maxHeight += toolBoxPlugin.childrenGap * (children.length - 1);
+            maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
             maxH = maxHeight > worldRect.height?maxHeight : worldRect.height;
             pen.mind.maxHeight = maxH;
             pen.mind.maxWidth = maxWidth;
@@ -351,7 +363,7 @@ export let toolBoxPlugin = {
                 maxWidth += maxObj.maxWidth;
                 maxHeight = maxHeight > maxObj.maxHeight? maxHeight : maxObj.maxHeight;
             }
-            maxWidth += toolBoxPlugin.childrenGap * (children.length - 1);
+            maxWidth += +toolBoxPlugin.childrenGap * (children.length - 1);
             maxW = maxWidth > worldRect.width?maxWidth : worldRect.width;
             pen.mind.maxHeight = maxHeight;
             pen.mind.maxWidth = maxW;
@@ -389,9 +401,9 @@ export let toolBoxPlugin = {
     //
     combineLifeCycle(target,del = false){
         let toolbox = globalThis.toolbox;
-        const onMove = (targetPen)=>{
-            toolbox.hide();
-        };
+        // const onMove = (targetPen)=>{
+        //     toolbox.hide();
+        // };
         const onDestroy = (targetPen)=>{
             toolbox.hide();
             toolBoxPlugin.deleteNode(targetPen);
@@ -400,11 +412,12 @@ export let toolBoxPlugin = {
             toolbox.bindPen(targetPen);
             toolbox.setFuncList(this.getFuncList(target));
             toolbox.translatePosition(targetPen);
+            toolbox.show()
         }
         const onMouseDown = (targetPen)=>{
             toolbox.hide();
         }
-        setLifeCycleFunc(target,'onMove',onMove,del);
+        // setLifeCycleFunc(target,'onMove',onMove,del);
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onMouseUp',onMouseUp,del);
         setLifeCycleFunc(target,'onMouseDown',onMouseDown,del);
@@ -475,3 +488,4 @@ export let toolBoxPlugin = {
         pluginsMessageChannels.publish('render')
     }
 };
+

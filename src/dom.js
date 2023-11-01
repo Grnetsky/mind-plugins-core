@@ -200,7 +200,7 @@ export class ToolBox {
               throw new Error('function setDom must return string or node object');
           }
         }else {
-          node.innerHTML = (i.icon && i.name)? '<span style="padding-right: 30px;" >'+ i.icon+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
+          node.innerHTML = (i.icon && i.name)? '<span style="padding-right: 30px;width: max-content" >'+ i.icon+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
         }
         fragment.appendChild(node);
       }
@@ -230,7 +230,7 @@ export class ToolBox {
         item.openChildDom?.(dom) || (dom.childrenDom && (dom.childrenDom.style.visibility = 'visible'));
 
         // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-        item.onOpenChildDom?.()
+        item.onOpenChildDom?.(item,pen,containerDom)
         this.curItem = item
       })
 
@@ -239,7 +239,7 @@ export class ToolBox {
         // 可手动派发隐藏函数
         this.curItem?.onHideChildDom?.()
         console.log('隐藏',item.closeChildDomEvent)
-        item.closeChildDom?.() || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
+        item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
         this.curItem = null
       })
 

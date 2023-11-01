@@ -30,26 +30,26 @@ export let toolBoxPlugin = {
         for(let i = 0;i<children.length;i++){
             // 循环设置每个
             let child = children[i]; // 获取子元素
-            topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(toolBoxPlugin.childrenGap):0) ;
-            topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(toolBoxPlugin.childrenGap):0) ;
+            topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
+            topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
 
             let nodeColor = pen.mind.color || generateColorFunc.next().value;
             switch (position){
                 case 'right':
-                    child.mind.x = worldReact.x + worldReact.width + toolBoxPlugin.levelGap;
+                    child.mind.x = worldReact.x + worldReact.width + +toolBoxPlugin.levelGap;
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'left':
-                    child.mind.x = worldReact.x - penRects[i].width - toolBoxPlugin.levelGap;
+                    child.mind.x = worldReact.x - penRects[i].width - +toolBoxPlugin.levelGap;
                     child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
                     break;
                 case 'bottom':
                     child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y + child.height + toolBoxPlugin.levelGap;
+                    child.mind.y = worldReact.y + child.height + +toolBoxPlugin.levelGap;
                     break;
                 case 'top':
                     child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y - child.height - toolBoxPlugin.levelGap;
+                    child.mind.y = worldReact.y - child.height - +toolBoxPlugin.levelGap;
             }
             if(!child.mind.color)child.mind.color = nodeColor;
             if(child.mind.visible){
@@ -127,7 +127,6 @@ export let toolBoxPlugin = {
     },
     // 重新递归设置连线的样式
     resetLineStyle(pen,recursion = true){
-        console.log('reset')
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
         let root = meta2d.findOne(pen.mind.rootId)
@@ -349,7 +348,7 @@ export let toolBoxPlugin = {
                 maxHeight += maxObj.maxHeight;
                 maxWidth = maxWidth > maxObj.maxWidth? maxWidth : maxObj.maxWidth;
             }
-            maxHeight += toolBoxPlugin.childrenGap * (children.length - 1);
+            maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
             maxH = maxHeight > worldRect.height?maxHeight : worldRect.height;
             pen.mind.maxHeight = maxH;
             pen.mind.maxWidth = maxWidth;
@@ -364,7 +363,7 @@ export let toolBoxPlugin = {
                 maxWidth += maxObj.maxWidth;
                 maxHeight = maxHeight > maxObj.maxHeight? maxHeight : maxObj.maxHeight;
             }
-            maxWidth += toolBoxPlugin.childrenGap * (children.length - 1);
+            maxWidth += +toolBoxPlugin.childrenGap * (children.length - 1);
             maxW = maxWidth > worldRect.width?maxWidth : worldRect.width;
             pen.mind.maxHeight = maxHeight;
             pen.mind.maxWidth = maxW;
@@ -402,9 +401,9 @@ export let toolBoxPlugin = {
     //
     combineLifeCycle(target,del = false){
         let toolbox = globalThis.toolbox;
-        const onMove = (targetPen)=>{
-            toolbox.hide();
-        };
+        // const onMove = (targetPen)=>{
+        //     toolbox.hide();
+        // };
         const onDestroy = (targetPen)=>{
             toolbox.hide();
             toolBoxPlugin.deleteNode(targetPen);
@@ -413,11 +412,12 @@ export let toolBoxPlugin = {
             toolbox.bindPen(targetPen);
             toolbox.setFuncList(this.getFuncList(target));
             toolbox.translatePosition(targetPen);
+            toolbox.show()
         }
         const onMouseDown = (targetPen)=>{
             toolbox.hide();
         }
-        setLifeCycleFunc(target,'onMove',onMove,del);
+        // setLifeCycleFunc(target,'onMove',onMove,del);
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onMouseUp',onMouseUp,del);
         setLifeCycleFunc(target,'onMouseDown',onMouseDown,del);

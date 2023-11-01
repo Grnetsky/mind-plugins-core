@@ -40,14 +40,18 @@ let funcList =
     key:'relayout',
     name:'重新布局',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局</title>\n' +
+        '    <title>重新布局下一级</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-        '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
+        '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
-        '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' +
+        '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
         '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
         '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+        '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
+        '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
         '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+        '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
+        '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
         '                </g>\n' +
         '            </g>\n' +
         '        </g>\n' +
@@ -71,18 +75,14 @@ let funcList =
     description:'',
     name:'重新布局下一级',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局下一级</title>\n' +
+        '    <title>重新布局</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-        '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
+        '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
-        '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
+        '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' +
         '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
         '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
-        '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
-        '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
         '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
-        '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
-        '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
         '                </g>\n' +
         '            </g>\n' +
         '        </g>\n' +
@@ -371,7 +371,7 @@ let funcList =
     width: 3,
     init(self,pen){
       self.color = pen.calculative.color || '#000';
-      self.lineStyle = pen.mind.lineStyle;
+      self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
       self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
     },
     setDom(self) {
@@ -610,6 +610,7 @@ let funcList =
   {
     key:'layoutDirection',
     name:'布局方式',
+    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
     openChildDom(dom){
       dom.classList.add('animate')
       return false
@@ -619,24 +620,21 @@ let funcList =
       // dom.style.opacity = 0
       return false
     },
-    setDom(self) {
-      let css = `<style>
-        .animate {
-            top: 0;
-            opacity: 1;
-            visibility: visible;
-           transition: all 1s ease;
-        }
-</style>`
-      return self.name + css
-    },
-    event: 'click',
     onHideChildDom(){
     },
-    func(self,pen,dom){
-      let root = dom.shadowRoot.querySelector('.root');
-      let divs = root.querySelectorAll('div');
-      let index = self.children.findIndex(i=>i.key === pen.mind.direction);
+    direction:'right',
+    childrenGap:20,
+    levelGap: 0,
+    init(self,pen){
+      self.direction = pen.mind.direction
+      self.childrenGap = toolBoxPlugin.childrenGap
+      self.levelGap = toolBoxPlugin.levelGap
+    },
+
+    activeDirection(self,pen,dom){
+      let rootDom = dom.querySelector('.main');
+      let divs = rootDom.querySelectorAll('div');
+      let index = ['right','left','top','bottom'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -653,130 +651,11 @@ let funcList =
       divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
       divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
     },
-
-    children:[
-      {
-        key:'right',
-        name:'',
-        event:'click',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>向右布局</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-633.000000, -684.000000)">\n' +
-            '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
-            '                <g id="布局备份-9" transform="translate(108.000000, 261.000000)">\n' +
-            '                    <rect class="toolbox_direction_svg_base" id="偷摸底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>\n' +
-            '                    <g id="编组-3" transform="translate(20.000000, 7.000000)">\n' +
-            '                        <line class="toolbox_direction_svg" x1="13.5" y1="18.5" x2="22.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="0.5" y="15.5" width="13" height="5" rx="2"/>\n' +
-            '                        <path class="toolbox_direction_svg_line" d="M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3" id="路径" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="25" y="0" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="25" y="16" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="25" y="32" width="10" height="5" rx="2"/>\n' +
-            '                    </g>\n' +
-            '                </g>\n' +
-            '            </g>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          toolBoxPlugin.resetLinePos(root,'right',true)
-          // toolBoxPlugin.resetDirection(root,'right',true);
-          toolBoxPlugin.update(root);
-        }
-      },
-      {
-        name:'',
-        key:'left',
-        event:'click',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>向左布局</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-541.000000, -684.000000)">\n' +
-            '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
-            '                <g id="布局备份-8" transform="translate(16.000000, 261.000000)">\n' +
-            '                    <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>\n' +
-            '                    <g id="编组-3" transform="translate(37.500000, 25.500000) scale(-1, 1) translate(-37.500000, -25.500000) translate(20.000000, 7.000000)">\n' +
-            '                        <line class="toolbox_direction_svg" x1="13.5" y1="18.5" x2="22.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="0.5" y="15.5" width="13" height="5" rx="2"/>\n' +
-            '                        <path class="toolbox_direction_svg_line" d="M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3" id="路径" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="25" y="0" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="25" y="16" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="25" y="32" width="10" height="5" rx="2"/>\n' +
-            '                    </g>\n' +
-            '                </g>\n' +
-            '            </g>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          toolBoxPlugin.resetLinePos(root,'left',true);
-          toolBoxPlugin.update(root);
-        }
-      },
-      {
-        name:'',
-        key:'top',
-        event:'click',
-        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>向上布局</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-633.000000, -616.000000)">\n' +
-            '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
-            '                <g id="布局备份-7" transform="translate(108.000000, 193.000000)">\n' +
-            '                    <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>\n' +
-            '                    <g id="编组-3" transform="translate(38.000000, 25.250000) scale(1, -1) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)">\n' +
-            '                        <line class="toolbox_direction_svg" x1="6.06363636" y1="25.5" x2="15.5333333" y2="25.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" transform="translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) " x="-3.5" y="23" width="13" height="5" rx="2"/>\n' +
-            '                        <path class="toolbox_direction_svg_line" d="M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7" id="路径" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" transform="translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) " x="17" y="41.5" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" transform="translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) " x="17" y="22.5" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" transform="translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) " x="17" y="2.5" width="10" height="5" rx="2"/>\n' +
-            '                    </g>\n' +
-            '                </g>\n' +
-            '            </g>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          toolBoxPlugin.resetLinePos(root,'top',true);
-          toolBoxPlugin.update(root);
-        }
-      },
-      {
-        name:'',
-        key:'bottom',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">\n' +
-            '    <title>向下布局</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-725.000000, -480.000000)">\n' +
-            '            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">\n' +
-            '                <g id="布局备份-2" transform="translate(200.000000, 57.000000)">\n' +
-            '                    <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>\n' +
-            '                    <g id="编组-3" transform="translate(38.000000, 25.250000) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)">\n' +
-            '                        <line x1="6.06363636" y1="25.5" x2="15.5333333" y2="25.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" transform="translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) " x="-3.5" y="23" width="13" height="5" rx="2"/>\n' +
-            '                        <path class="toolbox_direction_svg_line" d="M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7" id="路径" stroke="#818187" stroke-linecap="round"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" transform="translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) " x="17" y="41.5" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" transform="translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) " x="17" y="22.5" width="10" height="5" rx="2"/>\n' +
-            '                        <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" transform="translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) " x="17" y="2.5" width="10" height="5" rx="2"/>\n' +
-            '                    </g>\n' +
-            '                </g>\n' +
-            '            </g>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
-        event:'click',
-        func(self,pen){
-          let root = (window).meta2d.findOne(pen.mind.rootId);
-          toolBoxPlugin.resetLinePos(root,'bottom',true);
-          toolBoxPlugin.update(root);
-        }
-      },
-    ],
+    onOpenChildDom(self,pen,dom){
+      self.activeDirection(self,pen,dom);
+      self.childrenGap = toolBoxPlugin.childrenGap
+      self.levelGap = toolBoxPlugin.levelGap
+    },
     // 设置下拉列表的样式和子元素布局
     setChildrenDom(self,pen){
       let dom = createDom('div',{
@@ -789,28 +668,267 @@ let funcList =
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
-        padding:'3px',
+        padding:'16px',
         zIndex: 999,
-        width: '190px',
+        width: '170px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       },'',undefined,'root');
-      dom.innerHTML = `
-        <style>
-        .children_item:hover {
-        outline: 2px solid #8C8CFF;
-        }
-        </style>
-       `;
-      dom.addEventListener('click',(e)=>{
-        dom.childNodes.forEach((i)=>{
-          if(i.tagName !== 'style' && i.nodeType == 1){
-            i.classList.remove('active');
+
+      let str = template(self,{
+        template:`
+          <div class="container">
+              <div class="item">
+                <div class="title">布局方向</div>
+                <div class="main" >
+                    <div onclick="setDirection('right')" >
+                        <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                          <title>向右布局</title>
+                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                              <g id="未固定" transform="translate(-633.000000, -684.000000)">
+                                <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                     <g id="布局备份-9" transform="translate(108.000000, 261.000000)">
+                                          <rect class="toolbox_direction_svg_base" id="偷摸底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                          <g id="编组-3" transform="translate(20.000000, 7.000000)">
+                                              <line class="toolbox_direction_svg" x1="13.5" y1="18.5" x2="22.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                              <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="0.5" y="15.5" width="13" height="5" rx="2"/>
+                                              <path class="toolbox_direction_svg_line" d="M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3" id="路径" stroke="#818187" stroke-linecap="round"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="25" y="0" width="10" height="5" rx="2"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="25" y="16" width="10" height="5" rx="2"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="25" y="32" width="10" height="5" rx="2"/>
+                                          </g>
+                                      </g>
+                                 </g>
+                              </g>
+                          </g>
+                        </svg>
+                    </div>
+                    
+                    <div onclick="setDirection('left')"  >                    
+                      <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                          <title>向左布局</title>
+                          <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                              <g id="未固定" transform="translate(-541.000000, -684.000000)">
+                                  <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                      <g id="布局备份-8" transform="translate(16.000000, 261.000000)">
+                                          <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                          <g id="编组-3" transform="translate(37.500000, 25.500000) scale(-1, 1) translate(-37.500000, -25.500000) translate(20.000000, 7.000000)">
+                                             <line class="toolbox_direction_svg" x1="13.5" y1="18.5" x2="22.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                              <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="0.5" y="15.5" width="13" height="5" rx="2"/>
+                                              <path class="toolbox_direction_svg_line" d="M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3" id="路径" stroke="#818187" stroke-linecap="round"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="25" y="0" width="10" height="5" rx="2"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="25" y="16" width="10" height="5" rx="2"/>
+                                              <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="25" y="32" width="10" height="5" rx="2"/>
+                                          </g>
+                                      </g>
+                                  </g>+
+                              </g>
+                          </g>
+                      </svg>                           
+                    </div>
+                    
+                    <div onclick="setDirection('top')" >
+                      <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                        <title>向上布局</title>
+                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <g id="未固定" transform="translate(-633.000000, -616.000000)">
+                                <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                    <g id="布局备份-7" transform="translate(108.000000, 193.000000)">
+                                        <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                        <g id="编组-3" transform="translate(38.000000, 25.250000) scale(1, -1) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)">
+                                            <line class="toolbox_direction_svg" x1="6.06363636" y1="25.5" x2="15.5333333" y2="25.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" transform="translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) " x="-3.5" y="23" width="13" height="5" rx="2"/>
+                                            <path class="toolbox_direction_svg_line" d="M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7" id="路径" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" transform="translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) " x="17" y="41.5" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" transform="translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) " x="17" y="22.5" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" transform="translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) " x="17" y="2.5" width="10" height="5" rx="2"/>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                      </svg>
+                    </div>
+                    
+                    <div onclick="setDirection('bottom')">                  
+                      <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                        <title>向下布局</title>
+                        <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                           <g id="未固定" transform="translate(-725.000000, -480.000000)">
+                                <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                    <g id="布局备份-2" transform="translate(200.000000, 57.000000)">
+                                        <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                        <g id="编组-3" transform="translate(38.000000, 25.250000) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)">
+                                            <line x1="6.06363636" y1="25.5" x2="15.5333333" y2="25.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" transform="translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) " x="-3.5" y="23" width="13" height="5" rx="2"/>
+                                            <path class="toolbox_direction_svg_line" d="M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7" id="路径" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" transform="translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) " x="17" y="41.5" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" transform="translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) " x="17" y="22.5" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" transform="translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) " x="17" y="2.5" width="10" height="5" rx="2"/>
+                                        </g>
+                                   </g>
+                                </g>
+                            </g>
+                        </g>
+                      </svg>
+                    </div>
+                </div>
+              </div>
+              
+              <div class="item">
+                <div class="title">间隔设置</div>
+                <div class="main">
+                    <div class="number_container">
+                     <div class="number_item">
+                        <div class="flag">同级间隔</div>
+                        <div class="number">                        
+                            <input type="number" onchange="setChildGap(this.value)" value="${self.childrenGap}"/>
+                        </div>
+                    </div>
+                     <div class="number_item">
+                        <div class="flag">子级间隔</div>
+                        <div class="number">                        
+                            <input type="number" onchange="setLevelGap(this.value)" value="${self.levelGap}"/>
+                        </div>
+                    </div>
+                  </div>
+                   
+                </div>
+              </div>
+          </div>`,
+        scripts:{
+          // 能在这里面获取到dom
+          mounted(){ // 生命周期函数
+          },
+          setChildGap(value){
+            self.childrenGap = value;
+            toolBoxPlugin.childrenGap = value;
+            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+          },
+          setLevelGap(value){
+            self.levelGap = value;
+            toolBoxPlugin.levelGap = value;
+            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+          },
+          setDirection(e){
+            let root = (window).meta2d.findOne(pen.mind.rootId);
+            toolBoxPlugin.resetLinePos(root,e,true);
+            toolBoxPlugin.update(root);
+            self.direction = e
+            self.activeDirection(self,pen,dom)
           }
-        });
-        e.target.classList.add('active');
-      });
+        },
+        style:`<style>
+        .container {
+            overflow: hidden;
+        }
+        .flag{
+            font-size: 14px;
+        }
+        .number{
+            height:30px;
+            display: flex;
+            border: 1px solid #f7f7f9;
+            border-radius: 5px;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #f7f7f9;
+        }
+        .number_container{
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .number_item{
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 14px;
+        }
+        .number input{
+            width: 70px;
+            height: 100%;
+            outline: none;
+            background-color:#f7f7f9;
+            border: 1px solid #f7f7f9;
+            border-radius: 5px;            
+            font-size: 16px;
+            text-indent: 10px;
+        }
+        .number_control{
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(-3px);
+            margin-right: 6px;
+        }
+        .number_control_item{
+            display:block;
+            flex:1;
+            font-size: 25px;
+            width: 30px;
+            height: 15px;
+        }
+        .number_control_item:hover {
+            color: #484848;
+        }
+        .main {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-content: center;
+        }
+        .main_item{
+            margin-top: 5px;
+        }
+        .main_item:hover{
+            outline: 3px solid rgba(87,87,243,0.51);
+        }
+        .active{
+        }
+       .item {
+          display:flex;
+          justify-content: flex-start;
+          align-items: flex-start;
+          flex-direction: column;
+          margin-bottom: 14px;
+       }
+       .title {
+          width: 100%;
+          height: 17px;
+          font-size: 16px;
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          font-family: PingFang SC, PingFang SC-Regular;
+          font-weight: 400;
+          text-align: left;
+          color: #7d7878;
+          line-height: 17px;
+          margin-bottom: 14px;
+        }
+    </style> 
+        `
+      })
+
+
+      dom.innerHTML = str
+      // dom.addEventListener('click',(e)=>{
+      //   dom.childNodes.forEach((i)=>{
+      //     if(i.tagName !== 'style' && i.nodeType == 1){
+      //       i.classList.remove('active');
+      //     }
+      //   });
+      //   e.target.classList.add('active');
+      // });
       return dom ;
-    }
+    },
+    closeChildDomEvent: 'none'
   },
 {
   key:'addSiblingNode',

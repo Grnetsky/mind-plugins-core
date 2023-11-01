@@ -947,15 +947,14 @@
      * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
      * */;
     _proto.setChildDom = function setChildDom(pen, item) {
-      var _this2 = this;
       var dom = document.createElement('div');
       // 构建update方法 用于局部更新
-      item.update = function (target) {
+      item.update = function (target, keepOpen) {
         if (target === 'title') {
           renderTitle(item, pen, dom.titleDom);
           return;
         } else if (target === 'child') {
-          renderChildDom(item, pen, dom, dom.childrenDom);
+          renderChildDom(item, pen, dom, dom.childrenDom, keepOpen);
           return;
         }
         // 清空列表  初始化列表
@@ -971,47 +970,19 @@
 
         // 渲染下拉列表
         var containerDom = null;
-        containerDom = renderChildDom(item, pen, dom, containerDom);
+        renderChildDom(item, pen, dom, containerDom);
         item.dom = dom;
         item.dom.titleDom = title;
         // 事件处理
-        if (item.children || item.setChildrenDom || item.closeOther) {
-          // 打开下拉菜单事件
-          title.addEventListener(item.openChildDomEvent || 'click', function () {
-            // 关闭其他选项
-            if (_this2.curItem !== item && _this2.curItem) {
-              (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || _this2.curItem.dom.childrenDom && (_this2.curItem.dom.childrenDom.style.visibility = 'hidden');
-            }
-            // 将打开逻辑交给用户 或者
-            (item.openChildDom == null ? void 0 : item.openChildDom(item, pen, containerDom)) || dom.childrenDom && (dom.childrenDom.style.visibility = 'visible');
-
-            // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-            item.onOpenChildDom == null || item.onOpenChildDom(item, pen, containerDom);
-            _this2.curItem = item;
-          });
-
-          // 关闭下拉菜单
-          !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
-            var _this2$curItem;
-            // 可手动派发隐藏函数
-            (_this2$curItem = _this2.curItem) == null || _this2$curItem.onHideChildDom == null || _this2$curItem.onHideChildDom();
-            (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
-            _this2.curItem = null;
-          });
-
-          // 原打开关闭下来列表 事件
-          // dom.addEventListener((item.childVisibleEvent || 'click'),(e)=>{
-          //   console.log('触发dom click')
-          //   // 关闭其他的菜单项
-          //   this.curItem?.onHideChildDom?.()
-          //   if(this.curItem !== item && this.curItem){
-          //     ( this.curItem.dom.childrenDom.style.visibility = 'hidden' )
-          //   }
-          //   dom.childrenDom.style.visibility === 'visible'? dom.childrenDom.style.visibility = 'hidden': ((dom.childrenDom.style.visibility = 'visible') && ( this.curItem = item));
-          // });
-        }
       };
 
+      item.updateAll = function (keepOpen) {
+        if (keepOpen === void 0) {
+          keepOpen = true;
+        }
+        item.update('title');
+        item.update('child', keepOpen);
+      };
       item.update();
       return dom;
     };
@@ -1062,10 +1033,25 @@
     } else {
       title.innerHTML = item.icon ? item.icon : item.img ? "<img src=\"" + item.img + "\" title=\"" + item.name + "\" />" : item.name;
     }
+    title.addEventListener(item.openChildDomEvent || 'click', function () {
+      // 关闭其他选项
+      if (toolbox.curItem !== item && toolbox.curItem) {
+        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, item.dom.childrenDom)) || toolbox.curItem.dom.childrenDom && (toolbox.curItem.dom.childrenDom.style.visibility = 'hidden');
+      }
+      // 将打开逻辑交给用户 或者
+      (item.openChildDom == null ? void 0 : item.openChildDom(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
+
+      // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+      item.onOpenChildDom == null || item.onOpenChildDom(item, pen, item.dom.childrenDom);
+      toolbox.curItem = item;
+    });
     return title;
   }
-  function renderChildDom(item, pen, dom, containerDom) {
-    if (containerDom) containerDom.innerHTML = '';
+  function renderChildDom(item, pen, dom, containerDom, keepOpen) {
+    if (keepOpen === void 0) {
+      keepOpen = false;
+    }
+    if (dom.childrenDom) dom.shadowRoot.removeChild(dom.childrenDom);
     if (item.children && item.children.length > 0 || item.setChildrenDom) {
       var _containerDom;
       // 是否重写dom
@@ -1079,12 +1065,14 @@
          * */
         if (typeof childDom === 'string') {
           var div = document.createElement('div');
-          (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
+          // 默认隐藏节点
+          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (div.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
           div.innerHTML = childDom;
           dom.shadowRoot.appendChild(div);
           containerDom = div;
         } else {
           containerDom = childDom;
+          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (childDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (childDom.style.visibility = 'hidden');
         }
       } else {
         containerDom = createDom('div', {
@@ -1099,6 +1087,7 @@
           width: 'max-content',
           boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
         });
+        keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (containerDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (containerDom.style.visibility = 'hidden');
       }
       var fragment = new DocumentFragment();
       var _loop = function _loop() {
@@ -1141,8 +1130,33 @@
       // 添加样式到元素
     }
 
+    if (item.children || item.setChildrenDom || item.closeOther) {
+      // 关闭下拉菜单
+      !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
+        var _toolbox$curItem;
+        // 可手动派发隐藏函数
+        (_toolbox$curItem = toolbox.curItem) == null || _toolbox$curItem.onHideChildDom == null || _toolbox$curItem.onHideChildDom();
+        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
+        toolbox.curItem = null;
+      });
+    }
     return containerDom;
   }
+
+  // 7.2.2 IsArray(argument)
+
+  var _isArray = Array.isArray || function isArray(arg) {
+    return _cof(arg) == 'Array';
+  };
+
+  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+
+
+  _export(_export.S, 'Array', { isArray: _isArray });
+
+  var isArray = _core.Array.isArray;
+
+  var isArray$1 = isArray;
 
   // true  -> String#at
   // false -> String#codePointAt
@@ -1343,133 +1357,6 @@
     return { value: point, done: false };
   });
 
-  // call something on iterator step with safe closing on error
-
-  var _iterCall = function (iterator, fn, value, entries) {
-    try {
-      return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
-    // 7.4.6 IteratorClose(iterator, completion)
-    } catch (e) {
-      var ret = iterator['return'];
-      if (ret !== undefined) _anObject(ret.call(iterator));
-      throw e;
-    }
-  };
-
-  // check on default Array iterator
-
-  var ITERATOR$1 = _wks('iterator');
-  var ArrayProto = Array.prototype;
-
-  var _isArrayIter = function (it) {
-    return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
-  };
-
-  var _createProperty = function (object, index, value) {
-    if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
-    else object[index] = value;
-  };
-
-  // getting tag from 19.1.3.6 Object.prototype.toString()
-
-  var TAG$1 = _wks('toStringTag');
-  // ES3 wrong here
-  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
-
-  // fallback for IE11 Script Access Denied error
-  var tryGet = function (it, key) {
-    try {
-      return it[key];
-    } catch (e) { /* empty */ }
-  };
-
-  var _classof = function (it) {
-    var O, T, B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null'
-      // @@toStringTag case
-      : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
-      // builtinTag case
-      : ARG ? _cof(O)
-      // ES3 arguments fallback
-      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-  };
-
-  var ITERATOR$2 = _wks('iterator');
-
-  var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
-    if (it != undefined) return it[ITERATOR$2]
-      || it['@@iterator']
-      || _iterators[_classof(it)];
-  };
-
-  var ITERATOR$3 = _wks('iterator');
-  var SAFE_CLOSING = false;
-
-  try {
-    var riter = [7][ITERATOR$3]();
-    riter['return'] = function () { SAFE_CLOSING = true; };
-  } catch (e) { /* empty */ }
-
-  var _iterDetect = function (exec, skipClosing) {
-    if (!skipClosing && !SAFE_CLOSING) return false;
-    var safe = false;
-    try {
-      var arr = [7];
-      var iter = arr[ITERATOR$3]();
-      iter.next = function () { return { done: safe = true }; };
-      arr[ITERATOR$3] = function () { return iter; };
-      exec(arr);
-    } catch (e) { /* empty */ }
-    return safe;
-  };
-
-  _export(_export.S + _export.F * !_iterDetect(function (iter) { }), 'Array', {
-    // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
-    from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-      var O = _toObject(arrayLike);
-      var C = typeof this == 'function' ? this : Array;
-      var aLen = arguments.length;
-      var mapfn = aLen > 1 ? arguments[1] : undefined;
-      var mapping = mapfn !== undefined;
-      var index = 0;
-      var iterFn = core_getIteratorMethod(O);
-      var length, result, step, iterator;
-      if (mapping) mapfn = _ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
-      // if object isn't iterable or it's array with default iterator - use simple case
-      if (iterFn != undefined && !(C == Array && _isArrayIter(iterFn))) {
-        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-          _createProperty(result, index, mapping ? _iterCall(iterator, mapfn, [step.value, index], true) : step.value);
-        }
-      } else {
-        length = _toLength(O.length);
-        for (result = new C(length); length > index; index++) {
-          _createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
-        }
-      }
-      result.length = index;
-      return result;
-    }
-  });
-
-  var from = _core.Array.from;
-
-  var from$1 = from;
-
-  // 7.2.2 IsArray(argument)
-
-  var _isArray = Array.isArray || function isArray(arg) {
-    return _cof(arg) == 'Array';
-  };
-
-  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-
-
-  _export(_export.S, 'Array', { isArray: _isArray });
-
-  var isArray = _core.Array.isArray;
-
-  var isArray$1 = isArray;
-
   var _iterStep = function (done, value) {
     return { value: value, done: !!done };
   };
@@ -1515,10 +1402,64 @@
     _iterators[NAME] = _iterators.Array;
   }
 
+  // getting tag from 19.1.3.6 Object.prototype.toString()
+
+  var TAG$1 = _wks('toStringTag');
+  // ES3 wrong here
+  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
+
+  // fallback for IE11 Script Access Denied error
+  var tryGet = function (it, key) {
+    try {
+      return it[key];
+    } catch (e) { /* empty */ }
+  };
+
+  var _classof = function (it) {
+    var O, T, B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null'
+      // @@toStringTag case
+      : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
+      // builtinTag case
+      : ARG ? _cof(O)
+      // ES3 arguments fallback
+      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+
   var _anInstance = function (it, Constructor, name, forbiddenField) {
     if (!(it instanceof Constructor) || (forbiddenField !== undefined && forbiddenField in it)) {
       throw TypeError(name + ': incorrect invocation!');
     } return it;
+  };
+
+  // call something on iterator step with safe closing on error
+
+  var _iterCall = function (iterator, fn, value, entries) {
+    try {
+      return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
+    // 7.4.6 IteratorClose(iterator, completion)
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined) _anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+
+  // check on default Array iterator
+
+  var ITERATOR$1 = _wks('iterator');
+  var ArrayProto = Array.prototype;
+
+  var _isArrayIter = function (it) {
+    return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
+  };
+
+  var ITERATOR$2 = _wks('iterator');
+
+  var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
+    if (it != undefined) return it[ITERATOR$2]
+      || it['@@iterator']
+      || _iterators[_classof(it)];
   };
 
   var _forOf = createCommonjsModule(function (module) {
@@ -1777,6 +1718,27 @@
       configurable: true,
       get: function () { return this; }
     });
+  };
+
+  var ITERATOR$3 = _wks('iterator');
+  var SAFE_CLOSING = false;
+
+  try {
+    var riter = [7][ITERATOR$3]();
+    riter['return'] = function () { SAFE_CLOSING = true; };
+  } catch (e) { /* empty */ }
+
+  var _iterDetect = function (exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING) return false;
+    var safe = false;
+    try {
+      var arr = [7];
+      var iter = arr[ITERATOR$3]();
+      iter.next = function () { return { done: safe = true }; };
+      arr[ITERATOR$3] = function () { return iter; };
+      exec(arr);
+    } catch (e) { /* empty */ }
+    return safe;
   };
 
   var task = _task.set;
@@ -2319,20 +2281,11 @@
               lineDash: res
             });
             // toolbox.renderChildren()
-            var c = dom.shadowRoot.querySelectorAll('.style_item');
-            c.forEach(function (i) {
-              i.classList.remove('style_active');
-              if (i.dataset.style === '直线' && style) {
-                i.classList.add('style_active');
-              } else if (i.dataset.style === '虚线' && !style) {
-                i.classList.add('style_active');
-              }
-            });
             self.dash = res.join(',');
             self.update('title');
+            self.update('child', true);
           },
           sliderChange: function sliderChange(value) {
-            dom.shadowRoot.querySelector('#t').innerHTML = value;
             self.width = value;
             // toolbox.renderChildren()
             meta2d.setValue({
@@ -2340,6 +2293,7 @@
               lineWidth: value
             });
             self.update('title');
+            self.update('child', true);
           },
           setColor: function setColor(e, value) {
             var color = '';
@@ -2347,10 +2301,6 @@
               var t = e.target;
               var list = dom.shadowRoot.querySelector('.colorList');
               if (t === list) return;
-              from$1(list.children).forEach(function (i) {
-                return i.classList.remove('active');
-              });
-              t.classList.add('active');
               color = t.dataset.color;
             } else {
               color = value;
@@ -2361,7 +2311,7 @@
             });
             pen.mind.color = color;
             self.color = color;
-            self.update('title');
+            self.updateAll();
           }
         },
         style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            justify-content: space-around;\n            align-items: center;\n        }\n        .style_active{\n            width: 30%;\n            background-color:#fff;\n            height: 20px;\n            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);\n            border-radius: 3px;\n        }\n        .active{\n            border: 3px solid deepskyblue !important;\n        }\n        .colorList {\n            display: flex;\n            justify-content: space-between;\n            align-content: space-between;\n            flex-wrap: wrap;\n        }       \n        .main_style {\n            display: flex;\n            width: 100%;\n            height: 30px;\n            justify-content: space-around;\n            align-items: center;\n            border-radius: 3px;\n            background-color:#f7f7f9;\n        }\n        .style_item {\n            width:47%;\n            height: 22px;\n            display: flex;\n            align-items: center;\n            overflow: hidden;\n            justify-content: center;\n        }\n        .color_item {\n            width: 20px;\n            height: 20px;\n            border: 3px solid;\n            margin: 5px 5px 5px 0;\n            border-radius: 2px;\n        }\n        .color_item:hover {\n            border: 3px solid rgba(128,128,128,0.5) !important;\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
@@ -2451,19 +2401,13 @@
           setLineStyle: function setLineStyle(value) {
             var res = value ? 'curve' : 'polyline';
             // toolbox.renderChildren()
-            var c = dom.shadowRoot.querySelectorAll('.style_item');
-            c.forEach(function (i) {
-              i.classList.remove('style_active');
-              if (i.dataset.style === '曲线' && value) {
-                i.classList.add('style_active');
-              } else if (i.dataset.style === '折线' && !value) {
-                i.classList.add('style_active');
-              }
-            });
+
             var root = window.meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res;
             toolBoxPlugin.resetLineStyle(root);
+            self.lineStyle = res;
             // toolBoxPlugin.update(root);
+            self.updateAll();
           },
           setColor: function setColor(e, value) {
             var _pen$connectedLines;
@@ -2472,10 +2416,6 @@
               var t = e.target;
               var list = dom.shadowRoot.querySelector('.colorList');
               if (t === list) return;
-              from$1(list.children).forEach(function (i) {
-                return i.classList.remove('active');
-              });
-              t.classList.add('active');
               color = t.dataset.color;
             } else {
               color = value;
@@ -2488,7 +2428,7 @@
             });
             self.color = color;
             toolBoxPlugin.update(pen);
-            self.update('title');
+            self.updateAll();
           }
         },
         style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            justify-content: space-around;\n            align-items: center;\n        }\n        .style_active{\n            width: 30%;\n            background-color:#fff;\n            height: 20px;\n            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);\n            border-radius: 3px;\n        }\n        .active{\n            border: 3px solid deepskyblue !important;\n        }\n        .colorList {\n            display: flex;\n            justify-content: space-between;\n            align-content: space-between;\n            flex-wrap: wrap;\n        }       \n        .main_style {\n            display: flex;\n            width: 100%;\n            height: 30px;\n            justify-content: space-around;\n            align-items: center;\n            border-radius: 3px;\n            background-color:#f7f7f9;\n        }\n        .style_item {\n            width:47%;\n            height: 22px;\n            display: flex;\n            align-items: center;\n            overflow: hidden;\n            justify-content: center;\n        }\n        .color_item {\n            width: 20px;\n            height: 20px;\n            border: 3px solid;\n            margin: 5px 5px 5px 0;\n            border-radius: 2px;\n        }\n        .color_item:hover {\n            border: 3px solid rgba(128,128,128,0.5) !important;\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
@@ -2505,10 +2445,6 @@
     key: 'layoutDirection',
     name: '布局方式',
     icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
-    openChildDom: function openChildDom(dom) {
-      dom.classList.add('animate');
-      return false;
-    },
     closeChildDom: function closeChildDom(dom) {
       // dom.style.top = 0
       // dom.style.opacity = 0

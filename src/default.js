@@ -255,9 +255,7 @@ let funcList =
            })
            pen.mind.color = color
            self.color = color;
-           self.update('title');
-           self.update('child',true)
-
+           self.updateAll()
          }
         },
        style:`<style>
@@ -493,9 +491,9 @@ let funcList =
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res
             toolBoxPlugin.resetLineStyle(root);
+            self.lineStyle = res
             // toolBoxPlugin.update(root);
-            self.update('title')
-            self.update('child')
+            self.updateAll()
           },
           setColor(e,value){
             let color = ''
@@ -503,8 +501,6 @@ let funcList =
               let t = e.target
               let list = dom.shadowRoot.querySelector('.colorList')
               if(t === list)return
-              Array.from(list.children).forEach(i=>i.classList.remove('active'))
-              t.classList.add('active')
               color = t.dataset.color
             }else {
               color = value
@@ -517,7 +513,7 @@ let funcList =
             })
             self.color = color
             toolBoxPlugin.update(pen)
-            self.update('title')
+            self.updateAll()
           }
         },
         style:`<style>

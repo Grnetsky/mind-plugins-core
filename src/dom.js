@@ -129,6 +129,7 @@ export class ToolBox {
       item.dom.titleDom = title
       // 事件处理
     }
+    item.updateAll = (keepOpen = true)=>{item.update('title');item.update('child',keepOpen)}
     item.update()
     return dom;
   }

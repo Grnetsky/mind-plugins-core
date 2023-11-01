@@ -233,6 +233,8 @@ let funcList =
                 i.classList.add('style_active')
              }
            })
+           self.dash = res.join(',')
+           self.update('title')
          },
           sliderChange: (value)=>{
            dom.shadowRoot.querySelector('#t').innerHTML = value
@@ -242,6 +244,7 @@ let funcList =
               id:pen.id,
               lineWidth: value
             })
+            self.update('title')
           },
          setColor(e,value){
             let color = ''
@@ -260,6 +263,8 @@ let funcList =
              color
            })
            pen.mind.color = color
+           self.color = color;
+           self.update('title');
          }
         },
        style:`<style>
@@ -370,7 +375,7 @@ let funcList =
     lineStyle: 'curve',
     width: 3,
     init(self,pen){
-      self.color = pen.calculative.color || '#000';
+      self.color = pen.mind.lineColor || pen.calculative.color || '#000';
       self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
       self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
     },
@@ -396,8 +401,8 @@ let funcList =
      * @param pen 返回当前pen对象
      * @param dom 返回此容器dom
      * */
-    colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
-      '#6ffd97','#efe864','#ff931a','#fa7878'],
+    colorList:['#00000000','#5757F3','#fa7878','#8C8CFF','#19f1cc',
+      '#6ffd97','#efe864','#ff931a'],
     setChildrenDom(self, pen){
       let dom = createDom('div',{
         display: 'flex',
@@ -486,6 +491,7 @@ let funcList =
             let root = meta2d.findOne(pen.mind.rootId)
             root.mind.lineWidth = value
             toolBoxPlugin.resetLineStyle(root);
+            self.update('title')
           },
           setLineStyle(value){
             let res = value?'curve':'polyline'
@@ -503,6 +509,7 @@ let funcList =
             root.mind.lineStyle = res
             toolBoxPlugin.resetLineStyle(root);
             // toolBoxPlugin.update(root);
+
           },
           setColor(e,value){
             let color = ''
@@ -522,7 +529,9 @@ let funcList =
                 'mind.lineColor':color
               })
             })
+            self.color = color
             toolBoxPlugin.update(pen)
+            self.update('title')
           }
         },
         style:`<style>
@@ -605,7 +614,11 @@ let funcList =
       dom.shadowRoot.innerHTML = str
       return dom ;
     },
-    closeChildDomEvent: 'none'
+    closeChildDomEvent: 'none',
+    event: 'mouseenter',
+    func(self,pen,dom){
+      self.open = true
+    }
   },
   {
     key:'layoutDirection',
@@ -945,7 +958,6 @@ let funcList =
  //   name:'button',
  //   event: 'click',
  //   func(){
- //     console.log(9999)
  //   },
  //   openChildDomEvent:'mouseenter',
  //   closeChildDomEvent: 'mouseleave',

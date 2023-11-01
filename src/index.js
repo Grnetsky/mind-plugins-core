@@ -278,7 +278,7 @@ export let toolBoxPlugin = {
             globalThis.toolbox = toolbox;
         }
         meta2d.on('add',(pens)=>{
-            if(pens && pens.length === 1 && pens[0].name === 'mindNode2' && !pens[0].mind){
+            if(pens && pens.length === 1 && pens[0].target === 'mind' && !pens[0].mind){
                 let pen = pens[0]
                 pen.mind = {
                     isRoot: true,

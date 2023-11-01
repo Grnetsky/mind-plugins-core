@@ -2,7 +2,6 @@
 // 模板解析，注册函数并返回返回dom对象
 // TODO 此处只能处理返回字符串的信息
 
-
 let LifeCycle = ['mounted']
 export function template(config,{template,scripts,style}){
     let namespace = config.key

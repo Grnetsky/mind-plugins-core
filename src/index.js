@@ -1,10 +1,11 @@
 import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./dom.js";
-import {defaultFuncList, generateColor} from "./default.js";
+import {colorList, defaultFuncList, generateColor} from "./default.js";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
+    colorList:colorList,
     childrenGap: 20, // 子节点间的间距
     levelGap: 200, // 子级间的间距
     // 计算子节点的颜色和位置
@@ -64,22 +65,7 @@ export let toolBoxPlugin = {
                 meta2d.setVisible(child,false,false);
             }
             if(recursion) toolBoxPlugin.calChildrenPosAndColor(child,true,child.mind.direction);
-
-
-            // meta2d.setValue({
-            //   id:child.id,
-            //   x: worldReact.x + pen.mind.maxWidth + toolBoxPlugin.levelGap ,
-            //   y:worldReact.y  - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2*worldReact.height+((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0),
-            //   color:nodeColor
-            // },{render:false});
-            // meta2d.setValue({id:child.connectedLines[0].id,color:nodeColor,},{render:false});
         }
-        // 最后添加的图元
-        // let lastChild = children.find(child=>!child.connectedLines || child.connectedLines.length === 0);
-        // if(lastChild && (!lastChild.connectedLines || lastChild.connectedLines?.length === 0)) {
-        //   meta2d.updateLineType(line, 'curve');
-        //   meta2d.setValue({id: line.id, color: lastChild.calculative.color, lineWidth: 2}, {render: false});
-        // }
     },
     connectLine(pen,newPen,option = {position: 'top',style : 'polyline'}){
         let line = null;
@@ -105,7 +91,7 @@ export let toolBoxPlugin = {
     },
 
     // 重新设置线颜色
-    reSetLinesColor(pen,recursion = true){
+    resetLinesColor(pen,recursion = true){
         let colors = generateColor();
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
@@ -114,14 +100,14 @@ export let toolBoxPlugin = {
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
-                line.mind.color =pen.mind.lineColor|| pen.mind.color || colors.next().value;
+                line.mind.color = pen.mind.lineColor|| pen.mind.color || colors.next().value;
                 meta2d.setValue({
                     id:line.lineId,
                     color: line.mind.color
                 },{render:false});
             }
             if(recursion){
-                toolBoxPlugin.reSetLinesColor(child,true);
+                toolBoxPlugin.resetLinesColor(child,true);
             }
         }
     },
@@ -147,7 +133,7 @@ export let toolBoxPlugin = {
             }
         }
     },
-    // 重新设置连线的位置 TODO 有问题
+    // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
     resetLinePos(pen,pos,recursion = true){
         let children = pen.mind.children;
         if(!children || children.length === 0 ){
@@ -277,8 +263,22 @@ export let toolBoxPlugin = {
             });
             globalThis.toolbox = toolbox;
         }
+        // 打开时进行初始化
+        meta2d.on('opened',()=>{
+            let {pens} = meta2d.data()
+            pens.forEach(i=>{
+                if(i.mind){
+                    let pen = meta2d.findOne(i.id)
+                    toolBoxPlugin.combineLifeCycle(pen)
+                    i.mind.isRoot?window.MindManager.rootIds.push(pen):''
+                }
+
+            })
+        })
+
+        // 添加根节点
         meta2d.on('add',(pens)=>{
-            if(pens && pens.length === 1 && pens[0].target === 'mind' && !pens[0].mind){
+            if(pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind){
                 let pen = pens[0]
                 pen.mind = {
                     isRoot: true,
@@ -289,6 +289,7 @@ export let toolBoxPlugin = {
                     height: 0, // 包含了自己和子节点的最大高度
                     direction:'right',
                     lineStyle: 'curve',
+                    lineColor:'',
                     childrenVisible: true,
                     visible: true,
                     lineWidth: 2
@@ -431,9 +432,9 @@ export let toolBoxPlugin = {
     /**
      * @description 添加节点
      * @param pen 添加节点的目标节点
-     * @param position 添加节点的位置 默认*/
-    async addNode(pen,position = 0, type = "mindNode2",){
-        let newPen = await meta2d.addPen({
+     * @param position 添加节点的位置 默认为追加*/
+    async addNode(pen,position = 0, type = "mindNode2",option={}){
+        let opt = {
             name:type,
             mind:{
                 isRoot: false,
@@ -444,7 +445,9 @@ export let toolBoxPlugin = {
                 height: 0, // 包含了自己和子节点的最大高度
                 direction:pen.mind.direction,
                 childrenVisible: true,
-                visible: true
+                visible: true,
+                lineStyle:'',
+                lineColor:''
             },
             x:pen.x ,
             y:pen.y ,
@@ -456,7 +459,14 @@ export let toolBoxPlugin = {
             lineWidth:3,
             fontSize:16,
             borderRadius: pen.borderRadius,
-        });
+        }
+        console.log(pen.width,pen.height,'ppppppppppppp')
+        let scale = pen.calculative.canvas.store.data.scale;
+        option.width && (option.width *= scale)
+        option.height && (option.height *= scale)
+
+        Object.assign(opt,option)
+        let newPen = await meta2d.addPen(opt);
         window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
         // 添加节点
         if(position){
@@ -478,7 +488,7 @@ export let toolBoxPlugin = {
     update(pen,recursion = true){
         if(!pen)return;
         toolBoxPlugin.calChildrenPosAndColor(pen,recursion,pen.mind.direction);
-        toolBoxPlugin.reSetLinesColor(pen,recursion);
+        toolBoxPlugin.resetLinesColor(pen,recursion);
         toolBoxPlugin.resetLineStyle(pen,recursion);
         toolBoxPlugin.render();
         pluginsMessageChannels.publish('update')
@@ -488,4 +498,3 @@ export let toolBoxPlugin = {
         pluginsMessageChannels.publish('render')
     }
 };
-

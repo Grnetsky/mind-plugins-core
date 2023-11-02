@@ -45,7 +45,6 @@ export class ToolBox {
       "height: 100%;" +
       "margin: 0 1px;" +
       "cursor: pointer;" +
-      "transition: all .3s ease;" +
       "border-radius: 5px;" +
       "padding: 0 5px;" +
       "}", 0);
@@ -120,7 +119,7 @@ export class ToolBox {
       // 执行titleDom
       title = renderTitle(item,pen,title)
       // titleDom添加到dom中
-      dom.shadowRoot.appendChild(title);
+      item.closeShadowDom?dom.appendChild(title):dom.shadowRoot.appendChild(title);
 
       // 渲染下拉列表
       let containerDom = null;
@@ -147,7 +146,7 @@ function renderInit(item,pen,dom){
     // 清空
     dom.shadowRoot.innerHTML = ''
   }else{
-    dom.attachShadow({mode: "open"})
+    item.closeShadowDom?dom.innerHTML = '':dom.attachShadow({mode: "open"});
   }
 
   //设置样式与事件
@@ -215,7 +214,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
         // 默认隐藏节点
         keepOpen?item.openChildDom?.() ||  (div.style.visibility = 'visible'):item.closeChildDom?.() || (div.style.visibility = 'hidden');
         div.innerHTML = childDom;
-        dom.shadowRoot.appendChild(div);
+        dom.shadowRoot?dom.shadowRoot.appendChild(div):dom.appendChild(div);
         containerDom = div
       }else{
         containerDom = childDom;
@@ -245,7 +244,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
           },i.event,function(e){
             i.stopPropagation?e.stopPropagation():'';
             i.func(i, this, dom, item);
-          }.bind(pen),'children_item');
+          }.bind(pen),'toolbox_item');
 
       //TODO 执行时机是否正确？？？
       i.init?.(i,pen,node)
@@ -270,7 +269,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     containerDom?.appendChild(fragment);
     containerDom.classList.add('toolbox_container')
     containerDom.style.position = 'absolute';
-    dom.shadowRoot.appendChild(containerDom);
+    item.closeShadowDom?dom.appendChild(containerDom):dom.shadowRoot.appendChild(containerDom);
     dom.childrenDom = containerDom;
 // 添加样式到元素
   }
@@ -278,6 +277,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
   if(item.children || item.setChildrenDom || item.closeOther){
     // 关闭下拉菜单
     !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
+      console.log('mouselevae')
       // 可手动派发隐藏函数
       toolbox.curItem?.onHideChildDom?.()
       item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))

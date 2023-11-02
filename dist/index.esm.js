@@ -493,7 +493,7 @@ var ToolBox = /*#__PURE__*/function () {
     this.box.style.transform = 'translateX(-50%)';
     this.setStyle(this.box, style);
     var stylesheet = document.styleSheets[0]; // 选择第一个样式表
-    stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "transition: all .3s ease;" + "border-radius: 5px;" + "padding: 0 5px;" + "}", 0);
+    stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "padding: 0 5px;" + "}", 0);
     stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
     parentHtml.appendChild(this.box);
   }
@@ -562,7 +562,7 @@ var ToolBox = /*#__PURE__*/function () {
       // 执行titleDom
       title = renderTitle(item, pen, title);
       // titleDom添加到dom中
-      dom.shadowRoot.appendChild(title);
+      item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
 
       // 渲染下拉列表
       var containerDom = null;
@@ -596,7 +596,7 @@ function renderInit(item, pen, dom) {
     // 清空
     dom.shadowRoot.innerHTML = '';
   } else {
-    dom.attachShadow({
+    item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
       mode: "open"
     });
   }
@@ -664,7 +664,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
         // 默认隐藏节点
         keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (div.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
         div.innerHTML = childDom;
-        dom.shadowRoot.appendChild(div);
+        dom.shadowRoot ? dom.shadowRoot.appendChild(div) : dom.appendChild(div);
         containerDom = div;
       } else {
         containerDom = childDom;
@@ -693,7 +693,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
       }, i.event, function (e) {
         i.stopPropagation ? e.stopPropagation() : '';
         i.func(i, this, dom, item);
-      }.bind(pen), 'children_item');
+      }.bind(pen), 'toolbox_item');
 
       //TODO 执行时机是否正确？？？
       i.init == null || i.init(i, pen, node);
@@ -721,7 +721,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
     (_containerDom = containerDom) == null || _containerDom.appendChild(fragment);
     containerDom.classList.add('toolbox_container');
     containerDom.style.position = 'absolute';
-    dom.shadowRoot.appendChild(containerDom);
+    item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
     dom.childrenDom = containerDom;
     // 添加样式到元素
   }
@@ -730,6 +730,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
     // 关闭下拉菜单
     !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
       var _toolbox$curItem;
+      console.log('mouselevae');
       // 可手动派发隐藏函数
       (_toolbox$curItem = toolbox.curItem) == null || _toolbox$curItem.onHideChildDom == null || _toolbox$curItem.onHideChildDom();
       (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
@@ -829,7 +830,7 @@ function isLiteral(_) {
 }
 
 var _marked = /*#__PURE__*/_regeneratorRuntime().mark(generateColor$$1);
-var colorList = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
+var colorList$$1 = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
 function generateColor$$1() {
   var index;
   return _regeneratorRuntime().wrap(function generateColor$(_context) {
@@ -838,9 +839,9 @@ function generateColor$$1() {
         index = 0;
       case 1:
         _context.next = 4;
-        return colorList[index];
+        return toolBoxPlugin.colorList[index];
       case 4:
-        index = (index + 1) % colorList.length;
+        index = (index + 1) % toolBoxPlugin.colorList.length;
         _context.next = 1;
         break;
       case 7:
@@ -854,38 +855,89 @@ var funcList = [{
   name: '新增子级节点',
   // 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
   // 监听事件名
-  event: 'click',
+  // event: 'click',
   /**
    * @description 事件对应的回调函数
    * @param self 返回该选项自身
    * @param pen 返回当前操作的pen对象
    * */
-  func: function () {
-    var _func = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(self, pen) {
-      return _regeneratorRuntime().wrap(function _callee$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
-          case 0:
-            toolBoxPlugin.addNode(pen, 0);
-          case 1:
-          case "end":
-            return _context2.stop();
-        }
-      }, _callee);
-    }));
-    function func(_x, _x2) {
-      return _func.apply(this, arguments);
+  // func: async (self,pen)=>{
+  //   toolBoxPlugin.addNode(pen,0);
+  //   },
+  openChildDomEvent: 'mouseenter',
+  closeChildDomEvent: 'mouseleave',
+  closeShadowDom: true,
+  children: [{
+    name: '',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+    event: 'click',
+    func: function func(self, pen, dom) {
+      toolBoxPlugin.addNode(pen, 0, 'mindNode2');
     }
-    return func;
-  }(),
+  }, {
+    name: '',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+    event: 'click',
+    func: function func(self, pen, dom) {
+      toolBoxPlugin.addNode(pen, 0, 'diamond', {
+        width: 150,
+        height: 100
+      });
+    }
+  }, {
+    name: '',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>',
+    event: 'click',
+    func: function func(self, pen, dom) {
+      toolBoxPlugin.addNode(pen, 0, 'mindNode2');
+    }
+  }],
+  //     setChildrenDom(self, pen) {
+  //       let dom = createDom('div',{
+  //         display: 'flex',
+  //         flexDirection: 'row',
+  //         flexWrap: 'wrap',
+  //         justifyContent: 'flex-start',
+  //         position:'absolute',
+  //         visibility:'hidden',
+  //         top:'50px',
+  //         backgroundColor:'#fff',
+  //         borderRadius:'5px',
+  //         padding:'16px',
+  //         width: '140px',
+  //         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+  //       });
+  //
+  //       let str = template(self,{
+  //         template:`
+  //           <div class="container">
+  //             <ul>
+  //               <li data-target="rectangle"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-flow-start"></use></svg></li>
+  //               <li data-target="mindLine"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-zizhuti"></use></svg></li>
+  //               <li></li>
+  //               <li></li>
+  //               <li></li>
+  //             </ul>
+  //           </div>
+  //         `,
+  //         scripts:``,
+  //         style:`<style>
+  //             li{
+  //                 list-style: none;
+  //             }
+  // </style>`
+  //       })
+  //       dom.innerHTML = str
+  //       return dom
+  //       },
   // 显示的图标
-  img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=',
+  img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
   /**
    * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
    * @param self 此配置项自身
    * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
    * @return string dom字符串
    * */
-  closeOther: true
 }, {
   key: 'relayout',
   name: '重新布局',
@@ -1053,6 +1105,7 @@ var funcList = [{
    * @param dom 返回此容器dom
    * */
   colorList: ['#00000000', '#5757F3', '#fa7878', '#8C8CFF', '#19f1cc', '#6ffd97', '#efe864', '#ff931a'],
+  closeShadowDom: true,
   setChildrenDom: function setChildrenDom(self, pen) {
     var dom = createDom('div', {
       display: 'flex',
@@ -1240,23 +1293,26 @@ var funcList = [{
   name: '新增同级节点',
   event: 'click',
   func: function () {
-    var _func2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(self, pen) {
+    var _func = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(self, pen) {
       var parent, index;
-      return _regeneratorRuntime().wrap(function _callee2$(_context3) {
-        while (1) switch (_context3.prev = _context3.next) {
+      return _regeneratorRuntime().wrap(function _callee$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
           case 0:
             parent = window.meta2d.findOne(pen.mind.preNodeId);
-            index = parent.mind.children.indexOf(pen);
-            _context3.next = 4;
-            return toolBoxPlugin.addNode(parent, index + 1);
+            index = parent.mind.children.indexOf(pen); // 此处拿到的是父节点
+            _context2.next = 4;
+            return toolBoxPlugin.addNode(parent, index + 1, pen.name, {
+              width: pen.calculative.width,
+              height: pen.calculative.height
+            });
           case 4:
           case "end":
-            return _context3.stop();
+            return _context2.stop();
         }
-      }, _callee2);
+      }, _callee);
     }));
-    function func(_x3, _x4) {
-      return _func2.apply(this, arguments);
+    function func(_x, _x2) {
+      return _func.apply(this, arguments);
     }
     return func;
   }(),
@@ -1315,6 +1371,7 @@ var defaultFuncList$$1 = {
 var toolBoxPlugin = {
   name: 'toolBox',
   status: false,
+  colorList: colorList$$1,
   childrenGap: 20,
   // 子节点间的间距
   levelGap: 200,
@@ -1383,21 +1440,7 @@ var toolBoxPlugin = {
         meta2d.setVisible(_child, false, false);
       }
       if (recursion) toolBoxPlugin.calChildrenPosAndColor(_child, true, _child.mind.direction);
-
-      // meta2d.setValue({
-      //   id:child.id,
-      //   x: worldReact.x + pen.mind.maxWidth + toolBoxPlugin.levelGap ,
-      //   y:worldReact.y  - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2*worldReact.height+((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0),
-      //   color:nodeColor
-      // },{render:false});
-      // meta2d.setValue({id:child.connectedLines[0].id,color:nodeColor,},{render:false});
     }
-    // 最后添加的图元
-    // let lastChild = children.find(child=>!child.connectedLines || child.connectedLines.length === 0);
-    // if(lastChild && (!lastChild.connectedLines || lastChild.connectedLines?.length === 0)) {
-    //   meta2d.updateLineType(line, 'curve');
-    //   meta2d.setValue({id: line.id, color: lastChild.calculative.color, lineWidth: 2}, {render: false});
-    // }
   },
   connectLine: function connectLine$$1(pen, newPen, option) {
     if (option === void 0) {
@@ -1430,7 +1473,7 @@ var toolBoxPlugin = {
     meta2d.updateLineType(line, option.style);
   },
   // 重新设置线颜色
-  reSetLinesColor: function reSetLinesColor(pen, recursion) {
+  resetLinesColor: function resetLinesColor(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
@@ -1452,7 +1495,7 @@ var toolBoxPlugin = {
         });
       }
       if (recursion) {
-        toolBoxPlugin.reSetLinesColor(child, true);
+        toolBoxPlugin.resetLinesColor(child, true);
       }
     }
   },
@@ -1482,7 +1525,7 @@ var toolBoxPlugin = {
       }
     }
   },
-  // 重新设置连线的位置 TODO 有问题
+  // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
   resetLinePos: function resetLinePos(pen, pos, recursion) {
     if (recursion === void 0) {
       recursion = true;
@@ -1621,8 +1664,22 @@ var toolBoxPlugin = {
       toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement, {});
       globalThis.toolbox = toolbox;
     }
+    // 打开时进行初始化
+    meta2d.on('opened', function () {
+      var _meta2d$data = meta2d.data(),
+        pens = _meta2d$data.pens;
+      pens.forEach(function (i) {
+        if (i.mind) {
+          var pen = meta2d.findOne(i.id);
+          toolBoxPlugin.combineLifeCycle(pen);
+          i.mind.isRoot ? window.MindManager.rootIds.push(pen) : '';
+        }
+      });
+    });
+
+    // 添加根节点
     meta2d.on('add', function (pens) {
-      if (pens && pens.length === 1 && pens[0].target === 'mind' && !pens[0].mind) {
+      if (pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind) {
         var pen = pens[0];
         pen.mind = {
           isRoot: true,
@@ -1635,6 +1692,7 @@ var toolBoxPlugin = {
           // 包含了自己和子节点的最大高度
           direction: 'right',
           lineStyle: 'curve',
+          lineColor: '',
           childrenVisible: true,
           visible: true,
           lineWidth: 2
@@ -1780,11 +1838,11 @@ var toolBoxPlugin = {
   /**
    * @description 添加节点
    * @param pen 添加节点的目标节点
-   * @param position 添加节点的位置 默认*/
-  addNode: function addNode(pen, position, type) {
+   * @param position 添加节点的位置 默认为追加*/
+  addNode: function addNode(pen, position, type, option) {
     var _this4 = this;
     return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-      var newPen, rootNode;
+      var opt, scale, newPen, rootNode;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
@@ -1794,8 +1852,10 @@ var toolBoxPlugin = {
             if (type === void 0) {
               type = "mindNode2";
             }
-            _context2.next = 4;
-            return meta2d.addPen({
+            if (option === void 0) {
+              option = {};
+            }
+            opt = {
               name: type,
               mind: {
                 isRoot: false,
@@ -1808,7 +1868,9 @@ var toolBoxPlugin = {
                 // 包含了自己和子节点的最大高度
                 direction: pen.mind.direction,
                 childrenVisible: true,
-                visible: true
+                visible: true,
+                lineStyle: '',
+                lineColor: ''
               },
               x: pen.x,
               y: pen.y,
@@ -1820,8 +1882,15 @@ var toolBoxPlugin = {
               lineWidth: 3,
               fontSize: 16,
               borderRadius: pen.borderRadius
-            });
-          case 4:
+            };
+            console.log(pen.width, pen.height, 'ppppppppppppp');
+            scale = pen.calculative.canvas.store.data.scale;
+            option.width && (option.width *= scale);
+            option.height && (option.height *= scale);
+            _Object$assign(opt, option);
+            _context2.next = 11;
+            return meta2d.addPen(opt);
+          case 11:
             newPen = _context2.sent;
             window.MindManager.pluginsMessageChannels.publish('addNode', newPen);
             // 添加节点
@@ -1842,7 +1911,7 @@ var toolBoxPlugin = {
             globalThis.toolbox.bindPen(newPen);
             globalThis.toolbox.setFuncList(_this4.getFuncList(newPen));
             globalThis.toolbox.translatePosition(newPen);
-          case 14:
+          case 21:
           case "end":
             return _context2.stop();
         }
@@ -1855,7 +1924,7 @@ var toolBoxPlugin = {
     }
     if (!pen) return;
     toolBoxPlugin.calChildrenPosAndColor(pen, recursion, pen.mind.direction);
-    toolBoxPlugin.reSetLinesColor(pen, recursion);
+    toolBoxPlugin.resetLinesColor(pen, recursion);
     toolBoxPlugin.resetLineStyle(pen, recursion);
     toolBoxPlugin.render();
     pluginsMessageChannels.publish('update');
@@ -1866,4 +1935,4 @@ var toolBoxPlugin = {
   }
 };
 
-export { toolBoxPlugin, generateColor$$1 as generateColor, defaultFuncs$$1 as defaultFuncs, defaultFuncList$$1 as defaultFuncList, createDom, ToolBox };
+export { toolBoxPlugin, colorList$$1 as colorList, generateColor$$1 as generateColor, defaultFuncs$$1 as defaultFuncs, defaultFuncList$$1 as defaultFuncList, createDom, ToolBox };

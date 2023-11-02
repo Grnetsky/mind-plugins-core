@@ -34,6 +34,6 @@
     "@babel/runtime-corejs2": "^7.12.5",
     "@babel/runtime-corejs3": "^7.12.5",
     "core-js": "^3.7.0",
-    "mind-diagram": "file:C:\\Users\\Andy\\Desktop\\大屏\\meta2d.js\\dist\\mind-diagram"
+    "mind-diagram": "0.0.1"
   }
 }

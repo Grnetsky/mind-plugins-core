@@ -1054,7 +1054,7 @@ var funcList = [{
             id: pen.id,
             color: color
           });
-          pen.mind.color = color;
+          resetLinesColor = color;
           self.color = color;
           self.updateAll();
         }
@@ -1407,7 +1407,7 @@ var toolBoxPlugin = {
       var _child = children[_i]; // 获取子元素
       topHeight += (((_children = children[_i - 1]) == null || (_children = _children.mind) == null ? void 0 : _children.maxHeight) || 0) + (children[_i - 1] ? +toolBoxPlugin.childrenGap : 0);
       topWidth += (((_children2 = children[_i - 1]) == null || (_children2 = _children2.mind) == null ? void 0 : _children2.maxWidth) || 0) + (children[_i - 1] ? +toolBoxPlugin.childrenGap : 0);
-      var nodeColor = pen.mind.color || generateColorFunc.next().value;
+      var nodeColor = resetLinesColor || generateColorFunc.next().value;
       switch (position) {
         case 'right':
           _child.mind.x = worldReact.x + worldReact.width + +toolBoxPlugin.levelGap;

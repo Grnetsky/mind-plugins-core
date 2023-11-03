@@ -1,7 +1,7 @@
 import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
-import {ToolBox} from "./dom.js";
-import {colorList, defaultFuncList, generateColor} from "./default.js";
+import {ToolBox} from "./toolbox";
+import {colorList, defaultFuncList, generateColor} from "../default.js";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -446,7 +446,7 @@ export let toolBoxPlugin = {
                 direction:pen.mind.direction,
                 childrenVisible: true,
                 visible: true,
-                lineStyle:'',
+                lineStyle:pen.mind.lineStyle || '',
                 lineColor:''
             },
             x:pen.x ,
@@ -460,7 +460,6 @@ export let toolBoxPlugin = {
             fontSize:16,
             borderRadius: pen.borderRadius,
         }
-        console.log(pen.width,pen.height,'ppppppppppppp')
         let scale = pen.calculative.canvas.store.data.scale;
         option.width && (option.width *= scale)
         option.height && (option.height *= scale)
@@ -498,3 +497,6 @@ export let toolBoxPlugin = {
         pluginsMessageChannels.publish('render')
     }
 };
+
+
+

@@ -43,7 +43,8 @@ export let toolBoxPlugin = {
         }
         meta2d.setValue({
             id:line.id,
-            lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth
+            lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth,
+            locked: 2
         },{render:false})
         meta2d.updateLineType(line, option.style);
     },

@@ -2,10 +2,7 @@ import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import {colorList, defaultFuncList, generateColor} from "../default.js";
-import right from "../layout/right";
-import left from "../layout/left";
-import top from "../layout/top";
-import bottom from "../layout/bottom"
+import { right,left,top,bottom } from "../layout"
 import defaultColorRule from "../color/default";
 export let toolBoxPlugin = {
     name:'toolBox',
@@ -57,7 +54,7 @@ export let toolBoxPlugin = {
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
-            const child = children[i];
+            const child = meta2d.store.pens[children[i]];
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
@@ -83,7 +80,7 @@ export let toolBoxPlugin = {
         if(!children || children.length === 0 )return;
         let root = meta2d.findOne(pen.mind.rootId)
         for(let i = 0 ;i<children.length;i++){
-            const child = children[i];
+            const child = meta2d.store.pens[children[i]];
             let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
                 meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
@@ -107,7 +104,7 @@ export let toolBoxPlugin = {
             return;
         };
         for(let i = 0 ;i<children.length;i++){
-            const child = children[i];
+            const child = meta2d.store.pens[children[i]];
             if(!child.connectedLines || child.connectedLines.length === 0)return;
             let line = meta2d.findOne(child.connectedLines[0]?.lineId);
             let penAnchor = null;
@@ -214,12 +211,12 @@ export let toolBoxPlugin = {
 
         // 查找到对应的父级，删除其在父级中的子级列表数据
         let parent = meta2d.findOne(pen.mind.preNodeId);
-        parent && parent.mind.children.splice(parent.mind.children.indexOf(pen),1);
+        parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
 
         // 刷新界面
 
         // 删除meta2d数据
-        await meta2d.delete(pen.mind.children);
+        await meta2d.delete(pen.mind.children.map(i=>meta2d.store.pens[i]));
         toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
     },
     install:()=>{
@@ -245,6 +242,9 @@ export let toolBoxPlugin = {
                     let pen = meta2d.findOne(i.id)
                     toolBoxPlugin.combineLifeCycle(pen)
                     i.mind.isRoot?window.MindManager.rootIds.push(pen):''
+                    i.mind.children.forEach(i=>{
+
+                    })
                 }
 
             })
@@ -291,7 +291,8 @@ export let toolBoxPlugin = {
         if(!pen.mind.children || pen.mind.children.length === 0)return;
         this.combineLifeCycle(pen,true)
         pen.mind.children.forEach(i=>{
-            this.unCombineLifeCycle(i)
+            let child = meta2d.store.pens[i]
+            this.unCombineLifeCycle(child)
         })
     },
 
@@ -319,7 +320,7 @@ export let toolBoxPlugin = {
         let maxW = 0;
         if(position === 'right' || position === 'left'){
             for(let i = 0;i<children.length;i++){
-                let child = children[i];
+                let child = meta2d.store.pens[children[i]];
                 let maxObj = toolBoxPlugin.calcChildWandH(child,position);
                 maxHeight += maxObj.maxHeight;
                 maxWidth = maxWidth > maxObj.maxWidth? maxWidth : maxObj.maxWidth;
@@ -334,7 +335,7 @@ export let toolBoxPlugin = {
             };
         }else {
             for(let i = 0;i<children.length;i++){
-                let child = children[i];
+                let child = meta2d.store.pens[children[i]];
                 let maxObj = toolBoxPlugin.calcChildWandH(child,position);
                 maxWidth += maxObj.maxWidth;
                 maxHeight = maxHeight > maxObj.maxHeight? maxHeight : maxObj.maxHeight;
@@ -445,9 +446,9 @@ export let toolBoxPlugin = {
         window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
         // 添加节点
         if(position){
-            pen.mind.children.splice(position,0,newPen);
+            pen.mind.children.splice(position,0,newPen.id);
         }else{
-            pen.mind.children.push(newPen);
+            pen.mind.children.push(newPen.id);
         }
         toolBoxPlugin.combineLifeCycle(newPen); // 重写生命周期
         let rootNode = meta2d.findOne(pen.mind.rootId);

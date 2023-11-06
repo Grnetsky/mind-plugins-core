@@ -1001,7 +1001,7 @@ let funcList =
   event: 'click',
   func: async (self,pen)=>{
     let parent = (window).meta2d.findOne(pen.mind.preNodeId);
-    let index = parent.mind.children.indexOf(pen);
+    let index = parent.mind.children.indexOf(pen.id);
 
     // TODO 此处拿到的是父节点
     await toolBoxPlugin.addNode(parent,index+1,pen.name);

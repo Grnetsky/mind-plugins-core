@@ -1,6 +1,6 @@
 
 import {toolBoxPlugin} from "../core/ToolBoxPlugin";
-function top(pen,recursion = true) {
+export function top(pen,recursion = true) {
     let childrenGap = toolBoxPlugin.childrenGap
     let levelGap = toolBoxPlugin.levelGap
     let children = pen.mind.children;
@@ -9,10 +9,10 @@ function top(pen,recursion = true) {
     let topWidth = 0;
     toolBoxPlugin.calcChildWandH(pen,'top');
     for(let i = 0;i<children.length;i++){
-        let child = children[i]
+        let child =  meta2d.store.pens[children[i]]
         let childRect = meta2d.getPenRect(child)
-        topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(+childrenGap):0) ;
-        topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(+childrenGap):0) ;
+        topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
+        topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
         child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
         child.mind.y = worldReact.y - 1/2 * meta2d.getPenRect(child).height - +levelGap;
         if(child.mind.visible){
@@ -30,4 +30,3 @@ function top(pen,recursion = true) {
     }
 }
 
-export default top

@@ -61,8 +61,7 @@ export let toolBoxPlugin = {
                 if(child.mind.level > 1){
                     line.mind.color = pen.mind.lineColor || pen.color
                 }else {
-                    line.mind.color = pen.mind.lineColor|| pen.mind.color || colors.next().value;
-
+                    line.mind.color = pen.mind.lineColor|| colors.next().value;
                 }
                 meta2d.setValue({
                     id:line.lineId,

@@ -5,9 +5,9 @@ function defaultColorRule(pen,recursion = true) {
     for(let i = 0;i<children.length;i++){
         let child = meta2d.store.pens[children[i]]
         let nodeColor = undefined
-        if(child.mind.level === 1){
+        if(pen.mind.level === 0){
             let nextColor = generateColorFunc.next().value;
-            nodeColor = child.mind.color || pen.mind.color || nextColor;
+            nodeColor = child.mind.color || nextColor;
         }else {
             nodeColor = child.mind.color || pen.mind.color || pen.color;
         }

@@ -199,9 +199,10 @@ export let toolBoxPlugin = {
             i
         )=>{
             let line = meta2d.findOne(i.lineId);
+            line.locked = 0;
             line && lines.push(line);
         });
-        meta2d.delete(lines);
+        meta2d.delete(lines,true);
     },
 
     // 删除node
@@ -216,7 +217,7 @@ export let toolBoxPlugin = {
         // 刷新界面
 
         // 删除meta2d数据
-        await meta2d.delete(pen.mind.children.map(i=>meta2d.store.pens[i]));
+        await meta2d.delete(pen.mind.children.map(i=>meta2d.store.pens[i]),true);
         toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
     },
     install:()=>{

@@ -1,6 +1,6 @@
-import { createDom } from "./utils";
-import {toolBoxPlugin} from "./core";
-import {template} from "./parse";
+import { createDom } from "../utils";
+import {toolBoxPlugin} from "../core";
+import {template} from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
@@ -1044,4 +1044,14 @@ export let defaultFuncList = {
   'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','relayout','relayoutNext','nodeStyle','lineStyle',)
 };
 
+export let childrenGap = 20;
 
+export let levelGap = 200;
+
+export default {
+  childrenGap,
+  levelGap,
+  funcList,
+  colorList,
+  defaultFuncList
+}

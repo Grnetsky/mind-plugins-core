@@ -1,4 +1,4 @@
-import {generateColor} from "../default";
+import {generateColor} from "../config/default";
 function defaultColorRule(pen,recursion = true) {
     let children = pen.mind.children;
     let generateColorFunc = generateColor();

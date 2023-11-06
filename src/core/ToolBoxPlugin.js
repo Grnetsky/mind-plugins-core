@@ -1,15 +1,15 @@
 import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
-import {colorList, defaultFuncList, generateColor} from "../default.js";
+import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import { right,left,top,bottom } from "../layout"
 import defaultColorRule from "../color/default";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
     colorList:colorList,
-    childrenGap: 20, // 子节点间的间距
-    levelGap: 200, // 子级间的间距
+    childrenGap: config.childrenGap, // 子节点间的间距
+    levelGap: config.levelGap, // 子级间的间距
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置

@@ -2,69 +2,30 @@ import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import {colorList, defaultFuncList, generateColor} from "../default.js";
+import right from "../layout/right";
+import left from "../layout/left";
+import top from "../layout/top";
+import bottom from "../layout/bottom"
+import defaultColorRule from "../color/default";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
     colorList:colorList,
     childrenGap: 20, // 子节点间的间距
     levelGap: 200, // 子级间的间距
+    layoutFunc:new Map(), // 布局位置函数map
+    colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
     calChildrenPosAndColor(pen,recursion = true, position='right'){
         if(!pen)return;
-        let children = pen.mind?.children;
-        if(!children)return;
-        let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
-        // let allHeight = 0; // 子节点所占的高度
-        let allWidth = 0; // 子节点所占的宽度
-        // 子节点的世界坐标信息集合
-        let penRects = [];
-        for(let i = 0 ;i<children.length;i++){
-            let child = children[i];
-            let childWorldRect = meta2d.getPenRect(child);
-            penRects.push(childWorldRect);
-        }
-        let topHeight = 0;
-        let topWidth = 0;
-        // 设置值
-        let generateColorFunc = generateColor();
-        toolBoxPlugin.calcChildWandH(pen,position);
-        for(let i = 0;i<children.length;i++){
-            // 循环设置每个
-            let child = children[i]; // 获取子元素
-            topHeight += ((children[i-1]?.mind?.maxHeight) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
-            topWidth += ((children[i-1]?.mind?.maxWidth) || 0) +(children[i-1]?(+toolBoxPlugin.childrenGap):0) ;
-
-            let nodeColor = pen.mind.color || generateColorFunc.next().value;
-            switch (position){
-                case 'right':
-                    child.mind.x = worldReact.x + worldReact.width + +toolBoxPlugin.levelGap;
-                    child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
-                    break;
-                case 'left':
-                    child.mind.x = worldReact.x - penRects[i].width - +toolBoxPlugin.levelGap;
-                    child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * penRects[i].height) || 0);
-                    break;
-                case 'bottom':
-                    child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y + child.height + +toolBoxPlugin.levelGap;
-                    break;
-                case 'top':
-                    child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * penRects[i].width) || 0);
-                    child.mind.y = worldReact.y - child.height - +toolBoxPlugin.levelGap;
-            }
-            if(!child.mind.color)child.mind.color = nodeColor;
-            if(child.mind.visible){
-                meta2d.setValue({
-                    id: child.id,
-                    x: child.mind.x,
-                    y: child.mind.y,
-                    color: child.mind.color
-                },{render:false});
-                meta2d.setVisible(child,true,false);
-            }else{
-                meta2d.setVisible(child,false,false);
-            }
-            if(recursion) toolBoxPlugin.calChildrenPosAndColor(child,true,child.mind.direction);
+        let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
+        let colorFunc = toolBoxPlugin.colorFunc.get('default')
+        if(!layoutFunc)throw new Error('toolBoxPlugin error : The layout function does not exist')
+        try{
+            layoutFunc(pen)
+            colorFunc(pen)
+        }catch (e){
+            throw new Error(`toolBoxPlugin error : ${e.message}`)
         }
     },
     connectLine(pen,newPen,option = {position: 'top',style : 'polyline'}){
@@ -100,7 +61,12 @@ export let toolBoxPlugin = {
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
-                line.mind.color = pen.mind.lineColor|| pen.mind.color || colors.next().value;
+                if(child.mind.level > 1){
+                    line.mind.color = pen.mind.lineColor || pen.color
+                }else {
+                    line.mind.color = pen.mind.lineColor|| pen.mind.color || colors.next().value;
+
+                }
                 meta2d.setValue({
                     id:line.lineId,
                     color: line.mind.color
@@ -263,6 +229,14 @@ export let toolBoxPlugin = {
             });
             globalThis.toolbox = toolbox;
         }
+
+        // 初始化布局函数
+        toolBoxPlugin.layoutFunc.set('right',right)
+        toolBoxPlugin.layoutFunc.set('left',left)
+        toolBoxPlugin.layoutFunc.set('top',top)
+        toolBoxPlugin.layoutFunc.set('bottom',bottom)
+
+        toolBoxPlugin.colorFunc.set('default',defaultColorRule)
         // 打开时进行初始化
         meta2d.on('opened',()=>{
             let {pens} = meta2d.data()
@@ -292,7 +266,8 @@ export let toolBoxPlugin = {
                     lineColor:'',
                     childrenVisible: true,
                     visible: true,
-                    lineWidth: 2
+                    lineWidth: 2,
+                    level:0,
                 };
                 window.MindManager.rootIds.push(pen)
                 // 跟随移动
@@ -447,7 +422,8 @@ export let toolBoxPlugin = {
                 childrenVisible: true,
                 visible: true,
                 lineStyle:pen.mind.lineStyle || '',
-                lineColor:''
+                lineColor:'',
+                level: pen.mind.level + 1
             },
             x:pen.x ,
             y:pen.y ,

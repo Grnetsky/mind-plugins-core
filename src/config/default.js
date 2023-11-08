@@ -134,7 +134,7 @@ let funcList =
     func(self,pen,dom,father){
       let children = pen.mind?.children || [];
       if(children.length >0){
-        toolBoxPlugin.update(pen,true);
+        toolBoxPlugin.update(meta2d.store.pens[pen.mind.rootId],true);
       }
     },
     // setDom(self,dom){

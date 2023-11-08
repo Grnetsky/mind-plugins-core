@@ -1,6 +1,6 @@
 import {toolBoxPlugin} from "../core/ToolBoxPlugin";
-export function top(pen,reset=true,recursion = true,) {
-    reset?pen.mind.direction = 'top':''
+export function top(pen,recursion = true,) {
+    pen.mind.direction = 'top'
     let childrenGap = toolBoxPlugin.childrenGap
     let levelGap = toolBoxPlugin.levelGap
     let children = pen.mind.children;
@@ -34,7 +34,7 @@ export function top(pen,reset=true,recursion = true,) {
         }else{
             meta2d.setVisible(child,false,false);
         }
-        if(recursion) top(child,reset,true);
+        if(recursion) top(child,true);
     }
 }
 

@@ -26,10 +26,10 @@ export function createDom(name,style,even = undefined,func = undefined,className
 
 export function debounce(fn, delay) {
     let timer = null;
-    return function() {
+    return function(pen,recursion = true) {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            fn.apply(this, arguments);
+            fn.call(this, pen,recursion);
         }, delay);
     };
 }

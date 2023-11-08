@@ -262,7 +262,6 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(item.children || item.setChildrenDom || item.closeOther){
         // 关闭下拉菜单
         !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
-            console.log('mouselevae')
             // 可手动派发隐藏函数
             toolbox.curItem?.onHideChildDom?.()
             item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))

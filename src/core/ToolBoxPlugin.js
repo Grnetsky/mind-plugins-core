@@ -492,7 +492,6 @@ export let toolBoxPlugin = {
         },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
-        console.log(pen,recursion,'xxxxxxxxxxxxxxxxxxxxxxx')
         toolBoxPlugin.calChildrenPosAndColor(pen,pen.mind.direction,recursion);
         toolBoxPlugin.resetLinesColor(pen,recursion);
         toolBoxPlugin.resetLinesStyle(pen,recursion);

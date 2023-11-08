@@ -22,3 +22,14 @@ export function createDom(name,style,even = undefined,func = undefined,className
     }
     return dom;
 }
+
+
+export function debounce(fn, delay) {
+    let timer = null;
+    return function() {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            fn.apply(this, arguments);
+        }, delay);
+    };
+}

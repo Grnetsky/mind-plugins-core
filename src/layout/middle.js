@@ -3,7 +3,7 @@ import {left} from "./left";
 import {right} from "./right";
 export function middle(pen,reset = true,recursion = true) {
     pen.mind.direction = 'middle'
-    const VALUE = 5;
+    const VALUE = 8;
     let childrenGap = toolBoxPlugin.childrenGap
     let levelGap = toolBoxPlugin.levelGap
     let children = JSON.parse(JSON.stringify(pen.mind.children));

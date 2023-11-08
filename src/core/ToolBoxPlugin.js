@@ -4,6 +4,7 @@ import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import { right,left,top,bottom, middle } from "../layout"
 import defaultColorRule from "../color/default";
+import { debounce } from "../utils"
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -176,6 +177,7 @@ export let toolBoxPlugin = {
     },
     // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
     resetLayOut(pen,pos,recursion = true){
+        if(!pen)return
         if(!pos)pos = pen.mind.direction
         toolBoxPlugin.disconnectLines(pen,recursion)
         // toolBoxPlugin.deleteLines(pen)
@@ -204,7 +206,9 @@ export let toolBoxPlugin = {
         pen.connectedLines?.forEach((
             i
         )=>{
+
             let line = meta2d.findOne(i.lineId);
+            if(!line)return
             line.locked = 0;
             line && lines.push(line);
         });
@@ -212,7 +216,7 @@ export let toolBoxPlugin = {
     },
 
     // 删除node
-    async deleteNode(pen){
+    async deleteNode(pen,update = false){
         // 删除与之相关的线
         toolBoxPlugin.deleteLines(pen);
 
@@ -223,8 +227,9 @@ export let toolBoxPlugin = {
         // 刷新界面
 
         // 删除meta2d数据
-        await meta2d.delete(pen.mind.children.map(i=>meta2d.store.pens[i]),true);
-        toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
+        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]) || [],true);
+        update?toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId)):'';
+
     },
     install:()=>{
         let toolbox = null;
@@ -330,7 +335,7 @@ export let toolBoxPlugin = {
         let maxWidth = 0;
         let maxH = 0;
         let maxW = 0;
-        if(position === 'right' || position === 'left'){
+        if(position === 'right' || position === 'left' || position === 'middle'){
             for(let i = 0;i<children.length;i++){
                 let child = meta2d.store.pens[children[i]];
                 let maxObj = toolBoxPlugin.calcChildWandH(child,position);
@@ -394,14 +399,15 @@ export let toolBoxPlugin = {
         //     toolbox.hide();
         // };
         const onDestroy = (targetPen)=>{
-            toolbox.hide();
+            toolbox?.hide();
             toolBoxPlugin.deleteNode(targetPen);
             if(targetPen.mind.isRoot){
                 let index = MindManager.rootIds.indexOf(targetPen.id)
                 if(index === -1)return
                 MindManager.rootIds.splice(index,1)
             }
-
+            toolBoxPlugin.resetLayOut(meta2d.findOne(targetPen.mind.rootId))
+            toolBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
         };
         const onMouseUp = (targetPen)=>{
             toolbox.bindPen(targetPen);
@@ -484,14 +490,17 @@ export let toolBoxPlugin = {
         toolBoxPlugin.resetLayOut(rootNode)
         toolBoxPlugin.update(rootNode)
         },
-    update(pen,recursion = true){
+    update: debounce((pen,recursion = true)=>{
         if(!pen)return;
+        console.log('update')
         toolBoxPlugin.calChildrenPosAndColor(pen,pen.mind.direction,recursion);
         toolBoxPlugin.resetLinesColor(pen,recursion);
         toolBoxPlugin.resetLinesStyle(pen,recursion);
         toolBoxPlugin.render();
         pluginsMessageChannels.publish('update')
-    },
+    },5),
+
+
     render(){
         meta2d.render();
         pluginsMessageChannels.publish('render')

@@ -51,6 +51,9 @@ export class ToolBox {
         this.box.style.display = 'flex';
         this.box.style.flexDirection = 'row';
     }
+    destroy(){
+        this.box.parentNode.removeChild(this.box)
+    }
     curItem = null
     translatePosition(pen){
         this.hide();

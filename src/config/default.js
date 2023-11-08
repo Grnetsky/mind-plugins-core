@@ -58,7 +58,7 @@ let funcList =
             '</svg>',
         event:'click',
         func(self,pen,dom){
-          toolBoxPlugin.addNode(pen,0,'mindNode2')
+          toolBoxPlugin.addNode(pen,0,'mindLine2')
         }
       }
     ],
@@ -329,6 +329,8 @@ let funcList =
            pen.mind.color = color
            self.color = color;
            self.updateAll()
+           toolBoxPlugin.resetLinesColor(pen)
+           toolBoxPlugin.calcChildrenColor(pen)
          }
         },
        style:`<style>
@@ -436,7 +438,7 @@ let funcList =
     key:'lineStyle',
     name:'线条样式',
     color:'#4D4DFF',
-    lineStyle: 'curve',
+    lineStyle: 'mind',
     width: 3,
     init(self,pen){
       self.color = pen.mind.lineColor || pen.calculative.color || '#000';
@@ -496,7 +498,7 @@ let funcList =
             <div class="item">
                 <div class="title">连线样式</div>
                 <div class="main_style ">
-                  <div class="style_item ${self.lineStyle === 'curve'?'style_active':''}" data-style="曲线" onclick="setLineStyle(true)">
+                  <div class="style_item ${self.lineStyle === 'mind'?'style_active':''}" data-style="曲线" onclick="setLineStyle(true)">
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50px" height="20px">
                   <g fill="none" stroke="black" stroke-width="1">
                     <path d="M0 9 a100,50 0 0,1 85,0"></path>
@@ -555,16 +557,16 @@ let funcList =
             // })
             let root = meta2d.findOne(pen.mind.rootId)
             root.mind.lineWidth = value
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.update('title')
           },
           setLineStyle(value){
-            let res = value?'curve':'polyline'
+            let res = value?'mind':'polyline'
             // toolbox.renderChildren()
 
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.lineStyle = res
             // toolBoxPlugin.update(root);
             self.updateAll()
@@ -586,7 +588,7 @@ let funcList =
               })
             })
             self.color = color
-            toolBoxPlugin.update(pen)
+            toolBoxPlugin.resetLinesColor(pen,true)
             self.updateAll()
           }
         },
@@ -699,7 +701,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','bottom'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','middle'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -814,7 +816,7 @@ let funcList =
                       </svg>
                     </div>
                     
-                    <div onclick="setDirection('bottom')">                  
+                    <div onclick="setDirection('middle')">                  
                       <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
                         <title>向下布局</title>
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -876,7 +878,7 @@ let funcList =
           },
           setDirection(e){
             let root = (window).meta2d.findOne(pen.mind.rootId);
-            toolBoxPlugin.resetLinePos(root,e,true);
+            toolBoxPlugin.resetLayOut(root,e,true);
             toolBoxPlugin.update(root);
             self.direction = e
             self.activeDirection(self,pen,dom)

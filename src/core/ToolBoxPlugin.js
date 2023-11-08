@@ -2,7 +2,7 @@ import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
-import { right,left,top,bottom } from "../layout"
+import { right,left,top,bottom, middle } from "../layout"
 import defaultColorRule from "../color/default";
 export let toolBoxPlugin = {
     name:'toolBox',
@@ -13,40 +13,62 @@ export let toolBoxPlugin = {
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
-    calChildrenPosAndColor(pen,recursion = true, position='right'){
+    calChildrenPosAndColor(pen, position= pen.mind.direction || 'right',recursion = true){
         if(!pen)return;
         let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
         let colorFunc = toolBoxPlugin.colorFunc.get('default')
         if(!layoutFunc)throw new Error('toolBoxPlugin error : The layout function does not exist')
         try{
-            layoutFunc(pen)
-            colorFunc(pen)
+            layoutFunc(pen, recursion)
+            colorFunc(pen, recursion)
         }catch (e){
             throw new Error(`toolBoxPlugin error : ${e.message}`)
         }
     },
-    connectLine(pen,newPen,option = {position: 'top',style : 'polyline'}){
-        let line = null;
-        switch (option.position){
-            case 'right':
-                line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
-                break;
-            case 'left':
-                line = meta2d.connectLine(newPen, pen, newPen.anchors[1],pen.anchors[3] , false);
-                break;
-            case 'bottom':
-                line = meta2d.connectLine(pen, newPen, pen.anchors[2],newPen.anchors[0] , false);
-                break;
-            case 'top':
-                line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
-                break;
+    calcChildrenColor(pen,type = 'default',recursion = true){
+        let colorFunc = toolBoxPlugin.colorFunc.get(type)
+        if(!colorFunc)return
+        try{
+            colorFunc(pen,recursion)
+        }catch (e){
+            throw new Error(`toolBoxPlugin error : ${e.message}`)
         }
+    },
+    calcChildrenPos(pen,position = pen.mind.direction || 'right',recursion = true){
+        let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
+        if(!layoutFunc)return
+        try{
+            layoutFunc(pen, recursion)
+        }catch (e){
+            throw new Error(`toolBoxPlugin error : ${e.message}`)
+        }
+    },
+    connectLine(pen,newPen,style = 'polyline'){
+        // let line = null;
+        // switch (option.position){
+        //     case 'right':
+        //         line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
+        //         break;
+        //     case 'left':
+        //         line = meta2d.connectLine(newPen, pen, newPen.anchors[1],pen.anchors[3] , false);
+        //         break;
+        //     case 'bottom':
+        //         line = meta2d.connectLine(pen, newPen, pen.anchors[2],newPen.anchors[0] , false);
+        //         break;
+        //     case 'top':
+        //         line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
+        //         break;
+        // }
+        let from = meta2d.store.pens[newPen.mind.connect.from]
+        let to = meta2d.store.pens[newPen.mind.connect.to]
+        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor)
+        newPen.mind.lineId = line.id
         meta2d.setValue({
             id:line.id,
             lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth,
             locked: 2
         },{render:false})
-        meta2d.updateLineType(line, option.style);
+        meta2d.updateLineType(line, style);
     },
 
     // 重新设置线颜色
@@ -75,12 +97,13 @@ export let toolBoxPlugin = {
         }
     },
     // 重新递归设置连线的样式
-    resetLineStyle(pen,recursion = true){
+    resetLinesStyle(pen,recursion = true){
         let children = pen.mind.children;
         if(!children || children.length === 0 )return;
         let root = meta2d.findOne(pen.mind.rootId)
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
+            child.mind.lineStyle = pen.mind.lineStyle
             let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
                 meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
@@ -92,90 +115,73 @@ export let toolBoxPlugin = {
                 })
             }
             if(recursion){
-                toolBoxPlugin.resetLineStyle(child,true);
+                toolBoxPlugin.resetLinesStyle(child,true);
             }
         }
     },
-    // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
-    resetLinePos(pen,pos,recursion = true){
+    disconnectLines(pen,recursion = true){
         let children = pen.mind.children;
         if(!children || children.length === 0 ){
-            pen.mind.direction = pos;
             return;
         };
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
             if(!child.connectedLines || child.connectedLines.length === 0)return;
+            // 保留lineId
             let line = meta2d.findOne(child.connectedLines[0]?.lineId);
-            let penAnchor = null;
             let lineAnchor1 = line.anchors[0];
-            let childAnchor = null;
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
+            let from = meta2d.store.pens[child.mind.connect.from]
+            let to = meta2d.store.pens[child.mind.connect.to]
+            let fromAnchor = child.mind.connect.fromAnchor
+            let toAnchor = child.mind.connect.toAnchor
 
-            // 改变之前是什么方向 来按要求断开
-            switch (pen.mind.direction) {
-                case 'right':
-                    penAnchor = pen.anchors[1];
-                    childAnchor = child.anchors[3];
-
-                    disconnectLine(child,childAnchor,line,lineAnchor2);
-                    disconnectLine(pen,penAnchor,line,lineAnchor1);
-                    break;
-                case 'left':
-                    penAnchor = pen.anchors[3];
-                    childAnchor = child.anchors[1];
-                    disconnectLine(child,childAnchor,line,lineAnchor1);
-                    disconnectLine(pen,penAnchor,line,lineAnchor2);
-                    break;
-                case 'bottom':
-                    penAnchor = pen.anchors[2];
-                    childAnchor = child.anchors[0];
-
-                    disconnectLine(child,childAnchor,line,lineAnchor2);
-                    disconnectLine(pen,penAnchor,line,lineAnchor1);
-                    break;
-                case 'top':
-                    penAnchor = pen.anchors[0];
-                    childAnchor = child.anchors[2];
-
-                    disconnectLine(child,childAnchor,line,lineAnchor1);
-                    disconnectLine(pen,penAnchor,line,lineAnchor2);
-                    break;
-            }
-
-            switch (pos){
-                case 'right':
-                    penAnchor = pen.anchors[1];
-                    childAnchor = child.anchors[3];
-                    connectLine(pen,penAnchor,line,lineAnchor1)
-                    connectLine(child,childAnchor,line,lineAnchor2)
-                    break;
-                case 'left':
-                    penAnchor = pen.anchors[3];
-                    childAnchor = child.anchors[1];
-                    connectLine(pen,penAnchor,line,lineAnchor2)
-                    connectLine(child,childAnchor,line,lineAnchor1)
-                    break;
-                case 'bottom':
-                    penAnchor = pen.anchors[2];
-                    childAnchor = child.anchors[0];
-                    connectLine(pen,penAnchor,line,lineAnchor1)
-                    connectLine(child,childAnchor,line,lineAnchor2)
-                    break;
-                case 'top':
-                    penAnchor = pen.anchors[0];
-                    childAnchor = child.anchors[2];
-                    connectLine(pen,penAnchor,line,lineAnchor2)
-                    connectLine(child,childAnchor,line,lineAnchor1)
-                    break;
-            }
-
+            // 断开连线
+            disconnectLine(from,fromAnchor,line,lineAnchor1)
+            disconnectLine(to,toAnchor,line,lineAnchor2)
             if(recursion){
-                toolBoxPlugin.resetLinePos(child,pos,true);
-                child.mind.direction = pos
+                toolBoxPlugin.disconnectLines(child,true);
             }
         }
-        pen.mind.direction = pos
+    },
+    resetLines(pen,recursion){
+
+    },
+    reconnectLines(pen,recursion){
+        let children = pen.mind.children;
+        if(!children || children.length === 0 ){
+            return;
+        };
+        for(let i = 0 ;i<children.length;i++){
+            const child = meta2d.store.pens[children[i]];
+            let line = meta2d.findOne(child.mind.lineId);
+            let lineAnchor1 = line.anchors[0];
+            let lineAnchor2 = line.anchors[line.anchors.length - 1];
+            let from = meta2d.store.pens[child.mind.connect.from]
+            let to = meta2d.store.pens[child.mind.connect.to]
+            let fromAnchor = child.mind.connect.fromAnchor
+            let toAnchor = child.mind.connect.toAnchor
+
+            // 断开连线
+            connectLine(from,fromAnchor,line,lineAnchor1)
+            connectLine(to,toAnchor,line,lineAnchor2)
+
+
+            if(recursion){
+                toolBoxPlugin.reconnectLines(child,true);
+            }
+        }
+
+
+    },
+    // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
+    resetLayOut(pen,pos,recursion = true){
+        if(!pos)pos = pen.mind.direction
+        toolBoxPlugin.disconnectLines(pen,recursion)
+        // toolBoxPlugin.deleteLines(pen)
+        let layoutFunc = toolBoxPlugin.layoutFunc.get(pos)
+        layoutFunc(pen,recursion)
+        toolBoxPlugin.reconnectLines(pen,recursion)
         meta2d.canvas.updateLines(pen)
     },
     // 递归修改子节点的direction属性
@@ -192,7 +198,7 @@ export let toolBoxPlugin = {
     //     }
     // },
     // 删除连线
-    deleteLines(pen){
+    deleteLines(pen,recursion = false){
         if(!pen)return;
         let lines = [];
         pen.connectedLines?.forEach((
@@ -233,7 +239,10 @@ export let toolBoxPlugin = {
         toolBoxPlugin.layoutFunc.set('left',left)
         toolBoxPlugin.layoutFunc.set('top',top)
         toolBoxPlugin.layoutFunc.set('bottom',bottom)
+        toolBoxPlugin.layoutFunc.set('middle',middle)
 
+
+        // 设置颜色生成函数
         toolBoxPlugin.colorFunc.set('default',defaultColorRule)
         // 打开时进行初始化
         meta2d.on('opened',()=>{
@@ -241,8 +250,8 @@ export let toolBoxPlugin = {
             pens.forEach(i=>{
                 if(i.mind){
                     let pen = meta2d.findOne(i.id)
-                    toolBoxPlugin.combineLifeCycle(pen)
-                    i.mind.isRoot?window.MindManager.rootIds.push(pen):''
+                    toolBoxPlugin.combineToolBox(pen)
+                    i.mind.isRoot?window.MindManager.rootIds.push(pen.id):''
                     i.mind.children.forEach(i=>{
 
                     })
@@ -263,37 +272,38 @@ export let toolBoxPlugin = {
                     width: 0, // 包含了自己和子节点的最大宽度
                     height: 0, // 包含了自己和子节点的最大高度
                     direction:'right',
-                    lineStyle: 'curve',
+                    lineStyle: 'mind',
                     lineColor:'',
                     childrenVisible: true,
                     visible: true,
                     lineWidth: 2,
                     level:0,
                 };
-                window.MindManager.rootIds.push(pen)
+                window.MindManager.rootIds.push(pen.id)
                 // 跟随移动
-                toolBoxPlugin.combineLifeCycle(pen);
+                toolBoxPlugin.combineToolBox(pen);
             }
         })
         meta2d.on('inactive',(targetPen)=>{
-            globalThis.toolbox.hide();
+            globalThis.toolbox?.hide();
         });
     },
     uninstall(){
+        globalThis.toolbox.destroy()
         globalThis.toolbox = null;
         // 解绑生命周期
         window.MindManager.rootIds?.forEach(i=>{
             let root = meta2d.findOne(i)
-            this.unCombineLifeCycle(root)
+            this.unCombineToolBox(root)
         })
     },
 
-    unCombineLifeCycle(pen){
+    unCombineToolBox(pen){
         if(!pen.mind.children || pen.mind.children.length === 0)return;
-        this.combineLifeCycle(pen,true)
+        this.combineToolBox(pen,true)
         pen.mind.children.forEach(i=>{
             let child = meta2d.store.pens[i]
-            this.unCombineLifeCycle(child)
+            this.unCombineToolBox(child)
         })
     },
 
@@ -304,7 +314,8 @@ export let toolBoxPlugin = {
         }
         this.funcList = funcList;
     },
-    calcChildWandH(pen,position = 'right'){
+    calcChildWandH(pen){
+        let position = pen.mind.direction;
         let children = pen.mind.children || [];
         let worldRect = meta2d.getPenRect(pen);
         if(children.length === 0 || !pen.mind.childrenVisible){
@@ -328,8 +339,8 @@ export let toolBoxPlugin = {
             }
             maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
             maxH = maxHeight > worldRect.height?maxHeight : worldRect.height;
-            pen.mind.maxHeight = maxH;
             pen.mind.maxWidth = maxWidth;
+            pen.mind.maxHeight = maxH;
             return {
                 maxHeight:maxH,
                 maxWidth
@@ -377,7 +388,7 @@ export let toolBoxPlugin = {
     },
 
     //
-    combineLifeCycle(target,del = false){
+    combineToolBox(target,del = false){
         let toolbox = globalThis.toolbox;
         // const onMove = (targetPen)=>{
         //     toolbox.hide();
@@ -385,6 +396,12 @@ export let toolBoxPlugin = {
         const onDestroy = (targetPen)=>{
             toolbox.hide();
             toolBoxPlugin.deleteNode(targetPen);
+            if(targetPen.mind.isRoot){
+                let index = MindManager.rootIds.indexOf(targetPen.id)
+                if(index === -1)return
+                MindManager.rootIds.splice(index,1)
+            }
+
         };
         const onMouseUp = (targetPen)=>{
             toolbox.bindPen(targetPen);
@@ -451,22 +468,27 @@ export let toolBoxPlugin = {
         }else{
             pen.mind.children.push(newPen.id);
         }
-        toolBoxPlugin.combineLifeCycle(newPen); // 重写生命周期
+        toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
         let rootNode = meta2d.findOne(pen.mind.rootId);
+
+        //TODO 这里似乎性能不太好
+        toolBoxPlugin.calChildrenPosAndColor(rootNode,rootNode.mind.direction,true);
         // 连线
         toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
 
         // 从根节点更新
-        toolBoxPlugin.update(rootNode,true);
+        // toolBoxPlugin.update(rootNode,true);
         globalThis.toolbox.bindPen(newPen);
         globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
-    },
+        toolBoxPlugin.resetLayOut(rootNode)
+        toolBoxPlugin.update(rootNode)
+        },
     update(pen,recursion = true){
         if(!pen)return;
-        toolBoxPlugin.calChildrenPosAndColor(pen,recursion,pen.mind.direction);
+        toolBoxPlugin.calChildrenPosAndColor(pen,pen.mind.direction,recursion);
         toolBoxPlugin.resetLinesColor(pen,recursion);
-        toolBoxPlugin.resetLineStyle(pen,recursion);
+        toolBoxPlugin.resetLinesStyle(pen,recursion);
         toolBoxPlugin.render();
         pluginsMessageChannels.publish('update')
     },

@@ -2,7 +2,7 @@
 var common = require("./rollup")
 
 module.exports = {
-    input:"index.js",
+    input:"./index.js",
     output:{
         file:"dist/index.js",
         format:"cjs", //commonjs

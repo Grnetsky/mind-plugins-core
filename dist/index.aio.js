@@ -441,6 +441,37 @@
     throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
+  // 7.1.4 ToInteger
+  var ceil = Math.ceil;
+  var floor = Math.floor;
+  var _toInteger = function (it) {
+    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+  };
+
+  // 7.2.1 RequireObjectCoercible(argument)
+  var _defined = function (it) {
+    if (it == undefined) throw TypeError("Can't call method on  " + it);
+    return it;
+  };
+
+  // true  -> String#at
+  // false -> String#codePointAt
+  var _stringAt = function (TO_STRING) {
+    return function (that, pos) {
+      var s = String(_defined(that));
+      var i = _toInteger(pos);
+      var l = s.length;
+      var a, b;
+      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+        ? TO_STRING ? s.charAt(i) : a
+        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+
+  var _library = true;
+
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
@@ -629,6 +660,10 @@
   $export.R = 128; // real proto method for `library`
   var _export = $export;
 
+  var _redefine = _hide;
+
+  var _iterators = {};
+
   var toString = {}.toString;
 
   var _cof = function (it) {
@@ -642,24 +677,11 @@
     return _cof(it) == 'String' ? it.split('') : Object(it);
   };
 
-  // 7.2.1 RequireObjectCoercible(argument)
-  var _defined = function (it) {
-    if (it == undefined) throw TypeError("Can't call method on  " + it);
-    return it;
-  };
-
   // to indexed object, toObject with fallback for non-array-like ES3 strings
 
 
   var _toIobject = function (it) {
     return _iobject(_defined(it));
-  };
-
-  // 7.1.4 ToInteger
-  var ceil = Math.ceil;
-  var floor = Math.floor;
-  var _toInteger = function (it) {
-    return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
   };
 
   // 7.1.15 ToLength
@@ -699,8 +721,6 @@
       } return !IS_INCLUDES && -1;
     };
   };
-
-  var _library = true;
 
   var _shared = createCommonjsModule(function (module) {
   var SHARED = '__core-js_shared__';
@@ -755,429 +775,6 @@
   var _objectKeys = Object.keys || function keys(O) {
     return _objectKeysInternal(O, _enumBugKeys);
   };
-
-  var f$1 = Object.getOwnPropertySymbols;
-
-  var _objectGops = {
-  	f: f$1
-  };
-
-  var f$2 = {}.propertyIsEnumerable;
-
-  var _objectPie = {
-  	f: f$2
-  };
-
-  // 7.1.13 ToObject(argument)
-
-  var _toObject = function (it) {
-    return Object(_defined(it));
-  };
-
-  // 19.1.2.1 Object.assign(target, source, ...)
-
-
-
-
-
-
-  var $assign = Object.assign;
-
-  // should work with symbols and should have deterministic property order (V8 bug)
-  var _objectAssign = !$assign || _fails(function () {
-    var A = {};
-    var B = {};
-    // eslint-disable-next-line no-undef
-    var S = Symbol();
-    var K = 'abcdefghijklmnopqrst';
-    A[S] = 7;
-    K.split('').forEach(function (k) { B[k] = k; });
-    return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-    var T = _toObject(target);
-    var aLen = arguments.length;
-    var index = 1;
-    var getSymbols = _objectGops.f;
-    var isEnum = _objectPie.f;
-    while (aLen > index) {
-      var S = _iobject(arguments[index++]);
-      var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
-      var length = keys.length;
-      var j = 0;
-      var key;
-      while (length > j) {
-        key = keys[j++];
-        if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
-      }
-    } return T;
-  } : $assign;
-
-  // 19.1.3.1 Object.assign(target, source)
-
-
-  _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
-
-  var assign = _core.Object.assign;
-
-  var assign$1 = assign;
-
-  // most Object methods by ES6 should accept primitives
-
-
-
-  var _objectSap = function (KEY, exec) {
-    var fn = (_core.Object || {})[KEY] || Object[KEY];
-    var exp = {};
-    exp[KEY] = exec(fn);
-    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
-  };
-
-  // 19.1.2.14 Object.keys(O)
-
-
-
-  _objectSap('keys', function () {
-    return function keys(it) {
-      return _objectKeys(_toObject(it));
-    };
-  });
-
-  var keys = _core.Object.keys;
-
-  var keys$1 = keys;
-
-  function createDom(name, style, even, func, className) {
-    if (even === void 0) {
-      even = undefined;
-    }
-    if (func === void 0) {
-      func = undefined;
-    }
-    if (className === void 0) {
-      className = undefined;
-    }
-    // 创建dom
-    var dom = document.createElement(name);
-    // 设置dom样式
-    if (style && typeof style === 'object') {
-      assign$1(dom.style, style);
-      className && dom.classList.add(className);
-    } else {
-      throw new Error('createDom error: parma "style" must be a Object');
-    }
-    // 绑定dom事件；
-    if (typeof even === 'string' && typeof func === 'function') {
-      dom.addEventListener(even, function (e) {
-        func();
-      });
-    }
-    return dom;
-  }
-  var ToolBox = /*#__PURE__*/function () {
-    function ToolBox(parentHtml, style) {
-      if (style === void 0) {
-        style = {};
-      }
-      this.curItem = null;
-      this.box = document.createElement('div');
-      this.box.style.backgroundColor = '#fff';
-      this.box.style.borderRadius = '5px';
-      this.box.style.boxShadow = '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)';
-      this.box.style.width = 'max-content';
-      this.box.style.height = '40px';
-      this.box.style.padding = '6px';
-      this.box.className = 'toolBox';
-      this.box.style.display = 'none';
-      this.box.style.zIndex = '999';
-      this.box.style.display = 'flex';
-      this.box.style.justifyContent = 'center';
-      this.box.style.alignItems = 'center';
-      // this.box.style.overflow = 'hidden';
-      this.box.style.position = 'relative';
-      this.box.style.transform = 'translateX(-50%)';
-      this.setStyle(this.box, style);
-      var stylesheet = document.styleSheets[0]; // 选择第一个样式表
-      stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "padding: 0 5px;" + "}", 0);
-      stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
-      parentHtml.appendChild(this.box);
-    }
-    var _proto = ToolBox.prototype;
-    _proto.setStyle = function setStyle(box, style) {
-      keys$1(style).forEach(function (i) {
-        box.style[i] = style[i];
-      });
-    };
-    _proto.hide = function hide() {
-      this.box.style.display = 'none';
-    };
-    _proto.bindPen = function bindPen(pen) {
-      this.pen = pen;
-    };
-    _proto.show = function show() {
-      this.box.style.display = 'flex';
-      this.box.style.flexDirection = 'row';
-    };
-    _proto.translatePosition = function translatePosition(pen) {
-      this.hide();
-      var store = pen.calculative.canvas.store;
-      var worldRect = pen.calculative.worldRect;
-      this.box.style.position = 'absolute';
-      this.box.style.outline = 'none';
-      this.box.style.left = worldRect.x + store.data.x + worldRect.width / 2 + 'px';
-      this.box.style.top = worldRect.y + store.data.y + -80 + 'px';
-      this.box.style.userSelect = 'none';
-      this.show();
-    };
-    _proto.renderChildren = function renderChildren() {
-      var _this = this;
-      var fragmentChild = new DocumentFragment();
-      this.box.innerHTML = '';
-      this.funcList.forEach(function (i) {
-        if (i.name) {
-          var itemsSpan = _this.setChildDom(_this.pen, i);
-          itemsSpan.className = 'toolbox_item';
-          fragmentChild.appendChild(itemsSpan);
-        }
-      });
-      this.box.appendChild(fragmentChild);
-    }
-    /**
-     * @description 创造子节点  设置样式 配置事件函数等；
-     * @param pen 操作的图元
-     * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
-     * */;
-    _proto.setChildDom = function setChildDom(pen, item) {
-      var dom = document.createElement('div');
-      // 构建update方法 用于局部更新
-      item.update = function (target, keepOpen) {
-        if (target === 'title') {
-          renderTitle(item, pen, dom.titleDom);
-          return;
-        } else if (target === 'child') {
-          renderChildDom(item, pen, dom, dom.childrenDom, keepOpen);
-          return;
-        }
-        // 清空列表  初始化列表
-        renderInit(item, pen, dom);
-        item.init == null || item.init(item, pen, dom);
-
-        // 初始化titleDOM
-        var title = createDom('div', {}, undefined, undefined, 'toolbox_title');
-        // 执行titleDom
-        title = renderTitle(item, pen, title);
-        // titleDom添加到dom中
-        item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
-
-        // 渲染下拉列表
-        var containerDom = null;
-        renderChildDom(item, pen, dom, containerDom);
-        item.dom = dom;
-        item.dom.titleDom = title;
-        // 事件处理
-      };
-
-      item.updateAll = function (keepOpen) {
-        if (keepOpen === void 0) {
-          keepOpen = true;
-        }
-        item.update('title');
-        item.update('child', keepOpen);
-      };
-      item.update();
-      return dom;
-    };
-    _proto.setFuncList = function setFuncList(funcList) {
-      this.funcList = funcList;
-      this.renderChildren();
-    };
-    _proto.clearFuncList = function clearFuncList() {
-      this.setFuncList([]);
-    };
-    return ToolBox;
-  }();
-  function renderInit(item, pen, dom) {
-    if (dom.shadowRoot) {
-      // 清空
-      dom.shadowRoot.innerHTML = '';
-    } else {
-      item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
-        mode: "open"
-      });
-    }
-
-    //设置样式与事件
-    typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
-    if (item.event) {
-      var eventFunc = function eventFunc(e) {
-        // 绑定事件
-        item.func(item, this, dom);
-      };
-      dom.addEventListener(item.event, eventFunc.bind(pen));
-    }
-    return dom;
-  }
-  function renderTitle(item, pen, title) {
-    title.innerHTML = '';
-    if (typeof item.setDom === 'function') {
-      var re = item.setDom(item, title);
-      switch (typeof re) {
-        case "string":
-          title.innerHTML = re;
-          break;
-        case "object":
-          title.appendChild(re);
-          break;
-        default:
-          throw new Error('function setDom must return string or node object');
-      }
-    } else {
-      title.innerHTML = item.icon ? item.icon : item.img ? "<img src=\"" + item.img + "\" title=\"" + item.name + "\" />" : item.name;
-    }
-    title.addEventListener(item.openChildDomEvent || 'click', function () {
-      // 关闭其他选项
-      if (toolbox.curItem !== item && toolbox.curItem) {
-        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, item.dom.childrenDom)) || toolbox.curItem.dom.childrenDom && (toolbox.curItem.dom.childrenDom.style.visibility = 'hidden');
-      }
-      // 将打开逻辑交给用户 或者
-      (item.openChildDom == null ? void 0 : item.openChildDom(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
-
-      // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-      item.onOpenChildDom == null || item.onOpenChildDom(item, pen, item.dom.childrenDom);
-      toolbox.curItem = item;
-    });
-    return title;
-  }
-  function renderChildDom(item, pen, dom, containerDom, keepOpen) {
-    if (keepOpen === void 0) {
-      keepOpen = false;
-    }
-    if (dom.childrenDom) dom.shadowRoot.removeChild(dom.childrenDom);
-    if (item.children && item.children.length > 0 || item.setChildrenDom) {
-      var _containerDom;
-      // 是否重写dom
-      if (typeof item.setChildrenDom === 'function') {
-        // 重新childDom
-
-        var childDom = item.setChildrenDom(item, pen, dom);
-
-        /**
-         * @description 若返回的是字符串，则在外部包裹一层div作为其container
-         * */
-        if (typeof childDom === 'string') {
-          var div = document.createElement('div');
-          // 默认隐藏节点
-          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (div.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
-          div.innerHTML = childDom;
-          dom.shadowRoot ? dom.shadowRoot.appendChild(div) : dom.appendChild(div);
-          containerDom = div;
-        } else {
-          containerDom = childDom;
-          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (childDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (childDom.style.visibility = 'hidden');
-        }
-      } else {
-        containerDom = createDom('div', {
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          position: 'absolute',
-          top: '50px',
-          backgroundColor: '#fff',
-          borderRadius: '5px',
-          padding: '3px',
-          width: 'max-content',
-          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
-        });
-        keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (containerDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (containerDom.style.visibility = 'hidden');
-      }
-      var fragment = new DocumentFragment();
-      var _loop = function _loop() {
-        var i = _step.value;
-        var node = createDom('div', {
-          margin: '5px 8px'
-        }, i.event, function (e) {
-          i.stopPropagation ? e.stopPropagation() : '';
-          i.func(i, this, dom, item);
-        }.bind(pen), 'toolbox_item');
-
-        //TODO 执行时机是否正确？？？
-        i.init == null || i.init(i, pen, node);
-        if (i.setDom) {
-          var re = i.setDom(i, node);
-          switch (typeof re) {
-            case "string":
-              node.innerHTML = re;
-              break;
-            case "object":
-              node.appendChild(re);
-              break;
-            default:
-              throw new Error('function setDom must return string or node object');
-          }
-        } else {
-          node.innerHTML = i.icon && i.name ? '<span style="padding-right: 30px;width: max-content" >' + i.icon + '</span> <span>' + i.name + '</span>' : '<span>' + (i.name || i.icon) + '</span>';
-        }
-        fragment.appendChild(node);
-      };
-      for (var _iterator = _createForOfIteratorHelperLoose(item.children || []), _step; !(_step = _iterator()).done;) {
-        _loop();
-      }
-      dom.style.position = 'relative';
-      (_containerDom = containerDom) == null || _containerDom.appendChild(fragment);
-      containerDom.classList.add('toolbox_container');
-      containerDom.style.position = 'absolute';
-      item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
-      dom.childrenDom = containerDom;
-      // 添加样式到元素
-    }
-
-    if (item.children || item.setChildrenDom || item.closeOther) {
-      // 关闭下拉菜单
-      !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
-        var _toolbox$curItem;
-        console.log('mouselevae');
-        // 可手动派发隐藏函数
-        (_toolbox$curItem = toolbox.curItem) == null || _toolbox$curItem.onHideChildDom == null || _toolbox$curItem.onHideChildDom();
-        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
-        toolbox.curItem = null;
-      });
-    }
-    return containerDom;
-  }
-
-  // 7.2.2 IsArray(argument)
-
-  var _isArray = Array.isArray || function isArray(arg) {
-    return _cof(arg) == 'Array';
-  };
-
-  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-
-
-  _export(_export.S, 'Array', { isArray: _isArray });
-
-  var isArray = _core.Array.isArray;
-
-  var isArray$1 = isArray;
-
-  // true  -> String#at
-  // false -> String#codePointAt
-  var _stringAt = function (TO_STRING) {
-    return function (that, pos) {
-      var s = String(_defined(that));
-      var i = _toInteger(pos);
-      var l = s.length;
-      var a, b;
-      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-        ? TO_STRING ? s.charAt(i) : a
-        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
-  };
-
-  var _redefine = _hide;
-
-  var _iterators = {};
 
   var _objectDps = _descriptors ? Object.defineProperties : function defineProperties(O, Properties) {
     _anObject(O);
@@ -1264,6 +861,12 @@
   var _iterCreate = function (Constructor, NAME, next) {
     Constructor.prototype = _objectCreate(IteratorPrototype, { next: _propertyDesc(1, next) });
     _setToStringTag(Constructor, NAME + ' Iterator');
+  };
+
+  // 7.1.13 ToObject(argument)
+
+  var _toObject = function (it) {
+    return Object(_defined(it));
   };
 
   // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
@@ -1403,28 +1006,11 @@
     _iterators[NAME] = _iterators.Array;
   }
 
-  // getting tag from 19.1.3.6 Object.prototype.toString()
-
-  var TAG$1 = _wks('toStringTag');
-  // ES3 wrong here
-  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
-
-  // fallback for IE11 Script Access Denied error
-  var tryGet = function (it, key) {
-    try {
-      return it[key];
-    } catch (e) { /* empty */ }
-  };
-
-  var _classof = function (it) {
-    var O, T, B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null'
-      // @@toStringTag case
-      : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
-      // builtinTag case
-      : ARG ? _cof(O)
-      // ES3 arguments fallback
-      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  var _redefineAll = function (target, src, safe) {
+    for (var key in src) {
+      if (safe && target[key]) target[key] = src[key];
+      else _hide(target, key, src[key]);
+    } return target;
   };
 
   var _anInstance = function (it, Constructor, name, forbiddenField) {
@@ -1453,6 +1039,30 @@
 
   var _isArrayIter = function (it) {
     return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR$1] === it);
+  };
+
+  // getting tag from 19.1.3.6 Object.prototype.toString()
+
+  var TAG$1 = _wks('toStringTag');
+  // ES3 wrong here
+  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
+
+  // fallback for IE11 Script Access Denied error
+  var tryGet = function (it, key) {
+    try {
+      return it[key];
+    } catch (e) { /* empty */ }
+  };
+
+  var _classof = function (it) {
+    var O, T, B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null'
+      // @@toStringTag case
+      : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
+      // builtinTag case
+      : ARG ? _cof(O)
+      // ES3 arguments fallback
+      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
   };
 
   var ITERATOR$2 = _wks('iterator');
@@ -1485,14 +1095,840 @@
   exports.RETURN = RETURN;
   });
 
+  var SPECIES = _wks('species');
+
+  var _setSpecies = function (KEY) {
+    var C = typeof _core[KEY] == 'function' ? _core[KEY] : _global[KEY];
+    if (_descriptors && C && !C[SPECIES]) _objectDp.f(C, SPECIES, {
+      configurable: true,
+      get: function () { return this; }
+    });
+  };
+
+  var _meta = createCommonjsModule(function (module) {
+  var META = _uid('meta');
+
+
+  var setDesc = _objectDp.f;
+  var id = 0;
+  var isExtensible = Object.isExtensible || function () {
+    return true;
+  };
+  var FREEZE = !_fails(function () {
+    return isExtensible(Object.preventExtensions({}));
+  });
+  var setMeta = function (it) {
+    setDesc(it, META, { value: {
+      i: 'O' + ++id, // object ID
+      w: {}          // weak collections IDs
+    } });
+  };
+  var fastKey = function (it, create) {
+    // return primitive with prefix
+    if (!_isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+    if (!_has(it, META)) {
+      // can't set metadata to uncaught frozen object
+      if (!isExtensible(it)) return 'F';
+      // not necessary to add metadata
+      if (!create) return 'E';
+      // add missing metadata
+      setMeta(it);
+    // return object ID
+    } return it[META].i;
+  };
+  var getWeak = function (it, create) {
+    if (!_has(it, META)) {
+      // can't set metadata to uncaught frozen object
+      if (!isExtensible(it)) return true;
+      // not necessary to add metadata
+      if (!create) return false;
+      // add missing metadata
+      setMeta(it);
+    // return hash weak collections IDs
+    } return it[META].w;
+  };
+  // add metadata on freeze-family methods calling
+  var onFreeze = function (it) {
+    if (FREEZE && meta.NEED && isExtensible(it) && !_has(it, META)) setMeta(it);
+    return it;
+  };
+  var meta = module.exports = {
+    KEY: META,
+    NEED: false,
+    fastKey: fastKey,
+    getWeak: getWeak,
+    onFreeze: onFreeze
+  };
+  });
+  var _meta_1 = _meta.KEY;
+  var _meta_2 = _meta.NEED;
+  var _meta_3 = _meta.fastKey;
+  var _meta_4 = _meta.getWeak;
+  var _meta_5 = _meta.onFreeze;
+
+  var _validateCollection = function (it, TYPE) {
+    if (!_isObject(it) || it._t !== TYPE) throw TypeError('Incompatible receiver, ' + TYPE + ' required!');
+    return it;
+  };
+
+  var dP$1 = _objectDp.f;
+
+
+
+
+
+
+
+
+
+  var fastKey = _meta.fastKey;
+
+  var SIZE = _descriptors ? '_s' : 'size';
+
+  var getEntry = function (that, key) {
+    // fast case
+    var index = fastKey(key);
+    var entry;
+    if (index !== 'F') return that._i[index];
+    // frozen object case
+    for (entry = that._f; entry; entry = entry.n) {
+      if (entry.k == key) return entry;
+    }
+  };
+
+  var _collectionStrong = {
+    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+      var C = wrapper(function (that, iterable) {
+        _anInstance(that, C, NAME, '_i');
+        that._t = NAME;         // collection type
+        that._i = _objectCreate(null); // index
+        that._f = undefined;    // first entry
+        that._l = undefined;    // last entry
+        that[SIZE] = 0;         // size
+        if (iterable != undefined) _forOf(iterable, IS_MAP, that[ADDER], that);
+      });
+      _redefineAll(C.prototype, {
+        // 23.1.3.1 Map.prototype.clear()
+        // 23.2.3.2 Set.prototype.clear()
+        clear: function clear() {
+          for (var that = _validateCollection(this, NAME), data = that._i, entry = that._f; entry; entry = entry.n) {
+            entry.r = true;
+            if (entry.p) entry.p = entry.p.n = undefined;
+            delete data[entry.i];
+          }
+          that._f = that._l = undefined;
+          that[SIZE] = 0;
+        },
+        // 23.1.3.3 Map.prototype.delete(key)
+        // 23.2.3.4 Set.prototype.delete(value)
+        'delete': function (key) {
+          var that = _validateCollection(this, NAME);
+          var entry = getEntry(that, key);
+          if (entry) {
+            var next = entry.n;
+            var prev = entry.p;
+            delete that._i[entry.i];
+            entry.r = true;
+            if (prev) prev.n = next;
+            if (next) next.p = prev;
+            if (that._f == entry) that._f = next;
+            if (that._l == entry) that._l = prev;
+            that[SIZE]--;
+          } return !!entry;
+        },
+        // 23.2.3.6 Set.prototype.forEach(callbackfn, thisArg = undefined)
+        // 23.1.3.5 Map.prototype.forEach(callbackfn, thisArg = undefined)
+        forEach: function forEach(callbackfn /* , that = undefined */) {
+          _validateCollection(this, NAME);
+          var f = _ctx(callbackfn, arguments.length > 1 ? arguments[1] : undefined, 3);
+          var entry;
+          while (entry = entry ? entry.n : this._f) {
+            f(entry.v, entry.k, this);
+            // revert to the last existing entry
+            while (entry && entry.r) entry = entry.p;
+          }
+        },
+        // 23.1.3.7 Map.prototype.has(key)
+        // 23.2.3.7 Set.prototype.has(value)
+        has: function has(key) {
+          return !!getEntry(_validateCollection(this, NAME), key);
+        }
+      });
+      if (_descriptors) dP$1(C.prototype, 'size', {
+        get: function () {
+          return _validateCollection(this, NAME)[SIZE];
+        }
+      });
+      return C;
+    },
+    def: function (that, key, value) {
+      var entry = getEntry(that, key);
+      var prev, index;
+      // change existing entry
+      if (entry) {
+        entry.v = value;
+      // create new entry
+      } else {
+        that._l = entry = {
+          i: index = fastKey(key, true), // <- index
+          k: key,                        // <- key
+          v: value,                      // <- value
+          p: prev = that._l,             // <- previous entry
+          n: undefined,                  // <- next entry
+          r: false                       // <- removed
+        };
+        if (!that._f) that._f = entry;
+        if (prev) prev.n = entry;
+        that[SIZE]++;
+        // add to index
+        if (index !== 'F') that._i[index] = entry;
+      } return that;
+    },
+    getEntry: getEntry,
+    setStrong: function (C, NAME, IS_MAP) {
+      // add .keys, .values, .entries, [@@iterator]
+      // 23.1.3.4, 23.1.3.8, 23.1.3.11, 23.1.3.12, 23.2.3.5, 23.2.3.8, 23.2.3.10, 23.2.3.11
+      _iterDefine(C, NAME, function (iterated, kind) {
+        this._t = _validateCollection(iterated, NAME); // target
+        this._k = kind;                     // kind
+        this._l = undefined;                // previous
+      }, function () {
+        var that = this;
+        var kind = that._k;
+        var entry = that._l;
+        // revert to the last existing entry
+        while (entry && entry.r) entry = entry.p;
+        // get next entry
+        if (!that._t || !(that._l = entry = entry ? entry.n : that._t._f)) {
+          // or finish the iteration
+          that._t = undefined;
+          return _iterStep(1);
+        }
+        // return step by kind
+        if (kind == 'keys') return _iterStep(0, entry.k);
+        if (kind == 'values') return _iterStep(0, entry.v);
+        return _iterStep(0, [entry.k, entry.v]);
+      }, IS_MAP ? 'entries' : 'values', !IS_MAP, true);
+
+      // add [@@species], 23.1.2.2, 23.2.2.2
+      _setSpecies(NAME);
+    }
+  };
+
+  // 7.2.2 IsArray(argument)
+
+  var _isArray = Array.isArray || function isArray(arg) {
+    return _cof(arg) == 'Array';
+  };
+
+  var SPECIES$1 = _wks('species');
+
+  var _arraySpeciesConstructor = function (original) {
+    var C;
+    if (_isArray(original)) {
+      C = original.constructor;
+      // cross-realm fallback
+      if (typeof C == 'function' && (C === Array || _isArray(C.prototype))) C = undefined;
+      if (_isObject(C)) {
+        C = C[SPECIES$1];
+        if (C === null) C = undefined;
+      }
+    } return C === undefined ? Array : C;
+  };
+
+  // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+
+
+  var _arraySpeciesCreate = function (original, length) {
+    return new (_arraySpeciesConstructor(original))(length);
+  };
+
+  // 0 -> Array#forEach
+  // 1 -> Array#map
+  // 2 -> Array#filter
+  // 3 -> Array#some
+  // 4 -> Array#every
+  // 5 -> Array#find
+  // 6 -> Array#findIndex
+
+
+
+
+
+  var _arrayMethods = function (TYPE, $create) {
+    var IS_MAP = TYPE == 1;
+    var IS_FILTER = TYPE == 2;
+    var IS_SOME = TYPE == 3;
+    var IS_EVERY = TYPE == 4;
+    var IS_FIND_INDEX = TYPE == 6;
+    var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+    var create = $create || _arraySpeciesCreate;
+    return function ($this, callbackfn, that) {
+      var O = _toObject($this);
+      var self = _iobject(O);
+      var f = _ctx(callbackfn, that, 3);
+      var length = _toLength(self.length);
+      var index = 0;
+      var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+      var val, res;
+      for (;length > index; index++) if (NO_HOLES || index in self) {
+        val = self[index];
+        res = f(val, index, O);
+        if (TYPE) {
+          if (IS_MAP) result[index] = res;   // map
+          else if (res) switch (TYPE) {
+            case 3: return true;             // some
+            case 5: return val;              // find
+            case 6: return index;            // findIndex
+            case 2: result.push(val);        // filter
+          } else if (IS_EVERY) return false; // every
+        }
+      }
+      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+    };
+  };
+
+  var dP$2 = _objectDp.f;
+  var each = _arrayMethods(0);
+
+
+  var _collection = function (NAME, wrapper, methods, common, IS_MAP, IS_WEAK) {
+    var Base = _global[NAME];
+    var C = Base;
+    var ADDER = IS_MAP ? 'set' : 'add';
+    var proto = C && C.prototype;
+    var O = {};
+    if (!_descriptors || typeof C != 'function' || !(IS_WEAK || proto.forEach && !_fails(function () {
+      new C().entries().next();
+    }))) {
+      // create collection constructor
+      C = common.getConstructor(wrapper, NAME, IS_MAP, ADDER);
+      _redefineAll(C.prototype, methods);
+      _meta.NEED = true;
+    } else {
+      C = wrapper(function (target, iterable) {
+        _anInstance(target, C, NAME, '_c');
+        target._c = new Base();
+        if (iterable != undefined) _forOf(iterable, IS_MAP, target[ADDER], target);
+      });
+      each('add,clear,delete,forEach,get,has,set,keys,values,entries,toJSON'.split(','), function (KEY) {
+        var IS_ADDER = KEY == 'add' || KEY == 'set';
+        if (KEY in proto && !(IS_WEAK && KEY == 'clear')) _hide(C.prototype, KEY, function (a, b) {
+          _anInstance(this, C, KEY);
+          if (!IS_ADDER && IS_WEAK && !_isObject(a)) return KEY == 'get' ? undefined : false;
+          var result = this._c[KEY](a === 0 ? 0 : a, b);
+          return IS_ADDER ? this : result;
+        });
+      });
+      IS_WEAK || dP$2(C.prototype, 'size', {
+        get: function () {
+          return this._c.size;
+        }
+      });
+    }
+
+    _setToStringTag(C, NAME);
+
+    O[NAME] = C;
+    _export(_export.G + _export.W + _export.F, O);
+
+    if (!IS_WEAK) common.setStrong(C, NAME, IS_MAP);
+
+    return C;
+  };
+
+  var MAP = 'Map';
+
+  // 23.1 Map Objects
+  var es6_map = _collection(MAP, function (get) {
+    return function Map() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+  }, {
+    // 23.1.3.6 Map.prototype.get(key)
+    get: function get(key) {
+      var entry = _collectionStrong.getEntry(_validateCollection(this, MAP), key);
+      return entry && entry.v;
+    },
+    // 23.1.3.9 Map.prototype.set(key, value)
+    set: function set(key, value) {
+      return _collectionStrong.def(_validateCollection(this, MAP), key === 0 ? 0 : key, value);
+    }
+  }, _collectionStrong, true);
+
+  var _arrayFromIterable = function (iter, ITERATOR) {
+    var result = [];
+    _forOf(iter, false, result.push, result, ITERATOR);
+    return result;
+  };
+
+  // https://github.com/DavidBruant/Map-Set.prototype.toJSON
+
+
+  var _collectionToJson = function (NAME) {
+    return function toJSON() {
+      if (_classof(this) != NAME) throw TypeError(NAME + "#toJSON isn't generic");
+      return _arrayFromIterable(this);
+    };
+  };
+
+  // https://github.com/DavidBruant/Map-Set.prototype.toJSON
+
+
+  _export(_export.P + _export.R, 'Map', { toJSON: _collectionToJson('Map') });
+
+  // https://tc39.github.io/proposal-setmap-offrom/
+
+
+  var _setCollectionOf = function (COLLECTION) {
+    _export(_export.S, COLLECTION, { of: function of() {
+      var length = arguments.length;
+      var A = new Array(length);
+      while (length--) A[length] = arguments[length];
+      return new this(A);
+    } });
+  };
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-map.of
+  _setCollectionOf('Map');
+
+  // https://tc39.github.io/proposal-setmap-offrom/
+
+
+
+
+
+  var _setCollectionFrom = function (COLLECTION) {
+    _export(_export.S, COLLECTION, { from: function from(source /* , mapFn, thisArg */) {
+      var mapFn = arguments[1];
+      var mapping, A, n, cb;
+      _aFunction(this);
+      mapping = mapFn !== undefined;
+      if (mapping) _aFunction(mapFn);
+      if (source == undefined) return new this();
+      A = [];
+      if (mapping) {
+        n = 0;
+        cb = _ctx(mapFn, arguments[2], 2);
+        _forOf(source, false, function (nextItem) {
+          A.push(cb(nextItem, n++));
+        });
+      } else {
+        _forOf(source, false, A.push, A);
+      }
+      return new this(A);
+    } });
+  };
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-map.from
+  _setCollectionFrom('Map');
+
+  var map = _core.Map;
+
+  var map$1 = map;
+
+  var f$1 = Object.getOwnPropertySymbols;
+
+  var _objectGops = {
+  	f: f$1
+  };
+
+  var f$2 = {}.propertyIsEnumerable;
+
+  var _objectPie = {
+  	f: f$2
+  };
+
+  // 19.1.2.1 Object.assign(target, source, ...)
+
+
+
+
+
+
+  var $assign = Object.assign;
+
+  // should work with symbols and should have deterministic property order (V8 bug)
+  var _objectAssign = !$assign || _fails(function () {
+    var A = {};
+    var B = {};
+    // eslint-disable-next-line no-undef
+    var S = Symbol();
+    var K = 'abcdefghijklmnopqrst';
+    A[S] = 7;
+    K.split('').forEach(function (k) { B[k] = k; });
+    return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+    var T = _toObject(target);
+    var aLen = arguments.length;
+    var index = 1;
+    var getSymbols = _objectGops.f;
+    var isEnum = _objectPie.f;
+    while (aLen > index) {
+      var S = _iobject(arguments[index++]);
+      var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
+      var length = keys.length;
+      var j = 0;
+      var key;
+      while (length > j) {
+        key = keys[j++];
+        if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
+      }
+    } return T;
+  } : $assign;
+
+  // 19.1.3.1 Object.assign(target, source)
+
+
+  _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
+
+  var assign = _core.Object.assign;
+
+  var assign$1 = assign;
+
+  // most Object methods by ES6 should accept primitives
+
+
+
+  var _objectSap = function (KEY, exec) {
+    var fn = (_core.Object || {})[KEY] || Object[KEY];
+    var exp = {};
+    exp[KEY] = exec(fn);
+    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+  };
+
+  // 19.1.2.14 Object.keys(O)
+
+
+
+  _objectSap('keys', function () {
+    return function keys(it) {
+      return _objectKeys(_toObject(it));
+    };
+  });
+
+  var keys = _core.Object.keys;
+
+  var keys$1 = keys;
+
+  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+
+
+  _export(_export.S, 'Array', { isArray: _isArray });
+
+  var isArray = _core.Array.isArray;
+
+  var isArray$1 = isArray;
+
+  function createDom(name, style, even, func, className) {
+    if (even === void 0) {
+      even = undefined;
+    }
+    if (func === void 0) {
+      func = undefined;
+    }
+    if (className === void 0) {
+      className = undefined;
+    }
+    // 创建dom
+    var dom = document.createElement(name);
+    // 设置dom样式
+    if (style && typeof style === 'object') {
+      assign$1(dom.style, style);
+      className && dom.classList.add(className);
+    } else {
+      throw new Error('createDom error: parma "style" must be a Object');
+    }
+    // 绑定dom事件；
+    if (typeof even === 'string' && typeof func === 'function') {
+      dom.addEventListener(even, function (e) {
+        func();
+      });
+    }
+    return dom;
+  }
+
+  var ToolBox = /*#__PURE__*/function () {
+    function ToolBox(parentHtml, style) {
+      if (style === void 0) {
+        style = {};
+      }
+      this.curItem = null;
+      this.box = document.createElement('div');
+      this.box.style.backgroundColor = '#fff';
+      this.box.style.borderRadius = '5px';
+      this.box.style.boxShadow = '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)';
+      this.box.style.width = 'max-content';
+      this.box.style.height = '40px';
+      this.box.style.padding = '6px';
+      this.box.className = 'toolBox';
+      this.box.style.display = 'none';
+      this.box.style.zIndex = '999';
+      this.box.style.display = 'flex';
+      this.box.style.justifyContent = 'center';
+      this.box.style.alignItems = 'center';
+      // this.box.style.overflow = 'hidden';
+      this.box.style.position = 'relative';
+      this.box.style.transform = 'translateX(-50%)';
+      this.setStyle(style);
+      var stylesheet = document.styleSheets[0]; // 选择第一个样式表
+      stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "padding: 0 5px;" + "}", 0);
+      stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
+      parentHtml.appendChild(this.box);
+    }
+    var _proto = ToolBox.prototype;
+    _proto.setStyle = function setStyle(style) {
+      var _this = this;
+      keys$1(style).forEach(function (i) {
+        _this.box.style[i] = style[i];
+      });
+    };
+    _proto.hide = function hide() {
+      this.box.style.display = 'none';
+    };
+    _proto.bindPen = function bindPen(pen) {
+      this.pen = pen;
+    };
+    _proto.show = function show() {
+      this.box.style.display = 'flex';
+      this.box.style.flexDirection = 'row';
+    };
+    _proto.destroy = function destroy() {
+      this.box.parentNode.removeChild(this.box);
+    };
+    _proto.translatePosition = function translatePosition(pen) {
+      this.hide();
+      var store = pen.calculative.canvas.store;
+      var worldRect = pen.calculative.worldRect;
+      this.box.style.position = 'absolute';
+      this.box.style.outline = 'none';
+      this.box.style.left = worldRect.x + store.data.x + worldRect.width / 2 + 'px';
+      this.box.style.top = worldRect.y + store.data.y + -80 + 'px';
+      this.box.style.userSelect = 'none';
+      this.show();
+    };
+    _proto.renderChildren = function renderChildren() {
+      var _this2 = this;
+      var fragmentChild = new DocumentFragment();
+      this.box.innerHTML = '';
+      this.funcList.forEach(function (i) {
+        if (i.name) {
+          var itemsSpan = _this2.setChildDom(_this2.pen, i);
+          itemsSpan.className = 'toolbox_item';
+          fragmentChild.appendChild(itemsSpan);
+        }
+      });
+      this.box.appendChild(fragmentChild);
+    }
+    /**
+     * @description 创造子节点  设置样式 配置事件函数等；
+     * @param pen 操作的图元
+     * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
+     * */;
+    _proto.setChildDom = function setChildDom(pen, item) {
+      var dom = document.createElement('div');
+      // 构建update方法 用于局部更新
+      item.update = function (target, keepOpen) {
+        if (target === 'title') {
+          renderTitle(item, pen, dom.titleDom);
+          return;
+        } else if (target === 'child') {
+          renderChildDom(item, pen, dom, dom.childrenDom, keepOpen);
+          return;
+        }
+        // 清空列表  初始化列表
+        renderInit(item, pen, dom);
+        item.init == null || item.init(item, pen, dom);
+
+        // 初始化titleDOM
+        var title = createDom('div', {}, undefined, undefined, 'toolbox_title');
+        // 执行titleDom
+        title = renderTitle(item, pen, title);
+        // titleDom添加到dom中
+        item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
+
+        // 渲染下拉列表
+        var containerDom = null;
+        renderChildDom(item, pen, dom, containerDom);
+        item.dom = dom;
+        item.dom.titleDom = title;
+        // 事件处理
+      };
+
+      item.updateAll = function (keepOpen) {
+        if (keepOpen === void 0) {
+          keepOpen = true;
+        }
+        item.update('title');
+        item.update('child', keepOpen);
+      };
+      item.update();
+      return dom;
+    };
+    _proto.setFuncList = function setFuncList(funcList) {
+      this.funcList = funcList;
+      this.renderChildren();
+    };
+    _proto.clearFuncList = function clearFuncList() {
+      this.setFuncList([]);
+    };
+    return ToolBox;
+  }();
+  function renderInit(item, pen, dom) {
+    if (dom.shadowRoot) {
+      // 清空
+      dom.shadowRoot.innerHTML = '';
+    } else {
+      item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
+        mode: "open"
+      });
+    }
+
+    //设置样式与事件
+    typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
+    if (item.event) {
+      var eventFunc = function eventFunc(e) {
+        // 绑定事件
+        item.func(item, this, dom);
+      };
+      dom.addEventListener(item.event, eventFunc.bind(pen));
+    }
+    return dom;
+  }
+  function renderTitle(item, pen, title) {
+    title.innerHTML = '';
+    if (typeof item.setDom === 'function') {
+      var re = item.setDom(item, title);
+      switch (typeof re) {
+        case "string":
+          title.innerHTML = re;
+          break;
+        case "object":
+          title.appendChild(re);
+          break;
+        default:
+          throw new Error('function setDom must return string or node object');
+      }
+    } else {
+      title.innerHTML = item.icon ? item.icon : item.img ? "<img src=\"" + item.img + "\" title=\"" + item.name + "\" />" : item.name;
+    }
+    title.addEventListener(item.openChildDomEvent || 'click', function () {
+      // 关闭其他选项
+      if (toolbox.curItem !== item && toolbox.curItem) {
+        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, item.dom.childrenDom)) || toolbox.curItem.dom.childrenDom && (toolbox.curItem.dom.childrenDom.style.visibility = 'hidden');
+      }
+      // 将打开逻辑交给用户 或者
+      (item.openChildDom == null ? void 0 : item.openChildDom(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
+
+      // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+      item.onOpenChildDom == null || item.onOpenChildDom(item, pen, item.dom.childrenDom);
+      toolbox.curItem = item;
+    });
+    return title;
+  }
+  function renderChildDom(item, pen, dom, containerDom, keepOpen) {
+    if (keepOpen === void 0) {
+      keepOpen = false;
+    }
+    if (dom.childrenDom) dom.shadowRoot ? dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom);
+    if (item.children && item.children.length > 0 || item.setChildrenDom) {
+      var _containerDom;
+      // 是否重写dom
+      if (typeof item.setChildrenDom === 'function') {
+        // 重新childDom
+
+        var childDom = item.setChildrenDom(item, pen, dom);
+
+        /**
+         * @description 若返回的是字符串，则在外部包裹一层div作为其container
+         * */
+        if (typeof childDom === 'string') {
+          var div = document.createElement('div');
+          // 默认隐藏节点
+          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (div.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
+          div.innerHTML = childDom;
+          dom.shadowRoot ? dom.shadowRoot.appendChild(div) : dom.appendChild(div);
+          containerDom = div;
+        } else {
+          containerDom = childDom;
+          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (childDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (childDom.style.visibility = 'hidden');
+        }
+      } else {
+        containerDom = createDom('div', {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          position: 'absolute',
+          top: '50px',
+          backgroundColor: '#fff',
+          borderRadius: '5px',
+          padding: '3px',
+          width: 'max-content',
+          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        });
+        keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (containerDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (containerDom.style.visibility = 'hidden');
+      }
+      var fragment = new DocumentFragment();
+      var _loop = function _loop() {
+        var i = _step.value;
+        var node = createDom('div', {
+          margin: '5px 8px'
+        }, i.event, function (e) {
+          i.stopPropagation ? e.stopPropagation() : '';
+          i.func(i, this, dom, item);
+        }.bind(pen), 'toolbox_item');
+
+        //TODO 执行时机是否正确？？？
+        i.init == null || i.init(i, pen, node);
+        if (i.setDom) {
+          var re = i.setDom(i, node);
+          switch (typeof re) {
+            case "string":
+              node.innerHTML = re;
+              break;
+            case "object":
+              node.appendChild(re);
+              break;
+            default:
+              throw new Error('function setDom must return string or node object');
+          }
+        } else {
+          node.innerHTML = i.icon && i.name ? '<span style="padding-right: 30px;width: max-content" >' + i.icon + '</span> <span>' + i.name + '</span>' : '<span>' + (i.name || i.icon) + '</span>';
+        }
+        fragment.appendChild(node);
+      };
+      for (var _iterator = _createForOfIteratorHelperLoose(item.children || []), _step; !(_step = _iterator()).done;) {
+        _loop();
+      }
+      dom.style.position = 'relative';
+      (_containerDom = containerDom) == null || _containerDom.appendChild(fragment);
+      containerDom.classList.add('toolbox_container');
+      containerDom.style.position = 'absolute';
+      item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
+      dom.childrenDom = containerDom;
+      // 添加样式到元素
+    }
+
+    if (item.children || item.setChildrenDom || item.closeOther) {
+      // 关闭下拉菜单
+      !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
+        var _toolbox$curItem;
+        console.log('mouselevae');
+        // 可手动派发隐藏函数
+        (_toolbox$curItem = toolbox.curItem) == null || _toolbox$curItem.onHideChildDom == null || _toolbox$curItem.onHideChildDom();
+        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
+        toolbox.curItem = null;
+      });
+    }
+    return containerDom;
+  }
+
   // 7.3.20 SpeciesConstructor(O, defaultConstructor)
 
 
-  var SPECIES = _wks('species');
+  var SPECIES$2 = _wks('species');
   var _speciesConstructor = function (O, D) {
     var C = _anObject(O).constructor;
     var S;
-    return C === undefined || (S = _anObject(C)[SPECIES]) == undefined ? D : _aFunction(S);
+    return C === undefined || (S = _anObject(C)[SPECIES$2]) == undefined ? D : _aFunction(S);
   };
 
   // fast apply, http://jsperf.lnkit.com/fast-apply/5
@@ -1702,23 +2138,6 @@
     var resolve = promiseCapability.resolve;
     resolve(x);
     return promiseCapability.promise;
-  };
-
-  var _redefineAll = function (target, src, safe) {
-    for (var key in src) {
-      if (safe && target[key]) target[key] = src[key];
-      else _hide(target, key, src[key]);
-    } return target;
-  };
-
-  var SPECIES$1 = _wks('species');
-
-  var _setSpecies = function (KEY) {
-    var C = typeof _core[KEY] == 'function' ? _core[KEY] : _global[KEY];
-    if (_descriptors && C && !C[SPECIES$1]) _objectDp.f(C, SPECIES$1, {
-      configurable: true,
-      get: function () { return this; }
-    });
   };
 
   var ITERATOR$3 = _wks('iterator');
@@ -2136,9 +2555,9 @@
     return false;
   }
 
-  var _marked = /*#__PURE__*/_regeneratorRuntime().mark(generateColor$$1);
-  var colorList$$1 = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
-  function generateColor$$1() {
+  var _marked = /*#__PURE__*/_regeneratorRuntime().mark(generateColor);
+  var colorList = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
+  function generateColor() {
     var index;
     return _regeneratorRuntime().wrap(function generateColor$(_context) {
       while (1) switch (_context.prev = _context.next) {
@@ -2196,7 +2615,7 @@
       icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>',
       event: 'click',
       func: function func(self, pen, dom) {
-        toolBoxPlugin.addNode(pen, 0, 'mindNode2');
+        toolBoxPlugin.addNode(pen, 0, 'mindLine2');
       }
     }],
     //     setChildrenDom(self, pen) {
@@ -2364,6 +2783,8 @@
             pen.mind.color = color;
             self.color = color;
             self.updateAll();
+            toolBoxPlugin.resetLinesColor(pen);
+            toolBoxPlugin.calcChildrenColor(pen);
           }
         },
         style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            justify-content: space-around;\n            align-items: center;\n        }\n        .style_active{\n            width: 30%;\n            background-color:#fff;\n            height: 20px;\n            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);\n            border-radius: 3px;\n        }\n        .active{\n            border: 3px solid deepskyblue !important;\n        }\n        .colorList {\n            display: flex;\n            justify-content: space-between;\n            align-content: space-between;\n            flex-wrap: wrap;\n        }       \n        .main_style {\n            display: flex;\n            width: 100%;\n            height: 30px;\n            justify-content: space-around;\n            align-items: center;\n            border-radius: 3px;\n            background-color:#f7f7f9;\n        }\n        .style_item {\n            width:47%;\n            height: 22px;\n            display: flex;\n            align-items: center;\n            overflow: hidden;\n            justify-content: center;\n        }\n        .color_item {\n            width: 20px;\n            height: 20px;\n            border: 3px solid;\n            margin: 5px 5px 5px 0;\n            border-radius: 2px;\n        }\n        .color_item:hover {\n            border: 3px solid rgba(128,128,128,0.5) !important;\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
@@ -2394,7 +2815,7 @@
     key: 'lineStyle',
     name: '线条样式',
     color: '#4D4DFF',
-    lineStyle: 'curve',
+    lineStyle: 'mind',
     width: 3,
     init: function init(self, pen) {
       self.color = pen.mind.lineColor || pen.calculative.color || '#000';
@@ -2432,7 +2853,7 @@
         mode: 'open'
       });
       var str = template(self, {
-        template: "\n          <div class=\"container\">\n                <div class=\"item\">\n                <div class=\"title\">\u7EBF\u6761\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" max=\"10\" style=\"width: 81px\" onchange=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n            <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.lineStyle === 'curve' ? 'style_active' : '') + "\" data-style=\"\u66F2\u7EBF\" onclick=\"setLineStyle(true)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                  <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                    <path d=\"M0 9 a100,50 0 0,1 85,0\"></path>\n                  </g>\n                </svg>\n                  </div>\n                  <div class=\"style_item " + (self.lineStyle === 'polyline' ? 'style_active' : '') + "\" data-style=\"\u6298\u7EBF\" onclick=\"setLineStyle(false)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                    <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                      <path d=\"M0 4 l25 0 l0 12 l40 0\"></path>\n                    </g>\n                  </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\" onchange=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
+        template: "\n          <div class=\"container\">\n                <div class=\"item\">\n                <div class=\"title\">\u7EBF\u6761\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" max=\"10\" style=\"width: 81px\" onchange=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n            <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.lineStyle === 'mind' ? 'style_active' : '') + "\" data-style=\"\u66F2\u7EBF\" onclick=\"setLineStyle(true)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                  <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                    <path d=\"M0 9 a100,50 0 0,1 85,0\"></path>\n                  </g>\n                </svg>\n                  </div>\n                  <div class=\"style_item " + (self.lineStyle === 'polyline' ? 'style_active' : '') + "\" data-style=\"\u6298\u7EBF\" onclick=\"setLineStyle(false)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                    <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                      <path d=\"M0 4 l25 0 l0 12 l40 0\"></path>\n                    </g>\n                  </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\" onchange=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
           return "<span class=\"color_item " + (self.color === i ? 'active' : '') + "\" style=\"background-color: " + i + ";border: 3px solid " + i + "\" data-color=\"" + i + "\"></span>";
         }).join('') + "\n                     </div>\n                </div>\n              </div>\n          </div>",
         scripts: {
@@ -2448,16 +2869,16 @@
             // })
             var root = meta2d.findOne(pen.mind.rootId);
             root.mind.lineWidth = value;
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.update('title');
           },
           setLineStyle: function setLineStyle(value) {
-            var res = value ? 'curve' : 'polyline';
+            var res = value ? 'mind' : 'polyline';
             // toolbox.renderChildren()
 
             var root = window.meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res;
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.lineStyle = res;
             // toolBoxPlugin.update(root);
             self.updateAll();
@@ -2575,7 +2996,7 @@
           },
           setDirection: function setDirection(e) {
             var root = window.meta2d.findOne(pen.mind.rootId);
-            toolBoxPlugin.resetLinePos(root, e, true);
+            toolBoxPlugin.resetLayOut(root, e, true);
             toolBoxPlugin.update(root);
             self.direction = e;
             self.activeDirection(self, pen, dom);
@@ -2606,12 +3027,9 @@
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               parent = window.meta2d.findOne(pen.mind.preNodeId);
-              index = parent.mind.children.indexOf(pen); // 此处拿到的是父节点
+              index = parent.mind.children.indexOf(pen.id); // TODO 此处拿到的是父节点
               _context2.next = 4;
-              return toolBoxPlugin.addNode(parent, index + 1, pen.name, {
-                width: pen.calculative.width,
-                height: pen.calculative.height
-              });
+              return toolBoxPlugin.addNode(parent, index + 1, pen.name);
             case 4:
             case "end":
               return _context2.stop();
@@ -2640,7 +3058,7 @@
   // }
   ];
 
-  var defaultFuncs$$1 = {
+  var defaultFuncs = {
     funcList: funcList,
     getAllFuncDocs: function getAllFuncDocs() {
       return this.funcList.map(function (i) {
@@ -2668,85 +3086,261 @@
       return result;
     }
   };
-  var defaultFuncList$$1 = {
+  var defaultFuncList = {
     'root': funcList.filter(function (i) {
       return i.key !== 'addSiblingNode';
     }),
-    'leaf': defaultFuncs$$1.getFunc('addChildNode', 'addSiblingNode', 'relayout', 'relayoutNext', 'nodeStyle', 'lineStyle')
+    'leaf': defaultFuncs.getFunc('addChildNode', 'addSiblingNode', 'relayout', 'relayoutNext', 'nodeStyle', 'lineStyle')
   };
+  var childrenGap = 20;
+  var levelGap = 200;
+  var config = {
+    childrenGap: childrenGap,
+    levelGap: levelGap,
+    funcList: funcList,
+    colorList: colorList,
+    defaultFuncList: defaultFuncList
+  };
+
+  function right(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    var childrenGap = toolBoxPlugin.childrenGap;
+    var levelGap = toolBoxPlugin.levelGap;
+    var children = pen.mind.children;
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    toolBoxPlugin.calcChildWandH(pen);
+    for (var i = 0; i < children.length; i++) {
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var child = meta2d.store.pens[children[i]];
+      var childRect = meta2d.getPenRect(child);
+      topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      child.mind.x = worldReact.x + worldReact.width + +levelGap;
+      child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
+      if (child.mind.visible) {
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        meta2d.setVisible(child, true, false);
+      } else {
+        meta2d.setVisible(child, false, false);
+      }
+      if (recursion) right(child, true);
+    }
+  }
+
+  function left(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    var childrenGap = toolBoxPlugin.childrenGap;
+    var levelGap = toolBoxPlugin.levelGap;
+    var children = pen.mind.children;
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    toolBoxPlugin.calcChildWandH(pen);
+    for (var i = 0; i < children.length; i++) {
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var child = meta2d.store.pens[children[i]];
+      var childRect = meta2d.getPenRect(child);
+      topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      child.mind.connect = {
+        startIndex: 1,
+        fromAnchor: child.anchors[1],
+        endIndex: 3,
+        toAnchor: pen.anchors[3]
+      };
+      child.mind.x = worldReact.x - childRect.width - +levelGap;
+      child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
+      if (child.mind.visible) {
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        meta2d.setVisible(child, true, false);
+      } else {
+        meta2d.setVisible(child, false, false);
+      }
+      if (recursion) left(child, true);
+    }
+  }
+
+  function top(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    var childrenGap = toolBoxPlugin.childrenGap;
+    var levelGap = toolBoxPlugin.levelGap;
+    var children = pen.mind.children;
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    toolBoxPlugin.calcChildWandH(pen);
+    for (var i = 0; i < children.length; i++) {
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var child = meta2d.store.pens[children[i]];
+      var childRect = meta2d.getPenRect(child);
+      topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+      child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height - +levelGap;
+      if (child.mind.visible) {
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        meta2d.setVisible(child, true, false);
+      } else {
+        meta2d.setVisible(child, false, false);
+      }
+      if (recursion) top(child, true);
+    }
+  }
+
+  function bottom(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    var childrenGap = toolBoxPlugin.childrenGap;
+    var levelGap = toolBoxPlugin.levelGap;
+    var children = pen.mind.children;
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    toolBoxPlugin.calcChildWandH(pen);
+    for (var i = 0; i < children.length; i++) {
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var child = meta2d.store.pens[children[i]];
+      var childRect = meta2d.getPenRect(child);
+      topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+      child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height + +levelGap;
+      if (child.mind.visible) {
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        meta2d.setVisible(child, true, false);
+      } else {
+        meta2d.setVisible(child, false, false);
+      }
+      if (recursion) bottom(child, true);
+    }
+  }
+
+  function defaultColorRule(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    var children = pen.mind.children;
+    var generateColorFunc = generateColor();
+    for (var i = 0; i < children.length; i++) {
+      var child = meta2d.store.pens[children[i]];
+      var nodeColor = undefined;
+      if (pen.mind.level === 0) {
+        var nextColor = generateColorFunc.next().value;
+        nodeColor = child.mind.color || nextColor;
+      } else {
+        nodeColor = child.mind.color || pen.mind.color || pen.color;
+      }
+      if (child.mind.visible) {
+        meta2d.setValue({
+          id: child.id,
+          color: nodeColor
+        }, {
+          render: false
+        });
+        meta2d.setVisible(child, true, false);
+      } else {
+        meta2d.setVisible(child, false, false);
+      }
+      if (recursion) defaultColorRule(child, true);
+    }
+  }
 
   var toolBoxPlugin = {
     name: 'toolBox',
     status: false,
-    colorList: colorList$$1,
-    childrenGap: 20,
+    colorList: colorList,
+    childrenGap: config.childrenGap,
     // 子节点间的间距
-    levelGap: 200,
+    levelGap: config.levelGap,
     // 子级间的间距
+    layoutFunc: new map$1(),
+    // 布局位置函数map
+    colorFunc: new map$1(),
+    // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
-    calChildrenPosAndColor: function calChildrenPosAndColor(pen, recursion, position) {
-      var _pen$mind, _child$mind, _child$mind2, _child$mind3, _child$mind4;
+    calChildrenPosAndColor: function calChildrenPosAndColor(pen, position, recursion) {
+      if (position === void 0) {
+        position = pen.mind.direction || 'right';
+      }
       if (recursion === void 0) {
         recursion = true;
       }
-      if (position === void 0) {
-        position = 'right';
-      }
       if (!pen) return;
-      var children = (_pen$mind = pen.mind) == null ? void 0 : _pen$mind.children;
-      if (!children) return;
-      var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
-      // 子节点的世界坐标信息集合
-      var penRects = [];
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
-        var childWorldRect = meta2d.getPenRect(child);
-        penRects.push(childWorldRect);
+      var layoutFunc = toolBoxPlugin.layoutFunc.get(position);
+      var colorFunc = toolBoxPlugin.colorFunc.get('default');
+      if (!layoutFunc) throw new Error('toolBoxPlugin error : The layout function does not exist');
+      try {
+        layoutFunc(pen, recursion);
+        colorFunc(pen, recursion);
+      } catch (e) {
+        throw new Error("toolBoxPlugin error : " + e.message);
       }
-      var topHeight = 0;
-      var topWidth = 0;
-      // 设置值
-      var generateColorFunc = generateColor$$1();
-      toolBoxPlugin.calcChildWandH(pen, position);
-      for (var _i = 0; _i < children.length; _i++) {
-        var _children, _children2;
-        // 循环设置每个
-        var _child = children[_i]; // 获取子元素
-        topHeight += (((_children = children[_i - 1]) == null || (_children = _children.mind) == null ? void 0 : _children.maxHeight) || 0) + (children[_i - 1] ? +toolBoxPlugin.childrenGap : 0);
-        topWidth += (((_children2 = children[_i - 1]) == null || (_children2 = _children2.mind) == null ? void 0 : _children2.maxWidth) || 0) + (children[_i - 1] ? +toolBoxPlugin.childrenGap : 0);
-        var nodeColor = pen.mind.color || generateColorFunc.next().value;
-        switch (position) {
-          case 'right':
-            _child.mind.x = worldReact.x + worldReact.width + +toolBoxPlugin.levelGap;
-            _child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = _child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * penRects[_i].height || 0);
-            break;
-          case 'left':
-            _child.mind.x = worldReact.x - penRects[_i].width - +toolBoxPlugin.levelGap;
-            _child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind2 = _child.mind) == null ? void 0 : _child$mind2.maxHeight) / 2 - 1 / 2 * penRects[_i].height || 0);
-            break;
-          case 'bottom':
-            _child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind3 = _child.mind) == null ? void 0 : _child$mind3.maxWidth) / 2 - 1 / 2 * penRects[_i].width || 0);
-            _child.mind.y = worldReact.y + _child.height + +toolBoxPlugin.levelGap;
-            break;
-          case 'top':
-            _child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind4 = _child.mind) == null ? void 0 : _child$mind4.maxWidth) / 2 - 1 / 2 * penRects[_i].width || 0);
-            _child.mind.y = worldReact.y - _child.height - +toolBoxPlugin.levelGap;
-        }
-        if (!_child.mind.color) _child.mind.color = nodeColor;
-        if (_child.mind.visible) {
-          meta2d.setValue({
-            id: _child.id,
-            x: _child.mind.x,
-            y: _child.mind.y,
-            color: _child.mind.color
-          }, {
-            render: false
-          });
-          meta2d.setVisible(_child, true, false);
-        } else {
-          meta2d.setVisible(_child, false, false);
-        }
-        if (recursion) toolBoxPlugin.calChildrenPosAndColor(_child, true, _child.mind.direction);
+    },
+    calcChildrenColor: function calcChildrenColor(pen, type, recursion) {
+      if (type === void 0) {
+        type = 'default';
+      }
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      var colorFunc = toolBoxPlugin.colorFunc.get(type);
+      if (!colorFunc) return;
+      try {
+        colorFunc(pen, recursion);
+      } catch (e) {
+        throw new Error("toolBoxPlugin error : " + e.message);
+      }
+    },
+    calcChildrenPos: function calcChildrenPos(pen, position, recursion) {
+      if (position === void 0) {
+        position = pen.mind.direction || 'right';
+      }
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      var layoutFunc = toolBoxPlugin.layoutFunc.get(position);
+      if (!layoutFunc) return;
+      try {
+        layoutFunc(pen, recursion);
+      } catch (e) {
+        throw new Error("toolBoxPlugin error : " + e.message);
       }
     },
     connectLine: function connectLine(pen, newPen, option) {
@@ -2773,7 +3367,8 @@
       }
       meta2d.setValue({
         id: line.id,
-        lineWidth: meta2d.findOne(pen.mind.rootId).mind.lineWidth
+        lineWidth: meta2d.findOne(pen.mind.rootId).mind.lineWidth,
+        locked: 2
       }, {
         render: false
       });
@@ -2784,16 +3379,20 @@
       if (recursion === void 0) {
         recursion = true;
       }
-      var colors = generateColor$$1();
+      var colors = generateColor();
       var children = pen.mind.children;
       if (!children || children.length === 0) return;
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines;
-        var child = children[i];
+        var child = meta2d.store.pens[children[i]];
         var line = (_child$connectedLines = child.connectedLines) == null ? void 0 : _child$connectedLines[0];
         if (line) {
           line.mind ? '' : line.mind = {};
-          line.mind.color = pen.mind.lineColor || pen.mind.color || colors.next().value;
+          if (child.mind.level > 1) {
+            line.mind.color = pen.mind.lineColor || pen.color;
+          } else {
+            line.mind.color = pen.mind.lineColor || colors.next().value;
+          }
           meta2d.setValue({
             id: line.lineId,
             color: line.mind.color
@@ -2807,7 +3406,7 @@
       }
     },
     // 重新递归设置连线的样式
-    resetLineStyle: function resetLineStyle(pen, recursion) {
+    resetLinesStyle: function resetLinesStyle(pen, recursion) {
       if (recursion === void 0) {
         recursion = true;
       }
@@ -2816,7 +3415,7 @@
       var root = meta2d.findOne(pen.mind.rootId);
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines2;
-        var child = children[i];
+        var child = meta2d.store.pens[children[i]];
         var line = meta2d.findOne((_child$connectedLines2 = child.connectedLines) == null || (_child$connectedLines2 = _child$connectedLines2[0]) == null ? void 0 : _child$connectedLines2.lineId);
         if (line) {
           meta2d.updateLineType(line, meta2d.findOne(pen.mind.rootId).mind.lineStyle);
@@ -2828,12 +3427,12 @@
           });
         }
         if (recursion) {
-          toolBoxPlugin.resetLineStyle(child, true);
+          toolBoxPlugin.resetLinesStyle(child, true);
         }
       }
     },
     // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
-    resetLinePos: function resetLinePos(pen, pos, recursion) {
+    resetLayOut: function resetLayOut(pen, pos, recursion) {
       if (recursion === void 0) {
         recursion = true;
       }
@@ -2844,7 +3443,7 @@
       }
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines3;
-        var child = children[i];
+        var child = meta2d.store.pens[children[i]];
         if (!child.connectedLines || child.connectedLines.length === 0) return;
         var line = meta2d.findOne((_child$connectedLines3 = child.connectedLines[0]) == null ? void 0 : _child$connectedLines3.lineId);
         var penAnchor = null;
@@ -2889,8 +3488,13 @@
           case 'left':
             penAnchor = pen.anchors[3];
             childAnchor = child.anchors[1];
-            core.connectLine(pen, penAnchor, line, lineAnchor2);
-            core.connectLine(child, childAnchor, line, lineAnchor1);
+            if (pen.mind.lineStyle === 'mind') {
+              core.connectLine(pen, penAnchor, line, lineAnchor2);
+              core.connectLine(child, childAnchor, line, lineAnchor1);
+            } else {
+              core.connectLine(pen, penAnchor, line, lineAnchor1);
+              core.connectLine(child, childAnchor, line, lineAnchor2);
+            }
             break;
           case 'bottom':
             penAnchor = pen.anchors[2];
@@ -2901,12 +3505,17 @@
           case 'top':
             penAnchor = pen.anchors[0];
             childAnchor = child.anchors[2];
-            core.connectLine(pen, penAnchor, line, lineAnchor2);
-            core.connectLine(child, childAnchor, line, lineAnchor1);
+            if (pen.mind.lineStyle === 'mind') {
+              core.connectLine(pen, penAnchor, line, lineAnchor2);
+              core.connectLine(child, childAnchor, line, lineAnchor1);
+            } else {
+              core.connectLine(pen, penAnchor, line, lineAnchor1);
+              core.connectLine(child, childAnchor, line, lineAnchor2);
+            }
             break;
         }
         if (recursion) {
-          toolBoxPlugin.resetLinePos(child, pos, true);
+          toolBoxPlugin.resetLayOut(child, pos, true);
           child.mind.direction = pos;
         }
       }
@@ -2933,9 +3542,11 @@
       var lines = [];
       (_pen$connectedLines = pen.connectedLines) == null || _pen$connectedLines.forEach(function (i) {
         var line = meta2d.findOne(i.lineId);
+        if (!line) return;
+        line.locked = 0;
         line && lines.push(line);
       });
-      meta2d["delete"](lines);
+      meta2d["delete"](lines, true);
     },
     // 删除node
     deleteNode: function deleteNode(pen) {
@@ -2949,13 +3560,15 @@
 
               // 查找到对应的父级，删除其在父级中的子级列表数据
               parent = meta2d.findOne(pen.mind.preNodeId);
-              parent && parent.mind.children.splice(parent.mind.children.indexOf(pen), 1);
+              parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id), 1);
 
               // 刷新界面
 
               // 删除meta2d数据
               _context.next = 5;
-              return meta2d["delete"](pen.mind.children);
+              return meta2d["delete"](pen.mind.children.map(function (i) {
+                return meta2d.store.pens[i];
+              }), true);
             case 5:
               toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
             case 6:
@@ -2971,6 +3584,15 @@
         toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement, {});
         globalThis.toolbox = toolbox;
       }
+
+      // 初始化布局函数
+      toolBoxPlugin.layoutFunc.set('right', right);
+      toolBoxPlugin.layoutFunc.set('left', left);
+      toolBoxPlugin.layoutFunc.set('top', top);
+      toolBoxPlugin.layoutFunc.set('bottom', bottom);
+
+      // 设置颜色生成函数
+      toolBoxPlugin.colorFunc.set('default', defaultColorRule);
       // 打开时进行初始化
       meta2d.on('opened', function () {
         var _meta2d$data = meta2d.data(),
@@ -2978,8 +3600,9 @@
         pens.forEach(function (i) {
           if (i.mind) {
             var pen = meta2d.findOne(i.id);
-            toolBoxPlugin.combineLifeCycle(pen);
-            i.mind.isRoot ? window.MindManager.rootIds.push(pen) : '';
+            toolBoxPlugin.combineToolBox(pen);
+            i.mind.isRoot ? window.MindManager.rootIds.push(pen.id) : '';
+            i.mind.children.forEach(function (i) {});
           }
         });
       });
@@ -2998,50 +3621,52 @@
             height: 0,
             // 包含了自己和子节点的最大高度
             direction: 'right',
-            lineStyle: 'curve',
+            lineStyle: 'mind',
             lineColor: '',
             childrenVisible: true,
             visible: true,
-            lineWidth: 2
+            lineWidth: 2,
+            level: 0
           };
-          window.MindManager.rootIds.push(pen);
+          window.MindManager.rootIds.push(pen.id);
           // 跟随移动
-          toolBoxPlugin.combineLifeCycle(pen);
+          toolBoxPlugin.combineToolBox(pen);
         }
       });
       meta2d.on('inactive', function (targetPen) {
-        globalThis.toolbox.hide();
+        var _globalThis$toolbox;
+        (_globalThis$toolbox = globalThis.toolbox) == null || _globalThis$toolbox.hide();
       });
     },
     uninstall: function uninstall() {
       var _window$MindManager$r,
         _this = this;
+      globalThis.toolbox.destroy();
       globalThis.toolbox = null;
       // 解绑生命周期
       (_window$MindManager$r = window.MindManager.rootIds) == null || _window$MindManager$r.forEach(function (i) {
         var root = meta2d.findOne(i);
-        _this.unCombineLifeCycle(root);
+        _this.unCombineToolBox(root);
       });
     },
-    unCombineLifeCycle: function unCombineLifeCycle(pen) {
+    unCombineToolBox: function unCombineToolBox(pen) {
       var _this2 = this;
       if (!pen.mind.children || pen.mind.children.length === 0) return;
-      this.combineLifeCycle(pen, true);
+      this.combineToolBox(pen, true);
       pen.mind.children.forEach(function (i) {
-        _this2.unCombineLifeCycle(i);
+        var child = meta2d.store.pens[i];
+        _this2.unCombineToolBox(child);
       });
     },
-    funcList: defaultFuncList$$1,
+    funcList: defaultFuncList,
     setFuncList: function setFuncList(funcList) {
       if (Object.prototype.toString.call(funcList) !== '[object Object]') {
         throw new Error('The setFuncList function must take function arguments\n');
       }
       this.funcList = funcList;
     },
-    calcChildWandH: function calcChildWandH(pen, position) {
-      if (position === void 0) {
-        position = 'right';
-      }
+    calcChildWandH: function calcChildWandH(pen) {
+      var position = pen.mind.direction;
       var children = pen.mind.children || [];
       var worldRect = meta2d.getPenRect(pen);
       if (children.length === 0 || !pen.mind.childrenVisible) {
@@ -3058,23 +3683,23 @@
       var maxW = 0;
       if (position === 'right' || position === 'left') {
         for (var i = 0; i < children.length; i++) {
-          var child = children[i];
+          var child = meta2d.store.pens[children[i]];
           var maxObj = toolBoxPlugin.calcChildWandH(child, position);
           maxHeight += maxObj.maxHeight;
           maxWidth = maxWidth > maxObj.maxWidth ? maxWidth : maxObj.maxWidth;
         }
         maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
         maxH = maxHeight > worldRect.height ? maxHeight : worldRect.height;
-        pen.mind.maxHeight = maxH;
         pen.mind.maxWidth = maxWidth;
+        pen.mind.maxHeight = maxH;
         return {
           maxHeight: maxH,
           maxWidth: maxWidth
         };
       } else {
-        for (var _i2 = 0; _i2 < children.length; _i2++) {
-          var _child2 = children[_i2];
-          var _maxObj = toolBoxPlugin.calcChildWandH(_child2, position);
+        for (var _i = 0; _i < children.length; _i++) {
+          var _child = meta2d.store.pens[children[_i]];
+          var _maxObj = toolBoxPlugin.calcChildWandH(_child, position);
           maxWidth += _maxObj.maxWidth;
           maxHeight = maxHeight > _maxObj.maxHeight ? maxHeight : _maxObj.maxHeight;
         }
@@ -3111,7 +3736,7 @@
       }
     },
     //
-    combineLifeCycle: function combineLifeCycle(target, del) {
+    combineToolBox: function combineToolBox(target, del) {
       var _this3 = this;
       if (del === void 0) {
         del = false;
@@ -3123,6 +3748,11 @@
       var onDestroy = function onDestroy(targetPen) {
         toolbox.hide();
         toolBoxPlugin.deleteNode(targetPen);
+        if (targetPen.mind.isRoot) {
+          var index = MindManager.rootIds.indexOf(targetPen.id);
+          if (index === -1) return;
+          MindManager.rootIds.splice(index, 1);
+        }
       };
       var onMouseUp = function onMouseUp(targetPen) {
         toolbox.bindPen(targetPen);
@@ -3176,8 +3806,9 @@
                   direction: pen.mind.direction,
                   childrenVisible: true,
                   visible: true,
-                  lineStyle: '',
-                  lineColor: ''
+                  lineStyle: pen.mind.lineStyle || '',
+                  lineColor: '',
+                  level: pen.mind.level + 1
                 },
                 x: pen.x,
                 y: pen.y,
@@ -3190,23 +3821,22 @@
                 fontSize: 16,
                 borderRadius: pen.borderRadius
               };
-              console.log(pen.width, pen.height, 'ppppppppppppp');
               scale = pen.calculative.canvas.store.data.scale;
               option.width && (option.width *= scale);
               option.height && (option.height *= scale);
               assign$1(opt, option);
-              _context2.next = 11;
+              _context2.next = 10;
               return meta2d.addPen(opt);
-            case 11:
+            case 10:
               newPen = _context2.sent;
               window.MindManager.pluginsMessageChannels.publish('addNode', newPen);
               // 添加节点
               if (position) {
-                pen.mind.children.splice(position, 0, newPen);
+                pen.mind.children.splice(position, 0, newPen.id);
               } else {
-                pen.mind.children.push(newPen);
+                pen.mind.children.push(newPen.id);
               }
-              toolBoxPlugin.combineLifeCycle(newPen); // 重写生命周期
+              toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
               rootNode = meta2d.findOne(pen.mind.rootId); // 连线
               toolBoxPlugin.connectLine(pen, newPen, {
                 position: pen.mind.direction,
@@ -3218,7 +3848,7 @@
               globalThis.toolbox.bindPen(newPen);
               globalThis.toolbox.setFuncList(_this4.getFuncList(newPen));
               globalThis.toolbox.translatePosition(newPen);
-            case 21:
+            case 20:
             case "end":
               return _context2.stop();
           }
@@ -3230,9 +3860,9 @@
         recursion = true;
       }
       if (!pen) return;
-      toolBoxPlugin.calChildrenPosAndColor(pen, recursion, pen.mind.direction);
+      toolBoxPlugin.calChildrenPosAndColor(pen, pen.mind.direction, recursion);
       toolBoxPlugin.resetLinesColor(pen, recursion);
-      toolBoxPlugin.resetLineStyle(pen, recursion);
+      toolBoxPlugin.resetLinesStyle(pen, recursion);
       toolBoxPlugin.render();
       mindDiagram.pluginsMessageChannels.publish('update');
     },
@@ -3243,12 +3873,19 @@
   };
 
   exports.toolBoxPlugin = toolBoxPlugin;
-  exports.colorList = colorList$$1;
-  exports.generateColor = generateColor$$1;
-  exports.defaultFuncs = defaultFuncs$$1;
-  exports.defaultFuncList = defaultFuncList$$1;
-  exports.createDom = createDom;
   exports.ToolBox = ToolBox;
+  exports.colorList = colorList;
+  exports.generateColor = generateColor;
+  exports.defaultFuncs = defaultFuncs;
+  exports.defaultFuncList = defaultFuncList;
+  exports.childrenGap = childrenGap;
+  exports.levelGap = levelGap;
+  exports.right = right;
+  exports.left = left;
+  exports.top = top;
+  exports.bottom = bottom;
+  exports.template = template;
+  exports.createDom = createDom;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

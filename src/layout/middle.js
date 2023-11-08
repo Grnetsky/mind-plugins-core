@@ -6,10 +6,13 @@ export function middle(pen,reset = true,recursion = true) {
     const VALUE = 5;
     let childrenGap = toolBoxPlugin.childrenGap
     let levelGap = toolBoxPlugin.levelGap
-    let children = pen.mind.children;
+    let children = JSON.parse(JSON.stringify(pen.mind.children));
     let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     let topHeight = 0;
     let topWidth = 0;
+    let rightChildren = pen.mind.children.splice(0,VALUE)
+    let leftChildren = pen.mind.children
+    pen.mind.children = rightChildren
     toolBoxPlugin.calcChildWandH(pen);
     // let childrenLen = children.length;
     // let cutValue = childrenLen / 2
@@ -33,6 +36,8 @@ export function middle(pen,reset = true,recursion = true) {
             if(i===VALUE-1){
                 topHeight = 0
                 topWidth = 0
+                pen.mind.children = leftChildren
+                toolBoxPlugin.calcChildWandH(pen);
             }
         }else{
             topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
@@ -54,6 +59,7 @@ export function middle(pen,reset = true,recursion = true) {
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
             left(child,true,true)
         }
+        pen.mind.children = children
         if(child.mind.visible){
             meta2d.setValue({
                 id: child.id,

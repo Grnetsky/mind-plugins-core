@@ -4,7 +4,7 @@ import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import { right,left,top,bottom, middle } from "../layout"
 import defaultColorRule from "../color/default";
-import { debounce } from "../utils"
+import {debounce, deepMerge} from "../utils"
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -14,7 +14,7 @@ export let toolBoxPlugin = {
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
-    calChildrenPosAndColor(pen, position= pen.mind.direction || 'right',recursion = true){
+    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',recursion = true){
         if(!pen)return;
         let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
         let colorFunc = toolBoxPlugin.colorFunc.get('default')
@@ -41,7 +41,7 @@ export let toolBoxPlugin = {
         try{
             layoutFunc(pen, recursion)
         }catch (e){
-            throw new Error(`toolBoxPlugin error : ${e.message}`)
+            throw new Error(`[toolBoxPlugin calcChildrenPos] error : ${e.message}`)
         }
     },
     connectLine(pen,newPen,style = 'polyline'){
@@ -83,7 +83,7 @@ export let toolBoxPlugin = {
             if(line){
                 line.mind? '' : (line.mind = {});
                 if(child.mind.level > 1){
-                    line.mind.color = pen.mind.lineColor || pen.color
+                    line.mind.color = pen.mind.lineColor || pen.mind.color || pen.calculative.color
                 }else {
                     line.mind.color = pen.mind.lineColor|| colors.next().value;
                 }
@@ -130,6 +130,7 @@ export let toolBoxPlugin = {
             if(!child.connectedLines || child.connectedLines.length === 0)return;
             // 保留lineId
             let line = meta2d.findOne(child.connectedLines[0]?.lineId);
+            if(!line)continue
             let lineAnchor1 = line.anchors[0];
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
             let from = meta2d.store.pens[child.mind.connect.from]
@@ -145,10 +146,7 @@ export let toolBoxPlugin = {
             }
         }
     },
-    resetLines(pen,recursion){
-
-    },
-    reconnectLines(pen,recursion){
+    reconnectLines(pen,recursion = true){
         let children = pen.mind.children;
         if(!children || children.length === 0 ){
             return;
@@ -156,6 +154,7 @@ export let toolBoxPlugin = {
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
             let line = meta2d.findOne(child.mind.lineId);
+            if(!line)continue
             let lineAnchor1 = line.anchors[0];
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
             let from = meta2d.store.pens[child.mind.connect.from]
@@ -166,25 +165,29 @@ export let toolBoxPlugin = {
             // 断开连线
             connectLine(from,fromAnchor,line,lineAnchor1)
             connectLine(to,toAnchor,line,lineAnchor2)
-
-
+            meta2d.canvas.updateLines(child)
             if(recursion){
                 toolBoxPlugin.reconnectLines(child,true);
             }
         }
-
-
+        meta2d.canvas.updateLines(pen)
     },
-    // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
+    // 重新设置连线的位置
     resetLayOut(pen,pos,recursion = true){
         if(!pen)return
         if(!pos)pos = pen.mind.direction
+        // 断开连线
         toolBoxPlugin.disconnectLines(pen,recursion)
-        // toolBoxPlugin.deleteLines(pen)
-        let layoutFunc = toolBoxPlugin.layoutFunc.get(pos)
-        layoutFunc(pen,recursion)
+        // 执行布局函数
+        // let layoutFunc = toolBoxPlugin.layoutFunc.get(pos)
+        // layoutFunc(pen,recursion)
+        toolBoxPlugin.calcChildrenPos(pen,pos,recursion)
+
+
+        // 重新连线
         toolBoxPlugin.reconnectLines(pen,recursion)
-        meta2d.canvas.updateLines(pen)
+
+        // 更新连线
     },
     // 递归修改子节点的direction属性
     // resetDirection(pen,direction,recursion = true){
@@ -324,8 +327,8 @@ export let toolBoxPlugin = {
         let children = pen.mind.children || [];
         let worldRect = meta2d.getPenRect(pen);
         if(children.length === 0 || !pen.mind.childrenVisible){
-            pen.mind.maxHeight = worldRect.height;
-            pen.mind.maxWidth = worldRect.width;
+            pen.mind.maxHeight = pen.mind.height ?? worldRect.height;
+            pen.mind.maxWidth = pen.mind.width ?? worldRect.width;
             return {
                 maxHeight: worldRect.height,
                 maxWidth: worldRect.width
@@ -441,14 +444,16 @@ export let toolBoxPlugin = {
                 rootId: pen.mind.rootId,
                 preNodeId:pen.id,
                 children: [],
-                width: 0, // 包含了自己和子节点的最大宽度
-                height: 0, // 包含了自己和子节点的最大高度
+                width: undefined,
+                height: undefined,
+                maxHeight:0, // 包含了自己和子节点的最大高度
+                maxWidth:0,// 包含了自己和子节点的最大宽度
                 direction:pen.mind.direction,
                 childrenVisible: true,
                 visible: true,
                 lineStyle:pen.mind.lineStyle || '',
                 lineColor:'',
-                level: pen.mind.level + 1
+                level: pen.mind.level + 1,
             },
             x:pen.x ,
             y:pen.y ,
@@ -465,8 +470,14 @@ export let toolBoxPlugin = {
         option.width && (option.width *= scale)
         option.height && (option.height *= scale)
 
-        Object.assign(opt,option)
+        opt = deepMerge(opt,option)
         let newPen = await meta2d.addPen(opt);
+
+        // 设置连接关系
+        newPen.mind.connect =pen.mind.level === 0?
+            toolBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
+            : pen.mind.connect
+
         window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
         // 添加节点
         if(position){
@@ -477,27 +488,40 @@ export let toolBoxPlugin = {
         toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
         let rootNode = meta2d.findOne(pen.mind.rootId);
 
-        //TODO 这里似乎性能不太好
-        toolBoxPlugin.calChildrenPosAndColor(rootNode,rootNode.mind.direction,true);
-        // 连线
-        toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
+        //TODO 这里似乎性能不太好 d待优化
 
+        // 连线
+        toolBoxPlugin.calcChildrenPos(rootNode,rootNode.mind.direction,true)
+        toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
+        toolBoxPlugin.resetLayOut(rootNode)
+        toolBoxPlugin.calcChildrenColor(rootNode)
+
+
+        // toolBoxPlugin.calcChildrenColor(rootNode);
+
+        toolBoxPlugin.resetLinesColor(rootNode,true);
+        toolBoxPlugin.resetLinesStyle(rootNode,true);
+
+        // toolBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
         // toolBoxPlugin.update(rootNode,true);
         globalThis.toolbox.bindPen(newPen);
         globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
-        toolBoxPlugin.resetLayOut(rootNode)
-        toolBoxPlugin.update(rootNode)
-        },
+        // toolBoxPlugin.update(rootNode)
+
+    },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
-        toolBoxPlugin.calChildrenPosAndColor(pen,pen.mind.direction,recursion);
+        toolBoxPlugin.calcChildrenPosAndColor(pen,pen.mind.direction,recursion);
+        // toolBoxPlugin.resetLayOut(pen,recursion)
+        toolBoxPlugin.calcChildrenColor(pen,recursion)
         toolBoxPlugin.resetLinesColor(pen,recursion);
         toolBoxPlugin.resetLinesStyle(pen,recursion);
+
         toolBoxPlugin.render();
         pluginsMessageChannels.publish('update')
-    },5),
+    },50),
 
 
     render(){

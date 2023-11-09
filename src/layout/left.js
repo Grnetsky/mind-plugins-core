@@ -13,14 +13,7 @@ export function left(pen,recursion = true,) {
         let childRect = meta2d.getPenRect(child)
         topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
         topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
-        child.mind.connect = {
-            from:pen.id,
-            to:child.id,
-            startIndex: 3,
-            fromAnchor: pen.anchors[3],
-            endIndex: 1,
-            toAnchor: child.anchors[1]
-        }
+        child.mind.connect = left.connectRule(pen,child)
         child.mind.x = worldReact.x - childRect.width - +levelGap;
         child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         if(child.mind.visible){
@@ -35,5 +28,16 @@ export function left(pen,recursion = true,) {
             meta2d.setVisible(child,false,false);
         }
         if(recursion) left(child,true);
+    }
+}
+
+left.connectRule = (pen,child)=>{
+    return {
+        from:pen.id,
+        to:child.id,
+        startIndex: 3,
+        fromAnchor: pen.anchors[3],
+        endIndex: 1,
+        toAnchor: child.anchors[1]
     }
 }

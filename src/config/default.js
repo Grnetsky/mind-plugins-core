@@ -113,7 +113,7 @@ let funcList =
     key:'relayout',
     name:'重新布局',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局下一级</title>\n' +
+        '    <title>重新布局</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
         '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
@@ -134,7 +134,7 @@ let funcList =
     func(self,pen,dom,father){
       let children = pen.mind?.children || [];
       if(children.length >0){
-        toolBoxPlugin.update(meta2d.store.pens[pen.mind.rootId],true);
+        toolBoxPlugin.update(pen,true);
       }
     },
     // setDom(self,dom){
@@ -148,7 +148,7 @@ let funcList =
     description:'',
     name:'重新布局下一级',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局</title>\n' +
+        '    <title>重新布局下一级</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
         '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
@@ -295,7 +295,7 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              lineDash: res
-           })
+           },{render:false})
            // toolbox.renderChildren()
            self.dash = res.join(',')
            self.update('title')
@@ -307,7 +307,7 @@ let funcList =
             meta2d.setValue({
               id:pen.id,
               lineWidth: value
-            })
+            },{render:false})
             self.update('title')
             self.update('child',true)
 
@@ -325,12 +325,12 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              color
-           })
+           },{render:false})
            pen.mind.color = color
            self.color = color;
            self.updateAll()
-           toolBoxPlugin.resetLinesColor(pen)
            toolBoxPlugin.calcChildrenColor(pen)
+           toolBoxPlugin.resetLinesColor(pen)
          }
         },
        style:`<style>
@@ -585,7 +585,7 @@ let funcList =
               meta2d.setValue({
                 id:pen.id,
                 'mind.lineColor':color
-              })
+              },{render:false})
             })
             self.color = color
             toolBoxPlugin.resetLinesColor(pen,true)
@@ -701,7 +701,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','middle'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','bottom','middle'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -816,7 +816,7 @@ let funcList =
                       </svg>
                     </div>
                     
-                    <div onclick="setDirection('middle')">                  
+                    <div onclick="setDirection('bottom')">                  
                       <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
                         <title>向下布局</title>
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -837,6 +837,34 @@ let funcList =
                             </g>
                         </g>
                       </svg>
+                    </div>
+                   
+                    <div onclick="setDirection('middle')">
+                    <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                      <title>布局</title>
+                      <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                          <g id="未固定" transform="translate(-541.000000, -480.000000)">
+                              <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                  <g id="布局" transform="translate(16.000000, 57.000000)">
+                                      <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0.5" y="0.5" width="76" height="50" rx="2"/>
+                                      <g id="编组-3" transform="translate(10.000000, 7.000000)">
+                                          <line x1="12.5" y1="18.5" x2="21.969697" y2="18.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                          <line x1="35.5" y1="18.5" x2="44.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                          <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="22.5" y="15.5" width="13" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="47" y="0" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="0" y="16" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="47" y="16" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="0" y="32" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="47" y="32" width="10" height="5" rx="2"/>
+                                          <path class="toolbox_direction_svg_line" d="M11,3 C18.5461417,3 24.8721456,8.22403061 26.5588129,15.2528929 M26.9076362,20.7292725 C26.0454005,28.7525241 19.2522884,35 11,35" id="形状" stroke="#818187" stroke-linecap="round"/>
+                                          <path class="toolbox_direction_svg_line" d="M30,3 C37.6543889,3 44.0533839,8.37497993 45.6285232,15.5564778 M45.9076362,20.7292725 C45.0454005,28.7525241 38.2522884,35 30,35" id="形状" stroke="#818187" transform="translate(37.953818, 19.000000) scale(-1, 1) translate(-37.953818, -19.000000) "/>
+                                      </g>
+                                  </g>
+                              </g>
+                          </g>
+                      </g>
+                    </svg>
                     </div>
                 </div>
               </div>

@@ -1,16 +1,16 @@
 import {toolBoxPlugin} from "../core/ToolBoxPlugin";
 import {left} from "./left";
 import {right} from "./right";
-export function middle(pen,reset = true,recursion = true) {
+export function middle(pen,recursion = true) {
     pen.mind.direction = 'middle'
-    const VALUE = 8;
+    middle.VALUE = 8;
     let childrenGap = toolBoxPlugin.childrenGap
     let levelGap = toolBoxPlugin.levelGap
     let children = JSON.parse(JSON.stringify(pen.mind.children));
     let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     let topHeight = 0;
     let topWidth = 0;
-    let rightChildren = pen.mind.children.splice(0,VALUE)
+    let rightChildren = pen.mind.children.splice(0,middle.VALUE)
     let leftChildren = pen.mind.children
     pen.mind.children = rightChildren
     toolBoxPlugin.calcChildWandH(pen);
@@ -19,21 +19,14 @@ export function middle(pen,reset = true,recursion = true) {
     for(let i = 0;i<children.length;i++){
         let child =  meta2d.store.pens[children[i]]
         let childRect = meta2d.getPenRect(child)
-        if(i<VALUE){
+        if(i<middle.VALUE){
             topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
             topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
-            child.mind.connect = {
-                from:pen.id,
-                to:child.id,
-                startIndex: 1,
-                fromAnchor: pen.anchors[1],
-                endIndex: 3,
-                toAnchor: child.anchors[3]
-            }
+            child.mind.connect = middle.connectRule(pen,child,i)
             child.mind.x = worldReact.x + worldReact.width + +levelGap;
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-            right(child,true,true)
-            if(i===VALUE-1){
+            right(child,recursion)
+            if(i===middle.VALUE-1){
                 topHeight = 0
                 topWidth = 0
                 pen.mind.children = leftChildren
@@ -43,21 +36,14 @@ export function middle(pen,reset = true,recursion = true) {
             topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
             topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
 
-            if(i === VALUE ){
+            if(i === middle.VALUE ){
                 topHeight = 0;
                 topWidth = 0
             }
-            child.mind.connect = {
-                from:pen.id,
-                to:child.id,
-                startIndex: 3,
-                fromAnchor: pen.anchors[3],
-                endIndex: 1,
-                toAnchor: child.anchors[1]
-            }
+            child.mind.connect =middle.connectRule(pen,child,i)
             child.mind.x = worldReact.x - childRect.width - +levelGap;
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-            left(child,true,true)
+            left(child,recursion)
         }
         pen.mind.children = children
         if(child.mind.visible){
@@ -73,3 +59,6 @@ export function middle(pen,reset = true,recursion = true) {
         }
     }
 }
+ middle.connectRule = (pen,child,index)=>{
+   return index<middle.VALUE?right.connectRule(pen,child):left.connectRule(pen,child)
+ }

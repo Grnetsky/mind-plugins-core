@@ -33,3 +33,18 @@ export function debounce(fn, delay) {
         }, delay);
     };
 }
+
+
+export function deepMerge(obj1, obj2) {
+    let newObj = Object.assign({}, obj1);
+
+    for (let key in obj2) {
+        if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+            newObj[key] = deepMerge(obj1[key], obj2[key]);
+        } else {
+            newObj[key] = obj2[key];
+        }
+    }
+
+    return newObj;
+}

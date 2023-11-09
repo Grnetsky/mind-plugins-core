@@ -3295,7 +3295,7 @@
     colorFunc: new map$1(),
     // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
-    calChildrenPosAndColor: function calChildrenPosAndColor(pen, position, recursion) {
+    calcChildrenPosAndColor: function calcChildrenPosAndColor(pen, position, recursion) {
       if (position === void 0) {
         position = pen.mind.direction || 'right';
       }
@@ -3860,7 +3860,7 @@
         recursion = true;
       }
       if (!pen) return;
-      toolBoxPlugin.calChildrenPosAndColor(pen, pen.mind.direction, recursion);
+      toolBoxPlugin.calcChildrenPosAndColor(pen, pen.mind.direction, recursion);
       toolBoxPlugin.resetLinesColor(pen, recursion);
       toolBoxPlugin.resetLinesStyle(pen, recursion);
       toolBoxPlugin.render();

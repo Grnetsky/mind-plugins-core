@@ -78,7 +78,7 @@ export class ToolBox {
         this.box.style.userSelect = 'none';
         this.show();
     }
-    renderChildren(){
+    renderFuncList(){
         const fragmentChild = new DocumentFragment();
         this.box.innerHTML = '';
         this.funcList.forEach(i=>{
@@ -131,7 +131,7 @@ export class ToolBox {
     }
     setFuncList(funcList){
         this.funcList = funcList;
-        this.renderChildren();
+        this.renderFuncList();
     }
     clearFuncList(){
         this.setFuncList([]);

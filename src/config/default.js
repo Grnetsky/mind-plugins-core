@@ -296,14 +296,14 @@ let funcList =
              id:pen.id,
              lineDash: res
            },{render:false})
-           // toolbox.renderChildren()
+           // toolbox.renderFuncList()
            self.dash = res.join(',')
            self.update('title')
            self.update('child',true)
          },
           sliderChange: (value)=>{
             self.width = value
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             meta2d.setValue({
               id:pen.id,
               lineWidth: value
@@ -420,7 +420,7 @@ let funcList =
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[0,0]})
     //       father.dash = '0,0';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   },
     //   {
@@ -429,7 +429,7 @@ let funcList =
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[5,5]})
     //       father.dash = '5,5';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   }
     // ]
@@ -548,7 +548,7 @@ let funcList =
           sliderChange: (value)=>{
             dom.shadowRoot.querySelector('#t').innerHTML = value
             self.width = value
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             // pen.connectedLines?.forEach(i=>{
             //   meta2d.setValue({
             //     id:i.lineId,
@@ -562,7 +562,7 @@ let funcList =
           },
           setLineStyle(value){
             let res = value?'mind':'polyline'
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
 
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res

@@ -1,13 +1,13 @@
-import {createDom, ToolBox} from "./dom";
-import {toolBoxPlugin} from "../index";
-import {template} from "./parse";
-let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
+import { createDom } from "../utils";
+import {toolBoxPlugin} from "../core";
+import {template} from "../parse";
+export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
   let index = 0;
   while(true) {
-    yield colorList[index];
-    index = (index + 1) % colorList.length;
+    yield toolBoxPlugin.colorList[index];
+    index = (index + 1) % toolBoxPlugin.colorList.length;
   }
 }
 
@@ -17,15 +17,89 @@ let funcList =
     key:'addChildNode',
     name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
     // 监听事件名
-    event: 'click',
+    // event: 'click',
     /**
      * @description 事件对应的回调函数
      * @param self 返回该选项自身
      * @param pen 返回当前操作的pen对象
      * */
-    func: async (self,pen)=>{
-      toolBoxPlugin.addNode(pen,0);
-    },
+    // func: async (self,pen)=>{
+    //   toolBoxPlugin.addNode(pen,0);
+    //   },
+    openChildDomEvent: 'mouseenter',
+    closeChildDomEvent: 'mouseleave',
+    closeShadowDom:true,
+    children:[
+      {
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+        event:'click',
+        func(self,pen,dom){
+          toolBoxPlugin.addNode(pen,0,'mindNode2')
+        }
+      },
+      {
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+        event:'click',
+        func(self,pen,dom){
+          toolBoxPlugin.addNode(pen,0,'diamond',{width:150,height:100 })
+        }
+      },
+      {
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+            '    <title>椭圆形备份 12</title>\n' +
+            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+            '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>',
+        event:'click',
+        func(self,pen,dom){
+          toolBoxPlugin.addNode(pen,0,'mindLine2')
+        }
+      }
+    ],
+//     setChildrenDom(self, pen) {
+//       let dom = createDom('div',{
+//         display: 'flex',
+//         flexDirection: 'row',
+//         flexWrap: 'wrap',
+//         justifyContent: 'flex-start',
+//         position:'absolute',
+//         visibility:'hidden',
+//         top:'50px',
+//         backgroundColor:'#fff',
+//         borderRadius:'5px',
+//         padding:'16px',
+//         width: '140px',
+//         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+//       });
+//
+//       let str = template(self,{
+//         template:`
+//           <div class="container">
+//             <ul>
+//               <li data-target="rectangle"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-flow-start"></use></svg></li>
+//               <li data-target="mindLine"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-zizhuti"></use></svg></li>
+//               <li></li>
+//               <li></li>
+//               <li></li>
+//             </ul>
+//           </div>
+//         `,
+//         scripts:``,
+//         style:`<style>
+//             li{
+//                 list-style: none;
+//             }
+// </style>`
+//       })
+//       dom.innerHTML = str
+//       return dom
+//       },
     // 显示的图标
     img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=',
     /**
@@ -34,13 +108,12 @@ let funcList =
      * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
      * @return string dom字符串
      * */
-    closeOther:true
   },
   {
     key:'relayout',
     name:'重新布局',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局下一级</title>\n' +
+        '    <title>重新布局</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
         '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
@@ -75,7 +148,7 @@ let funcList =
     description:'',
     name:'重新布局下一级',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局</title>\n' +
+        '    <title>重新布局下一级</title>\n' +
         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
         '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
@@ -157,7 +230,7 @@ let funcList =
               <div class="item">
                 <div class="title">边框粗细</div>
                 <div class="main">
-                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                  <input type="range" min="1" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
                   <div class="item">
@@ -222,7 +295,7 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              lineDash: res
-           })
+           },{render:false})
            // toolbox.renderChildren()
            self.dash = res.join(',')
            self.update('title')
@@ -234,7 +307,7 @@ let funcList =
             meta2d.setValue({
               id:pen.id,
               lineWidth: value
-            })
+            },{render:false})
             self.update('title')
             self.update('child',true)
 
@@ -252,10 +325,12 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              color
-           })
+           },{render:false})
            pen.mind.color = color
            self.color = color;
            self.updateAll()
+           toolBoxPlugin.calcChildrenColor(pen)
+           toolBoxPlugin.resetLinesColor(pen)
          }
         },
        style:`<style>
@@ -363,7 +438,7 @@ let funcList =
     key:'lineStyle',
     name:'线条样式',
     color:'#4D4DFF',
-    lineStyle: 'curve',
+    lineStyle: 'mind',
     width: 3,
     init(self,pen){
       self.color = pen.mind.lineColor || pen.calculative.color || '#000';
@@ -394,6 +469,7 @@ let funcList =
      * */
     colorList:['#00000000','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
+    closeShadowDom: true,
     setChildrenDom(self, pen){
       let dom = createDom('div',{
         display: 'flex',
@@ -416,13 +492,13 @@ let funcList =
                 <div class="item">
                 <div class="title">线条粗细</div>
                 <div class="main">
-                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                  <input type="range" min="1" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
             <div class="item">
                 <div class="title">连线样式</div>
                 <div class="main_style ">
-                  <div class="style_item ${self.lineStyle === 'curve'?'style_active':''}" data-style="曲线" onclick="setLineStyle(true)">
+                  <div class="style_item ${self.lineStyle === 'mind'?'style_active':''}" data-style="曲线" onclick="setLineStyle(true)">
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50px" height="20px">
                   <g fill="none" stroke="black" stroke-width="1">
                     <path d="M0 9 a100,50 0 0,1 85,0"></path>
@@ -481,16 +557,16 @@ let funcList =
             // })
             let root = meta2d.findOne(pen.mind.rootId)
             root.mind.lineWidth = value
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.update('title')
           },
           setLineStyle(value){
-            let res = value?'curve':'polyline'
+            let res = value?'mind':'polyline'
             // toolbox.renderChildren()
 
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res
-            toolBoxPlugin.resetLineStyle(root);
+            toolBoxPlugin.resetLinesStyle(root);
             self.lineStyle = res
             // toolBoxPlugin.update(root);
             self.updateAll()
@@ -509,10 +585,10 @@ let funcList =
               meta2d.setValue({
                 id:pen.id,
                 'mind.lineColor':color
-              })
+              },{render:false})
             })
             self.color = color
-            toolBoxPlugin.update(pen)
+            toolBoxPlugin.resetLinesColor(pen,true)
             self.updateAll()
           }
         },
@@ -625,7 +701,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','bottom'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','bottom','butterfly','sandglass'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -762,6 +838,66 @@ let funcList =
                         </g>
                       </svg>
                     </div>
+                   
+                    <div onclick="setDirection('butterfly')">
+                    <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                      <title>蝶形布局</title>
+                      <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                          <g id="未固定" transform="translate(-541.000000, -480.000000)">
+                              <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                  <g id="布局" transform="translate(16.000000, 57.000000)">
+                                      <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0.5" y="0.5" width="76" height="50" rx="2"/>
+                                      <g id="编组-3" transform="translate(10.000000, 7.000000)">
+                                          <line x1="12.5" y1="18.5" x2="21.969697" y2="18.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                          <line x1="35.5" y1="18.5" x2="44.969697" y2="18.5" id="直线-12备份-2" stroke="#818187" stroke-linecap="round"/>
+                                          <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="22.5" y="15.5" width="13" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-11" fill="#DDDDE1" x="47" y="0" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="0" y="16" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-12" fill="#DDDDE1" x="47" y="16" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="0" y="32" width="10" height="5" rx="2"/>
+                                          <rect class="toolbox_direction_svg" id="矩形备份-13" fill="#DDDDE1" x="47" y="32" width="10" height="5" rx="2"/>
+                                          <path class="toolbox_direction_svg_line" d="M11,3 C18.5461417,3 24.8721456,8.22403061 26.5588129,15.2528929 M26.9076362,20.7292725 C26.0454005,28.7525241 19.2522884,35 11,35" id="形状" stroke="#818187" stroke-linecap="round"/>
+                                          <path class="toolbox_direction_svg_line" d="M30,3 C37.6543889,3 44.0533839,8.37497993 45.6285232,15.5564778 M45.9076362,20.7292725 C45.0454005,28.7525241 38.2522884,35 30,35" id="形状" stroke="#818187" transform="translate(37.953818, 19.000000) scale(-1, 1) translate(-37.953818, -19.000000) "/>
+                                      </g>
+                                  </g>
+                              </g>
+                          </g>
+                      </g>
+                    </svg>
+                    </div>
+                    
+                    <div onclick="setDirection('sandglass')">
+                    <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                    <title>沙漏布局</title>
+                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="未固定" transform="translate(-725.000000, -616.000000)">
+                            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                <g id="编组-10" transform="translate(200.000000, 193.000000)">
+                                    <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                    <g id="编组-3" transform="translate(17.000000, 6.000000)">
+                                        <g id="编组-9" transform="translate(0.000000, 0.000000)">
+                                            <line x1="21.5" y1="7.5" x2="21.5" y2="16.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="16" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="32" y="0" width="10" height="5" rx="2"/>
+                                            <path d="M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5" id="形状" stroke="#818187" stroke-linecap="round" transform="translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) "/>
+                                        </g>
+                                        <g id="编组-9" transform="translate(21.000000, 29.000000) scale(1, -1) translate(-21.000000, -29.000000) translate(0.000000, 20.000000)">
+                                            <line x1="21.5" y1="7.5" x2="21.5" y2="16.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="16" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="32" y="0" width="10" height="5" rx="2"/>
+                                            <path d="M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5" id="形状" stroke="#818187" stroke-linecap="round" transform="translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) "/>
+                                        </g>
+                                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="14.5" y="16.5" width="13" height="5" rx="2"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
+                    </div>
                 </div>
               </div>
               
@@ -802,7 +938,7 @@ let funcList =
           },
           setDirection(e){
             let root = (window).meta2d.findOne(pen.mind.rootId);
-            toolBoxPlugin.resetLinePos(root,e,true);
+            toolBoxPlugin.resetLayOut(root,e,true);
             toolBoxPlugin.update(root);
             self.direction = e
             self.activeDirection(self,pen,dom)
@@ -927,8 +1063,10 @@ let funcList =
   event: 'click',
   func: async (self,pen)=>{
     let parent = (window).meta2d.findOne(pen.mind.preNodeId);
-    let index = parent.mind.children.indexOf(pen);
-    await toolBoxPlugin.addNode(parent,index+1);
+    let index = parent.mind.children.indexOf(pen.id);
+
+    // TODO 此处拿到的是父节点
+    await toolBoxPlugin.addNode(parent,index+1,pen.name);
   },
   img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
   },
@@ -968,4 +1106,14 @@ export let defaultFuncList = {
   'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','relayout','relayoutNext','nodeStyle','lineStyle',)
 };
 
+export let childrenGap = 20;
 
+export let levelGap = 200;
+
+export default {
+  childrenGap,
+  levelGap,
+  funcList,
+  colorList,
+  defaultFuncList
+}

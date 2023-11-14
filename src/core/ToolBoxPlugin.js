@@ -2,10 +2,9 @@ import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
-import { right,left,top,bottom, butterfly } from "../layout"
+import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, deepMerge} from "../utils"
-import {sandglass} from "../layout/sandglass";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,

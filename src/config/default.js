@@ -701,7 +701,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','bottom','middle'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','bottom','butterfly'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -839,7 +839,7 @@ let funcList =
                       </svg>
                     </div>
                    
-                    <div onclick="setDirection('middle')">
+                    <div onclick="setDirection('butterfly')">
                     <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
                       <title>布局</title>
                       <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

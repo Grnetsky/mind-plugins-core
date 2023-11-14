@@ -2,7 +2,7 @@ import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
 import {disconnectLine,connectLine} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
-import { right,left,top,bottom, middle } from "../layout"
+import { right,left,top,bottom, butterfly } from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, deepMerge} from "../utils"
 export let toolBoxPlugin = {
@@ -181,11 +181,19 @@ export let toolBoxPlugin = {
         // 执行布局函数
         // let layoutFunc = toolBoxPlugin.layoutFunc.get(pos)
         // layoutFunc(pen,recursion)
-        toolBoxPlugin.calcChildrenPos(pen,pos,recursion)
 
+        // 计算子级节点位置
+        toolBoxPlugin.calcChildrenPos(pen,pos,recursion)
 
         // 重新连线
         toolBoxPlugin.reconnectLines(pen,recursion)
+
+        // 计算子级节点颜色  按默认颜色规则进行配置
+        toolBoxPlugin.calcChildrenColor(pen,'default',recursion)
+        // 重新设置连线样式
+        toolBoxPlugin.resetLinesStyle(pen,recursion)
+        toolBoxPlugin.resetLinesColor(pen,recursion)
+        toolBoxPlugin.render();
 
         // 更新连线
     },
@@ -247,7 +255,7 @@ export let toolBoxPlugin = {
         toolBoxPlugin.layoutFunc.set('left',left)
         toolBoxPlugin.layoutFunc.set('top',top)
         toolBoxPlugin.layoutFunc.set('bottom',bottom)
-        toolBoxPlugin.layoutFunc.set('middle',middle)
+        toolBoxPlugin.layoutFunc.set('butterfly',butterfly)
 
 
         // 设置颜色生成函数
@@ -338,7 +346,7 @@ export let toolBoxPlugin = {
         let maxWidth = 0;
         let maxH = 0;
         let maxW = 0;
-        if(position === 'right' || position === 'left' || position === 'middle'){
+        if(position === 'right' || position === 'left' || position === 'butterfly'){
             for(let i = 0;i<children.length;i++){
                 let child = meta2d.store.pens[children[i]];
                 let maxObj = toolBoxPlugin.calcChildWandH(child,position);
@@ -491,17 +499,9 @@ export let toolBoxPlugin = {
         //TODO 这里似乎性能不太好 d待优化
 
         // 连线
-        toolBoxPlugin.calcChildrenPos(rootNode,rootNode.mind.direction,true)
+        toolBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
         toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
-        toolBoxPlugin.resetLayOut(rootNode)
-        toolBoxPlugin.calcChildrenColor(rootNode)
-
-
-        // toolBoxPlugin.calcChildrenColor(rootNode);
-
-        toolBoxPlugin.resetLinesColor(rootNode,true);
-        toolBoxPlugin.resetLinesStyle(rootNode,true);
-
+        toolBoxPlugin.resetLayOut(pen)
         // toolBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
         // toolBoxPlugin.update(rootNode,true);
@@ -513,13 +513,7 @@ export let toolBoxPlugin = {
     },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
-        toolBoxPlugin.calcChildrenPosAndColor(pen,pen.mind.direction,recursion);
-        // toolBoxPlugin.resetLayOut(pen,recursion)
-        toolBoxPlugin.calcChildrenColor(pen,recursion)
-        toolBoxPlugin.resetLinesColor(pen,recursion);
-        toolBoxPlugin.resetLinesStyle(pen,recursion);
-
-        toolBoxPlugin.render();
+        toolBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
         pluginsMessageChannels.publish('update')
     },50),
 

@@ -14,10 +14,10 @@ export let toolBoxPlugin = {
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
     // 计算子节点的颜色和位置
-    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',recursion = true){
+    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;
         let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
-        let colorFunc = toolBoxPlugin.colorFunc.get('default')
+        let colorFunc = toolBoxPlugin.colorFunc.get(color)
         if(!layoutFunc)throw new Error('toolBoxPlugin error : The layout function does not exist')
         try{
             layoutFunc(pen, recursion)
@@ -381,26 +381,31 @@ export let toolBoxPlugin = {
     },
     /**
      * @description 自定义获取功能列表函数  返回值为最终展示的列表
-     * @param target 当前pen图元*/
-    getFuncList(target){
-        return target.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']
+     * @param pen 当前pen图元*/
+    getFuncList(pen){
+        return pen.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']
     },
 
     /**
      * @description 动态添加方法函数
-     * @param kind 添加到目标种类上
+     * @param tag 添加到目标种类上
      * @param func 方法函数
+     * @param pos 插入的目标位置
      * */
-    appendFuncList(kind,
+    appendFuncList(tag,func,pos
     ){
-        if(typeof kind !=="string" || typeof func !== "function"){
+        if(typeof tag !=="string" || typeof func !== "function"){
             throw new Error('appendFuncList error: appendFuncList parma error ')
         }
-        let funcList = this.funcList[kind]
+        let funcList = this.funcList[tag]
         if(Object.prototype.toString.call(funcList) === '[object Array]' ){
-            funcList.push(func)
+            if (pos == null){
+                funcList.push(func)
+            }else{
+                funcList.splice(pos,0,func)
+            }
         }else {
-            throw new Error('appendFuncList error: no such kind')
+            throw new Error('appendFuncList error: no such tag')
         }
     },
 
@@ -510,7 +515,7 @@ export let toolBoxPlugin = {
         globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
         // toolBoxPlugin.update(rootNode)
-
+        return newPen
     },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;

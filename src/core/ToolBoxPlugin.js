@@ -227,7 +227,7 @@ export let toolBoxPlugin = {
     },
 
     // 删除node
-    async deleteNode(pen,update = false){
+    async deleteNode(pen){
         // 删除与之相关的线
         toolBoxPlugin.deleteLines(pen);
 
@@ -239,7 +239,6 @@ export let toolBoxPlugin = {
 
         // 删除meta2d数据
         await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]) || [],true);
-        update?toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId)):'';
 
     },
     install:(...args)=>{
@@ -424,7 +423,6 @@ export let toolBoxPlugin = {
                 if(index === -1)return
                 MindManager.rootIds.splice(index,1)
             }
-            toolBoxPlugin.resetLayOut(meta2d.findOne(targetPen.mind.rootId))
             toolBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
         };
         const onMouseUp = (targetPen)=>{

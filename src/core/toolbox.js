@@ -1,7 +1,14 @@
 import {createDom} from "../utils";
 
 export class ToolBox {
-    constructor(parentHtml,style = {}) {
+    static instance = null
+    constructor(parentHtml,style = {}, dom = null) {
+        // 单例模式
+        if(!ToolBox.instance){
+            ToolBox.instance = this
+        }else{
+            return ToolBox.instance
+        }
         this.box = document.createElement('div');
         this.box.style.backgroundColor = '#fff';
         this.box.style.borderRadius = '5px';
@@ -40,6 +47,11 @@ export class ToolBox {
         Object.keys(style).forEach(i=>{
             this.box.style[i] = style[i];
         });
+    }
+    // 重写dom函数
+    _rewriteDom(dom){
+        this.dom = dom
+        return dom
     }
     hide(){
         this.box.style.display = 'none';

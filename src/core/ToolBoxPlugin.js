@@ -242,11 +242,10 @@ export let toolBoxPlugin = {
         update?toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId)):'';
 
     },
-    install:()=>{
+    install:(...args)=>{
         let toolbox = null;
         if(!globalThis.toolbox){
-            toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,{
-            });
+            toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,...args);
             globalThis.toolbox = toolbox;
         }
 
@@ -286,8 +285,10 @@ export let toolBoxPlugin = {
                     preNodeId:null,
                     rootId: pen.id,
                     children: [],
-                    width: 0, // 包含了自己和子节点的最大宽度
-                    height: 0, // 包含了自己和子节点的最大高度
+                    width: 0,
+                    height: 0,
+                    maxWidth:0, // 包含了自己和子节点的最大宽度
+                    maxHeight:0, // 包含了自己和子节点的最大高度
                     direction:'right',
                     lineStyle: 'mind',
                     lineColor:'',

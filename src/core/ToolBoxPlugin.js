@@ -5,6 +5,7 @@ import config,{colorList, defaultFuncList, generateColor} from "../config/defaul
 import { right,left,top,bottom, butterfly } from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, deepMerge} from "../utils"
+import {sandglass} from "../layout/sandglass";
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -256,6 +257,7 @@ export let toolBoxPlugin = {
         toolBoxPlugin.layoutFunc.set('top',top)
         toolBoxPlugin.layoutFunc.set('bottom',bottom)
         toolBoxPlugin.layoutFunc.set('butterfly',butterfly)
+        toolBoxPlugin.layoutFunc.set('sandglass',sandglass)
 
 
         // 设置颜色生成函数

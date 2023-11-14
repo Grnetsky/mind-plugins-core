@@ -230,7 +230,7 @@ let funcList =
               <div class="item">
                 <div class="title">边框粗细</div>
                 <div class="main">
-                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                  <input type="range" min="1" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
                   <div class="item">
@@ -492,7 +492,7 @@ let funcList =
                 <div class="item">
                 <div class="title">线条粗细</div>
                 <div class="main">
-                  <input type="range" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                  <input type="range" min="1" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
             <div class="item">
@@ -701,7 +701,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','bottom','butterfly'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','bottom','butterfly','sandglass'].findIndex(i=>i === self.direction);
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -841,7 +841,7 @@ let funcList =
                    
                     <div onclick="setDirection('butterfly')">
                     <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
-                      <title>布局</title>
+                      <title>蝶形布局</title>
                       <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                           <g id="未固定" transform="translate(-541.000000, -480.000000)">
                               <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
@@ -865,6 +865,38 @@ let funcList =
                           </g>
                       </g>
                     </svg>
+                    </div>
+                    
+                    <div onclick="setDirection('sandglass')">
+                    <svg class="main_item" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="76px" height="50px" viewBox="0 0 76 50" version="1.1">
+                    <title>沙漏布局</title>
+                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="未固定" transform="translate(-725.000000, -616.000000)">
+                            <g id="编组-6备份" transform="translate(525.000000, 423.000000)">
+                                <g id="编组-10" transform="translate(200.000000, 193.000000)">
+                                    <rect class="toolbox_direction_svg_base" id="透明底图" fill="#F8F8FC" x="0" y="0" width="76" height="50" rx="2"/>
+                                    <g id="编组-3" transform="translate(17.000000, 6.000000)">
+                                        <g id="编组-9" transform="translate(0.000000, 0.000000)">
+                                            <line x1="21.5" y1="7.5" x2="21.5" y2="16.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="16" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="32" y="0" width="10" height="5" rx="2"/>
+                                            <path d="M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5" id="形状" stroke="#818187" stroke-linecap="round" transform="translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) "/>
+                                        </g>
+                                        <g id="编组-9" transform="translate(21.000000, 29.000000) scale(1, -1) translate(-21.000000, -29.000000) translate(0.000000, 20.000000)">
+                                            <line x1="21.5" y1="7.5" x2="21.5" y2="16.5" id="直线-12备份" stroke="#818187" stroke-linecap="round"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-8" fill="#DDDDE1" x="0" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-9" fill="#DDDDE1" x="16" y="0" width="10" height="5" rx="2"/>
+                                            <rect class="toolbox_direction_svg" id="矩形备份-10" fill="#DDDDE1" x="32" y="0" width="10" height="5" rx="2"/>
+                                            <path d="M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5" id="形状" stroke="#818187" stroke-linecap="round" transform="translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) "/>
+                                        </g>
+                                        <rect class="toolbox_direction_svg_line" id="矩形" stroke="#818187" x="14.5" y="16.5" width="13" height="5" rx="2"/>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>
                     </div>
                 </div>
               </div>

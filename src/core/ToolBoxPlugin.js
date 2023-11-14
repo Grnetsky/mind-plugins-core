@@ -238,7 +238,9 @@ export let toolBoxPlugin = {
         // 刷新界面
 
         // 删除meta2d数据
-        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]) || [],true);
+
+        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean) || [],true);
+
 
     },
     install:(...args)=>{

@@ -4,7 +4,7 @@ function visibleChild(children) {
 }
 
 
-export function createDom(name,style,even = undefined,func = undefined,className = undefined) {
+export function createDom(name,style = {},even = undefined,func = undefined,className = undefined) {
     // 创建dom
     let dom = document.createElement(name);
     // 设置dom样式
@@ -17,7 +17,7 @@ export function createDom(name,style,even = undefined,func = undefined,className
     // 绑定dom事件；
     if(typeof even === 'string' && typeof func === 'function'){
         dom.addEventListener(even,(e)=>{
-            func();
+            func(e);
         });
     }
     return dom;

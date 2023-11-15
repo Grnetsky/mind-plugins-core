@@ -1705,7 +1705,7 @@
       this.box.style.userSelect = 'none';
       this.show();
     };
-    _proto.renderChildren = function renderChildren() {
+    _proto.renderFuncList = function renderFuncList() {
       var _this2 = this;
       var fragmentChild = new DocumentFragment();
       this.box.innerHTML = '';
@@ -1765,7 +1765,7 @@
     };
     _proto.setFuncList = function setFuncList(funcList) {
       this.funcList = funcList;
-      this.renderChildren();
+      this.renderFuncList();
     };
     _proto.clearFuncList = function clearFuncList() {
       this.setFuncList([]);
@@ -2751,14 +2751,14 @@
               id: pen.id,
               lineDash: res
             });
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             self.dash = res.join(',');
             self.update('title');
             self.update('child', true);
           },
           sliderChange: function sliderChange(value) {
             self.width = value;
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             meta2d.setValue({
               id: pen.id,
               lineWidth: value
@@ -2798,7 +2798,7 @@
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[0,0]})
     //       father.dash = '0,0';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   },
     //   {
@@ -2807,7 +2807,7 @@
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[5,5]})
     //       father.dash = '5,5';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   }
     // ]
@@ -2860,7 +2860,7 @@
           sliderChange: function sliderChange(value) {
             dom.shadowRoot.querySelector('#t').innerHTML = value;
             self.width = value;
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             // pen.connectedLines?.forEach(i=>{
             //   meta2d.setValue({
             //     id:i.lineId,
@@ -2874,7 +2874,7 @@
           },
           setLineStyle: function setLineStyle(value) {
             var res = value ? 'mind' : 'polyline';
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
 
             var root = window.meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res;

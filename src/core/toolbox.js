@@ -125,7 +125,10 @@ export class ToolBox {
             item.dom.titleDom = title
             // 事件处理
         }
-        item.updateAll = (keepOpen = true)=>{item.update('title');item.update('child',keepOpen)}
+        item.updateAll = (keepOpen = true)=>{
+            item.update('title');
+            item.update('child',keepOpen)
+        }
         item.update()
         return dom;
     }
@@ -151,7 +154,7 @@ function renderInit(item,pen,dom){
     if(item.event){
         let eventFunc = function (e){
             // 绑定事件
-            item.func(item,this,dom);
+            item.func(item,this,dom,e);
         };
         dom.addEventListener(item.event,eventFunc.bind(pen));
     }
@@ -240,7 +243,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                     margin: '5px 8px'
                 },i.event,function(e){
                     i.stopPropagation?e.stopPropagation():'';
-                    i.func(i, this, dom, item);
+                    i.func(i, this, dom, item,e);
                 }.bind(pen),'toolbox_item');
 
             //TODO 执行时机是否正确？？？

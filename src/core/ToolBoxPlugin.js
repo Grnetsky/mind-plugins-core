@@ -1,5 +1,5 @@
 import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
-import {disconnectLine,connectLine} from "@meta2d/core";
+import {disconnectLine,connectLine,deepClone} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
@@ -62,7 +62,7 @@ export let toolBoxPlugin = {
         // }
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
-        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor)
+        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false)
         newPen.mind.lineId = line.id
         meta2d.setValue({
             id:line.id,
@@ -70,6 +70,7 @@ export let toolBoxPlugin = {
             locked: 2
         },{render:false})
         meta2d.updateLineType(line, style);
+        return line
     },
 
     // 重新设置线颜色
@@ -210,7 +211,13 @@ export let toolBoxPlugin = {
     //         }
     //     }
     // },
-    // 删除连线
+    /**
+     * @description 删除连线
+     * @param pen {Object} 图元对象
+     * @param recursion {Boolean} 是否递归
+     * @example
+     * deleteLines(pen,true)
+     */
     deleteLines(pen,recursion = false){
         if(!pen)return;
         let lines = [];
@@ -507,7 +514,7 @@ export let toolBoxPlugin = {
 
         // 连线
         toolBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
-        toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
+        let line = toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
         toolBoxPlugin.resetLayOut(pen)
         // toolBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
@@ -516,6 +523,9 @@ export let toolBoxPlugin = {
         globalThis.toolbox.setFuncList(this.getFuncList(newPen));
         globalThis.toolbox.translatePosition(newPen);
         // toolBoxPlugin.update(rootNode)
+        let list = [newPen,line]
+        meta2d.canvas.pushHistory({ type: 0, pens: deepClone(list, true) });
+
         return newPen
     },
     update: debounce((pen,recursion = true)=>{

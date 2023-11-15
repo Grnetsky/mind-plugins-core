@@ -295,7 +295,7 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              lineDash: res
-           },{render:false})
+           },{render:true})
            // toolbox.renderFuncList()
            self.dash = res.join(',')
            self.update('title')
@@ -307,7 +307,7 @@ let funcList =
             meta2d.setValue({
               id:pen.id,
               lineWidth: value
-            },{render:false})
+            },{render:true})
             self.update('title')
             self.update('child',true)
 
@@ -325,7 +325,7 @@ let funcList =
            meta2d.setValue({
              id:pen.id,
              color
-           },{render:false})
+           },{render:true})
            pen.mind.color = color
            self.color = color;
            self.updateAll()
@@ -409,8 +409,8 @@ let funcList =
         }
     </style> 
         `
-     })
-      dom.shadowRoot.innerHTML = str
+     },'dom')
+      dom.shadowRoot.appendChild(str)
       return dom
       },
     // children: [
@@ -585,7 +585,7 @@ let funcList =
               meta2d.setValue({
                 id:pen.id,
                 'mind.lineColor':color
-              },{render:false})
+              },{render:true})
             })
             self.color = color
             toolBoxPlugin.resetLinesColor(pen,true)
@@ -1109,6 +1109,14 @@ export let defaultFuncList = {
 export let childrenGap = 20;
 
 export let levelGap = 200;
+
+export let defaultFuncConfig = {
+  key:"",
+  name:"",
+  img:undefined,
+  icon:undefined,
+  setDom:undefined
+}
 
 export default {
   childrenGap,

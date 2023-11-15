@@ -4,9 +4,9 @@ function visibleChild(children) {
 }
 
 
-export function createDom(name,style = {},even = undefined,func = undefined,className = undefined) {
+export function createDom(tag,style = {},event = undefined,func = undefined,className = undefined) {
     // 创建dom
-    let dom = document.createElement(name);
+    let dom = document.createElement(tag);
     // 设置dom样式
     if(style && typeof style === 'object'){
         Object.assign(dom.style,style);
@@ -15,8 +15,8 @@ export function createDom(name,style = {},even = undefined,func = undefined,clas
         throw new Error('createDom error: parma "style" must be a Object');
     }
     // 绑定dom事件；
-    if(typeof even === 'string' && typeof func === 'function'){
-        dom.addEventListener(even,(e)=>{
+    if(typeof event === 'string' && typeof func === 'function'){
+        dom.addEventListener(event,(e)=>{
             func(e);
         });
     }

@@ -2,8 +2,10 @@
 // 模板解析，注册函数并返回返回dom对象
 // TODO 此处只能处理返回字符串的信息
 
+import {createDom} from "./utils";
+
 let LifeCycle = ['mounted']
-export function template(config,{template,scripts,style}){
+export function template(config,{template,scripts,style},output = 'string'){
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
     MindManager._env[namespace]? '' : MindManager._env[namespace] = {};
@@ -38,7 +40,13 @@ export function template(config,{template,scripts,style}){
     if(style){
         style.startsWith('<style>')?(sty = style) : (sty = `<style>${style}</style>`)
     }
-    return dom + sty
+    if(output === 'string'){
+        return  dom + sty
+    }else if(output === 'dom'){
+        let res = createDom('div')
+        res.innerHTML = dom + sty
+        return res
+    }
 }
 
 

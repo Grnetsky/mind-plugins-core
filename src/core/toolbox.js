@@ -261,7 +261,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                         throw new Error('function setDom must return string or node object');
                 }
             }else {
-                node.innerHTML = (i.icon && i.name)? '<span style="padding-right: 30px;width: max-content" >'+ i.icon+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
+                node.innerHTML = (i.icon && i.name) || (i.img && i.name)? '<span style="padding-right: 30px;width: max-content" >'+ (i.icon || `<img src="${i.img}"/>`)+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
             }
             fragment.appendChild(node);
         }

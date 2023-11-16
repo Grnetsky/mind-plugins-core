@@ -12,7 +12,7 @@ export let toolBoxPlugin = {
     childrenGap: config.childrenGap, // 子节点间的间距
     levelGap: config.levelGap, // 子级间的间距
     layoutFunc:new Map(), // 布局位置函数map
-    colorFunc:new Map(), // 布局颜色函数map  TODO 目前只支持默认颜色规则
+    colorFunc:new Map(), // 布局颜色函数map
     // 计算子节点的颜色和位置
     calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;
@@ -38,11 +38,11 @@ export let toolBoxPlugin = {
     calcChildrenPos(pen,position = pen.mind.direction || 'right',recursion = true){
         let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
         if(!layoutFunc)return
-        try{
+        // try{
             layoutFunc(pen, recursion)
-        }catch (e){
-            throw new Error(`[toolBoxPlugin calcChildrenPos] error : ${e.message}`)
-        }
+        // }catch (e){
+        //     throw new Error(`[toolBoxPlugin calcChildrenPos] error : ${e.message}`)
+        // }
     },
     connectLine(pen,newPen,style = 'polyline'){
         // let line = null;
@@ -63,6 +63,14 @@ export let toolBoxPlugin = {
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
         let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false)
+        line.mind = {
+            type:'line',
+            from:from.id,
+            fromAnchor:newPen.mind.connect.fromAnchor,
+            to:to.id,
+            toAnchor:newPen.mind.connect.toAnchor,
+            rootId:newPen.mind.rootId
+        }
         newPen.mind.lineId = line.id
         meta2d.setValue({
             id:line.id,
@@ -76,7 +84,7 @@ export let toolBoxPlugin = {
     // 重新设置线颜色
     resetLinesColor(pen,recursion = true){
         let colors = generateColor();
-        let children = pen.mind.children;
+        let children = pen.mind.children || [];
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
@@ -100,7 +108,7 @@ export let toolBoxPlugin = {
     },
     // 重新递归设置连线的样式
     resetLinesStyle(pen,recursion = true){
-        let children = pen.mind.children;
+        let children = pen.mind.children || [];
         if(!children || children.length === 0 )return;
         let root = meta2d.findOne(pen.mind.rootId)
         for(let i = 0 ;i<children.length;i++){
@@ -122,7 +130,7 @@ export let toolBoxPlugin = {
         }
     },
     disconnectLines(pen,recursion = true){
-        let children = pen.mind.children;
+        let children = pen.mind.children || [];
         if(!children || children.length === 0 ){
             return;
         };
@@ -148,7 +156,7 @@ export let toolBoxPlugin = {
         }
     },
     reconnectLines(pen,recursion = true){
-        let children = pen.mind.children;
+        let children = pen.mind.children || [];
         if(!children || children.length === 0 ){
             return;
         };
@@ -232,22 +240,35 @@ export let toolBoxPlugin = {
         });
         meta2d.delete(lines,true);
     },
+    getLines(pen){
+        if(!pen)return;
+        let lines = [];
+        pen.connectedLines?.forEach((
+            i
+        )=>{
+            let line = meta2d.findOne(i.lineId);
+            if(!line)return
+            line.locked = 0;
+            line && lines.push(line);
+        });
+        return lines;
+    },
 
-    // 删除node
-    async deleteNode(pen){
+    // 删除node下的子节点
+    async deleteChildrenNode(pen){
         // 删除与之相关的线
-        toolBoxPlugin.deleteLines(pen);
+        let lines = toolBoxPlugin.getLines(pen);
 
         // 查找到对应的父级，删除其在父级中的子级列表数据
         let parent = meta2d.findOne(pen.mind.preNodeId);
+        parent && (pen.mind.preNodeChildren = deepClone(parent.mind.children))
         parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
 
         // 刷新界面
 
         // 删除meta2d数据
-
-        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean) || [],true);
-
+        // 删除数据单不追加到历史记录
+        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,true);
 
     },
     install:(...args)=>{
@@ -272,15 +293,29 @@ export let toolBoxPlugin = {
         meta2d.on('opened',()=>{
             let {pens} = meta2d.data()
             pens.forEach(i=>{
-                if(i.mind){
+                if(i.mind && i.mind.type === 'node'){
                     let pen = meta2d.findOne(i.id)
                     toolBoxPlugin.combineToolBox(pen)
                     i.mind.isRoot?window.MindManager.rootIds.push(pen.id):''
-                    i.mind.children.forEach(i=>{
-
-                    })
                 }
 
+            })
+        })
+
+        meta2d.on('undo',(e)=>{
+            // TODO 删除顺序有问题
+            e.pens.reverse().forEach(i=>{
+                if(i.mind){
+                    // 撤回节点
+                    if(i.mind.type === 'node'){
+                        let preNode = meta2d.findOne(i.mind.preNodeId)
+                        preNode && (preNode.mind.children.push(i.id))
+                        toolBoxPlugin.update(preNode)
+                    }else{
+                        let preNode = meta2d.findOne(i.mind.from)
+                        toolBoxPlugin.update(preNode)
+                    }
+                }
             })
         })
 
@@ -290,6 +325,7 @@ export let toolBoxPlugin = {
                 let pen = pens[0]
                 pen.mind = {
                     isRoot: true,
+                    type:'node',
                     preNodeId:null,
                     rootId: pen.id,
                     children: [],
@@ -341,6 +377,7 @@ export let toolBoxPlugin = {
         this.funcList = funcList;
     },
     calcChildWandH(pen){
+        if(!pen || !pen.mind)return;
         let position = pen.mind.direction;
         let children = pen.mind.children || [];
         let worldRect = meta2d.getPenRect(pen);
@@ -426,7 +463,7 @@ export let toolBoxPlugin = {
         // };
         const onDestroy = (targetPen)=>{
             toolbox?.hide();
-            toolBoxPlugin.deleteNode(targetPen);
+            toolBoxPlugin.deleteChildrenNode(targetPen);
             if(targetPen.mind.isRoot){
                 let index = MindManager.rootIds.indexOf(targetPen.id)
                 if(index === -1)return
@@ -462,6 +499,7 @@ export let toolBoxPlugin = {
         let opt = {
             name:type,
             mind:{
+                type:'node',
                 isRoot: false,
                 rootId: pen.mind.rootId,
                 preNodeId:pen.id,

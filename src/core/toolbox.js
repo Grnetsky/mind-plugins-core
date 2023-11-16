@@ -17,12 +17,12 @@ export class ToolBox {
         this.box.style.height = '40px';
         this.box.style.padding = '6px';
         this.box.className = 'toolBox';
-        this.box.style.display = 'none';
         this.box.style.zIndex = '999';
         this.box.style.display = 'flex';
+        this.box.style.visibility = 'hidden'
         this.box.style.justifyContent = 'center';
         this.box.style.alignItems = 'center';
-        // this.box.style.overflow = 'hidden';
+        // this.box.style.transition = 'all 1s ease';
         this.box.style.position = 'relative';
         this.box.style.transform = 'translateX(-50%)';
         this.setStyle(style);
@@ -40,6 +40,9 @@ export class ToolBox {
         stylesheet.insertRule(".toolbox_item:hover {" +
             "background-color: #eee;" +
             "}", 0);
+        stylesheet.insertRule(".toolbox_slider_item:hover {" +
+            "background-color: #eee;" +
+            "}", 0);
 
         parentHtml.appendChild(this.box);
     }
@@ -54,21 +57,21 @@ export class ToolBox {
         return dom
     }
     hide(){
-        this.box.style.display = 'none';
+        this.box.style.visibility = 'hidden';
     }
     bindPen(pen){
         this.pen = pen;
     }
     show(){
-        this.box.style.display = 'flex';
-        this.box.style.flexDirection = 'row';
+        this.box.style.visibility = 'visible';
     }
     destroy(){
         this.box.parentNode.removeChild(this.box)
     }
+    animate = false
     curItem = null
     translatePosition(pen){
-        this.hide();
+        if(!this.animate)this.hide();
         const store = pen.calculative.canvas.store;
         const worldRect = pen.calculative.worldRect;
         this.box.style.position = 'absolute';
@@ -76,12 +79,13 @@ export class ToolBox {
         this.box.style.left = worldRect.x + store.data.x + worldRect.width /2 + 'px';
         this.box.style.top = worldRect.y + store.data.y + -80 + 'px';
         this.box.style.userSelect = 'none';
-        this.show();
+        if(!this.animate)this.show();
     }
     renderFuncList(){
         const fragmentChild = new DocumentFragment();
         this.box.innerHTML = '';
         this.funcList.forEach(i=>{
+            preprocess(i,this.pen)
             if(i.name){
                 let itemsSpan =this.setChildDom(this.pen,i);
                 itemsSpan.className = 'toolbox_item';
@@ -98,8 +102,8 @@ export class ToolBox {
     setChildDom(pen, item ){
         const dom = document.createElement('div');
         // 构建update方法 用于局部更新
-        item.update =(target,keepOpen)=> {
-
+        item.update =(target,keepOpen = false)=> {
+            // update 局部更新
             if(target === 'title'){
                 renderTitle(item,pen,dom.titleDom)
                 return
@@ -109,20 +113,47 @@ export class ToolBox {
             }
             // 清空列表  初始化列表
             renderInit(item,pen,dom)
+            // 执行配置项初始化函数
             item.init?.(item,pen,dom)
 
             // 初始化titleDOM
             let title = createDom('div',{},undefined,undefined,'toolbox_title')
             // 执行titleDom
-            title = renderTitle(item,pen,title)
+            title = renderTitle(item,pen,title);
+
+            item.dom = dom
+            item.dom.titleDom = title;
+            if(item.children || item.setChildrenDom){
+                // 打开函数
+                title['on'+(item.openChildDomEvent || 'click')] = ()=>{
+                    // 关闭其他选项
+                    if(toolbox.curItem !== item){
+                        toolbox.funcList.filter(i=>i.isOpen).forEach(
+                            i=>{
+                                i.close()
+                            }
+                        )
+                        // toolbox.curItem?.closeChildDom?.(toolbox.curItem,pen,toolbox.curItem.dom.childrenDom) || (toolbox.curItem?.dom.childrenDom && ( toolbox.curItem.dom.childrenDom.style.visibility = 'hidden' ))
+                        // toolbox.curItem?.isOpen? (toolbox.curItem.isOpen = false): ''
+                    }
+                    if((toolbox.curItem === item) && item.isOpen)return
+                    // 将打开逻辑交给用户 或者
+                    item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'));
+
+                    // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+                    item.onOpenChildDom?.(item,pen,item.dom.childrenDom)
+                    item.isOpen = true
+                    toolbox.curItem = item
+                }
+            }
+
+
             // titleDom添加到dom中
             item.closeShadowDom?dom.appendChild(title):dom.shadowRoot.appendChild(title);
 
             // 渲染下拉列表
             let containerDom = null;
             renderChildDom(item,pen,dom,containerDom)
-            item.dom = dom
-            item.dom.titleDom = title
             // 事件处理
         }
         item.updateAll = (keepOpen = true)=>{
@@ -151,14 +182,22 @@ function renderInit(item,pen,dom){
 
     //设置样式与事件
     typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
+
+    // 绑定事件，绑定在dom上
     if(item.event){
         let eventFunc = function (e){
             // 绑定事件
+            if(item.closeOther){
+                toolbox.funcList.filter(i=>i.isOpen).forEach(
+                    i=>{
+                        i.close()
+                    }
+                )
+            }
             item.func(item,this,dom,e);
         };
         dom.addEventListener(item.event,eventFunc.bind(pen));
     }
-
     return dom
 }
 
@@ -179,24 +218,11 @@ function renderTitle(item,pen,title) {
     }else {
         title.innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name))
     }
-
-    title.addEventListener((item.openChildDomEvent || 'click'),()=>{
-        // 关闭其他选项
-        if(toolbox.curItem !== item && toolbox.curItem){
-            item.closeChildDom?.(item,pen,item.dom.childrenDom) || (toolbox.curItem.dom.childrenDom && ( toolbox.curItem.dom.childrenDom.style.visibility = 'hidden' ))
-        }
-        // 将打开逻辑交给用户 或者
-        item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'));
-
-        // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-        item.onOpenChildDom?.(item,pen,item.dom.childrenDom)
-        toolbox.curItem = item
-    })
     return title
 }
 
 function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
-    if(dom.childrenDom)dom.shadowRoot?dom.shadowRoot.removeChild(dom.childrenDom) :dom.removeChild(dom.childrenDom)
+    if(dom.childrenDom)dom.shadowRoot?dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom)
     if(item.children && item.children.length > 0 || item.setChildrenDom){
         // 是否重写dom
         if(
@@ -212,13 +238,13 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
             if(typeof childDom === 'string'){
                 let div = document.createElement('div');
                 // 默认隐藏节点
-                keepOpen?item.openChildDom?.() ||  (div.style.visibility = 'visible'):item.closeChildDom?.() || (div.style.visibility = 'hidden');
+                keepOpen? (item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (div.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,div) || (div.style.visibility = 'hidden'));
                 div.innerHTML = childDom;
                 dom.shadowRoot?dom.shadowRoot.appendChild(div):dom.appendChild(div);
                 containerDom = div
             }else{
                 containerDom = childDom;
-                keepOpen?item.openChildDom?.() ||  (childDom.style.visibility = 'visible'):item.closeChildDom?.() || (childDom.style.visibility = 'hidden');
+                keepOpen?(item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
             }
         }else{
             containerDom = createDom('div',{
@@ -233,7 +259,16 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 width:'max-content',
                 boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
             });
-            keepOpen?item.openChildDom?.() ||  (containerDom.style.visibility = 'visible'):item.closeChildDom?.() || (containerDom.style.visibility = 'hidden');
+            let gap = createDom('div',{
+                position:'absolute',
+                height:'10px',
+                bottom:'-10px',
+                backgroundColor:'#eee',
+                width: '100%',
+                opacity:0
+            })
+            dom.appendChild(gap)
+            keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
 
         }
         let fragment = new DocumentFragment();
@@ -276,12 +311,33 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 
     if(item.children || item.setChildrenDom || item.closeOther){
         // 关闭下拉菜单
-        !item.closeOther && dom.childrenDom.addEventListener((item.closeChildDomEvent || 'click'),()=>{
-            // 可手动派发隐藏函数
-            toolbox.curItem?.onHideChildDom?.()
-            item.closeChildDom?.(item,pen,containerDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden' ))
-            toolbox.curItem = null
-        })
+        if(!item.closeOther){
+            ((item.closeEventOnChild?dom.childrenDom: dom)['on'+(item.closeChildDomEvent || 'click')] = (()=>{
+                dom.offsetHeight
+                // 可手动派发隐藏函数
+                item.onCloseChildDom?.(item,pen,item.dom.childrenDom)
+
+                item.close()
+                toolbox.curItem = null
+                item.isOpen = false
+            }))
+        }
     }
     return containerDom
+}
+
+// 配置项预处理
+function preprocess(item,pen) {
+    if(item.openEventOnTitle == null){
+        item.openEventOnTitle = true
+    }
+    if(item.children || item.setChildrenDom){
+        item.isOpen = false
+        item.closeOther = false
+        item.close = ()=>{
+            item.closeChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden'))
+            item.isOpen = false
+        }
+    }
+
 }

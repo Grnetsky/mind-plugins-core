@@ -27,8 +27,27 @@ let funcList =
     //   toolBoxPlugin.addNode(pen,0);
     //   },
     openChildDomEvent: 'mouseenter',
-    closeChildDomEvent: 'mouseleave',
     closeShadowDom:true,
+    closeEventOnChild:false, // 是否在childrenDom中触发事件
+    closeChildDomEvent:'click',
+    stopPropagation:true,
+    closeChildDom(self,pen,dom){
+      // dom.style.height = 'max-height'
+      // dom.style.visibility = 'hidden'
+      // dom.style.overflow = 'hidden'
+      // dom.style.transition = '.3s'
+      // dom.style.height = 0'
+      dom.style.transformOrigin = 'top';
+      dom.offsetHeight
+      dom.style.transition = 'all .3s'
+
+      dom.style.transform = 'scaleY(0)'
+      return true
+    },
+    openChildDom(self,pen,dom){
+      dom.style.transform = 'scaleY(1)'
+      return true
+    },
     children:[
       {
         name:'',
@@ -142,6 +161,7 @@ let funcList =
     //   let result =  `<span>${self.name}</span>`;
     //   return result;
     // }
+    closeOther:true
   },
   {
     key:'relayoutNext',
@@ -178,7 +198,6 @@ let funcList =
     colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a','#fa7878'],
     openChildDomEvent:'mouseenter',
-    closeChildDomEvent: 'mouseleave',
     /**
      * @description 初始化函数
      * @param self 配置项本身
@@ -208,6 +227,26 @@ let funcList =
                 </svg>`
       return HTML
     },
+    closeEventOnChild:false,
+    closeChildDomEvent:'',
+    stopPropagation:true,
+    closeChildDom(self,pen,dom){
+      // dom.style.height = 'max-height'
+      // dom.style.visibility = 'hidden'
+      // dom.style.overflow = 'hidden'
+      // dom.style.transition = '.3s'
+      // dom.style.height = 0'
+      dom.style.transformOrigin = 'top';
+      dom.offsetHeight
+      dom.style.transition = 'all .3s'
+
+      dom.style.transform = 'scaleY(0)'
+      return true
+    },
+    openChildDom(self,pen,dom){
+      dom.style.transform = 'scaleY(1)'
+      return true
+    },
     setChildrenDom(self, pen) {
       let dom = createDom('div',{
         display: 'flex',
@@ -215,7 +254,6 @@ let funcList =
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         position:'absolute',
-        visibility:'hidden',
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
@@ -224,6 +262,15 @@ let funcList =
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       });
       dom.attachShadow({mode:'open'})
+      let gap = createDom('div',{
+        width:'100%',
+        height:'20px',
+        backgroundColor:'red',
+        position:'absolute',
+        top:'-10px',
+        opacity:0
+      })
+      dom.shadowRoot.appendChild(gap)
      let str = template(self,{
        template:`
           <div class="container">
@@ -276,7 +323,7 @@ let funcList =
     </g>
 </svg>                  
                   </div>
-                  <input id="color" style="display: none" type="color" onchange="setColor(event,this.value)" value="${self.color}">
+                  <input id="color" style="display: none" type="color"  onchange="setColor(event,this.value)" value="${self.color}">
                 </label>                
                      <div class="main">
 
@@ -313,6 +360,7 @@ let funcList =
 
           },
          setColor(e,value){
+           e.stopPropagation()
             let color = ''
             if(!value){
               let t = e.target
@@ -470,6 +518,27 @@ let funcList =
     colorList:['#00000000','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
     closeShadowDom: true,
+    closeEventOnChild:false,
+    openEventOnTitle:true,
+    openChildDomEvent: 'mouseenter',
+    closeChildDomEvent:'mouseleave',
+    closeChildDom(self,pen,dom){
+      // dom.style.height = 'max-height'
+      // dom.style.visibility = 'hidden'
+      // dom.style.overflow = 'hidden'
+      // dom.style.transition = '.3s'
+      // dom.style.height = 0'
+      dom.style.transformOrigin = 'top';
+      dom.offsetHeight
+      dom.style.transition = 'all .3s'
+
+      dom.style.transform = 'scaleY(0)'
+      return true
+    },
+    openChildDom(self,pen,dom){
+      dom.style.transform = 'scaleY(1)'
+      return true
+    },
     setChildrenDom(self, pen){
       let dom = createDom('div',{
         display: 'flex',
@@ -477,7 +546,6 @@ let funcList =
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         position:'absolute',
-        visibility:'hidden',
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
@@ -669,10 +737,18 @@ let funcList =
     </style> 
         `
       })
+      let gap = createDom('div',{
+        width:'100%',
+        height:'20px',
+        backgroundColor:'red',
+        position:'absolute',
+        top:'-10px',
+        opacity:0
+      })
       dom.shadowRoot.innerHTML = str
+      dom.shadowRoot.appendChild(gap)
       return dom ;
     },
-    closeChildDomEvent: 'none',
     event: 'mouseenter',
     func(self,pen,dom){
       self.open = true
@@ -682,13 +758,6 @@ let funcList =
     key:'layoutDirection',
     name:'布局方式',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
-    closeChildDom(dom){
-      // dom.style.top = 0
-      // dom.style.opacity = 0
-      return false
-    },
-    onHideChildDom(){
-    },
     direction:'right',
     childrenGap:20,
     levelGap: 0,
@@ -723,6 +792,27 @@ let funcList =
       self.childrenGap = toolBoxPlugin.childrenGap
       self.levelGap = toolBoxPlugin.levelGap
     },
+    openChildDomEvent: 'mouseenter',
+    closeEventOnChild:false, // 是否在childrenDom中触发事件
+    closeChildDomEvent:'click',
+    stopPropagation:true,
+    closeChildDom(self,pen,dom){
+      // dom.style.height = 'max-height'
+      // dom.style.visibility = 'hidden'
+      // dom.style.overflow = 'hidden'
+      // dom.style.transition = '.3s'
+      // dom.style.height = 0'
+      dom.style.transformOrigin = 'top';
+      dom.offsetHeight
+      dom.style.transition = 'all .3s'
+
+      dom.style.transform = 'scaleY(0)'
+      return true
+    },
+    openChildDom(self,pen,dom){
+      dom.style.transform = 'scaleY(1)'
+      return true
+    },
     // 设置下拉列表的样式和子元素布局
     setChildrenDom(self,pen){
       let dom = createDom('div',{
@@ -731,7 +821,6 @@ let funcList =
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         position:'absolute',
-        visibility:'hidden',
         top:'50px',
         backgroundColor:'#fff',
         borderRadius:'5px',
@@ -1055,7 +1144,6 @@ let funcList =
       // });
       return dom ;
     },
-    closeChildDomEvent: 'none'
   },
 {
   key:'addSiblingNode',

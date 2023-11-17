@@ -227,8 +227,6 @@ let funcList =
                 </svg>`
       return HTML
     },
-    closeEventOnChild:false,
-    closeChildDomEvent:'',
     stopPropagation:true,
     closeChildDom(self,pen,dom){
       // dom.style.height = 'max-height'
@@ -277,13 +275,13 @@ let funcList =
               <div class="item">
                 <div class="title">边框粗细</div>
                 <div class="main">
-                  <input type="range" min="1" max="10" style="width: 81px" onchange="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
+                  <input type="range" min="1" max="10" style="width: 81px" @change="sliderChange(this.value)" id="width" value="${self.width}">  <span id="t" style="display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px">${self.width}</span>
                 </div>
               </div>
                   <div class="item">
                 <div class="title">边框样式</div>
                 <div class="main_style ">
-                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" onclick="setOutLineStyle(true)">
+                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" @click="setOutLineStyle(true)">
                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -292,7 +290,7 @@ let funcList =
                         </g>
                     </svg>
                   </div>
-                  <div class="style_item ${self.dash !== '0,0'?'style_active':''}" data-style="虚线" onclick="setOutLineStyle(false)">
+                  <div class="style_item ${self.dash !== '0,0'?'style_active':''}" data-style="虚线" @click="setOutLineStyle(false)">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -323,7 +321,7 @@ let funcList =
     </g>
 </svg>                  
                   </div>
-                  <input id="color" style="display: none" type="color"  onchange="setColor(event,this.value)" value="${self.color}">
+                  <input id="color" style="display: none" type="color"  @change="setColor(event,this.value)" value="${self.color}">
                 </label>                
                      <div class="main">
 
@@ -337,6 +335,7 @@ let funcList =
          // 能在这里面获取到dom
          mounted(){ // 生命周期函数
          },
+         value:10,
          setOutLineStyle(style){
            let res = style?[0,0]:[5,5]
            meta2d.setValue({
@@ -347,6 +346,7 @@ let funcList =
            self.dash = res.join(',')
            self.update('title')
            self.update('child',true)
+           self.close()
          },
           sliderChange: (value)=>{
             self.width = value
@@ -794,7 +794,7 @@ let funcList =
     },
     openChildDomEvent: 'mouseenter',
     closeEventOnChild:false, // 是否在childrenDom中触发事件
-    closeChildDomEvent:'click',
+    closeChildDomEvent:'none',
     stopPropagation:true,
     closeChildDom(self,pen,dom){
       // dom.style.height = 'max-height'
@@ -994,13 +994,13 @@ let funcList =
                 <div class="title">间隔设置</div>
                 <div class="main">
                     <div class="number_container">
-                     <div class="number_item">
+                     <div class="number_item" onclick="(e=>{e.stopPropagation()})(event)">
                         <div class="flag">同级间隔</div>
                         <div class="number">                        
                             <input type="number" onchange="setChildGap(this.value)" value="${self.childrenGap}"/>
                         </div>
                     </div>
-                     <div class="number_item">
+                     <div class="number_item" onclick="(e=>{e.stopPropagation()})(event)">
                         <div class="flag">子级间隔</div>
                         <div class="number">                        
                             <input type="number" onchange="setLevelGap(this.value)" value="${self.levelGap}"/>
@@ -1031,6 +1031,7 @@ let funcList =
             toolBoxPlugin.update(root);
             self.direction = e
             self.activeDirection(self,pen,dom)
+            self.close()
           }
         },
         style:`<style>

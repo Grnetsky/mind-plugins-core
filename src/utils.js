@@ -49,3 +49,18 @@ export function deepMerge(obj1, obj2) {
     return newObj;
 }
 
+export function replaceAfterPosition(str, position, regex, replacement) {
+    // 判断位置是否超出字符串长度
+    if (position >= str.length) return str;
+
+    // 截取从指定位置开始到字符串末尾的子字符串
+    const substringToReplace = str.slice(position);
+
+    // 在子字符串中执行替换操作
+    const replacedSubstring = substringToReplace.replace(regex, replacement);
+
+    // 将替换后的子字符串与前面的部分结合
+    const resultString = str.slice(0, position) + replacedSubstring;
+
+    return resultString;
+}

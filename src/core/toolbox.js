@@ -312,15 +312,13 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(item.children || item.setChildrenDom || item.closeOther){
         // 关闭下拉菜单
         if(!item.closeOther){
-            ((item.closeEventOnChild?dom.childrenDom: dom)['on'+(item.closeChildDomEvent || 'click')] = (()=>{
+            item.closeChildDomEvent?((item.closeEventOnChild?dom.childrenDom: dom)['on'+(item.closeChildDomEvent)] = (()=>{
                 dom.offsetHeight
                 // 可手动派发隐藏函数
                 item.onCloseChildDom?.(item,pen,item.dom.childrenDom)
-
                 item.close()
                 toolbox.curItem = null
-                item.isOpen = false
-            }))
+            })):''
         }
     }
     return containerDom

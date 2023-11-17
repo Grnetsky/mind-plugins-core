@@ -29,7 +29,6 @@ let funcList =
     openChildDomEvent: 'mouseenter',
     closeShadowDom:true,
     closeEventOnChild:false, // 是否在childrenDom中触发事件
-    closeChildDomEvent:'click',
     stopPropagation:true,
     closeChildDom(self,pen,dom){
       // dom.style.height = 'max-height'
@@ -166,6 +165,7 @@ let funcList =
   {
     key:'relayoutNext',
     description:'',
+    closeOther: true,
     name:'重新布局下一级',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
         '    <title>重新布局下一级</title>\n' +

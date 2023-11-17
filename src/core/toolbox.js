@@ -336,6 +336,10 @@ function preprocess(item,pen) {
             item.closeChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden'))
             item.isOpen = false
         }
+        item.open = ()=>{
+            item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'))
+            item.isOpen = true
+        }
     }
 
 }

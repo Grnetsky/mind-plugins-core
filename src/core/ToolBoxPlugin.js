@@ -472,10 +472,12 @@ export let toolBoxPlugin = {
             toolBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
         };
         const onMouseUp = (targetPen)=>{
-            toolbox.bindPen(targetPen);
-            toolbox.setFuncList(this.getFuncList(target));
-            toolbox.translatePosition(targetPen);
-            toolbox.show()
+            if(!meta2d.store.data.locked){
+                toolbox.bindPen(targetPen);
+                toolbox.setFuncList(this.getFuncList(target));
+                toolbox.translatePosition(targetPen);
+                toolbox.show()
+            }
         }
         const onMouseDown = (targetPen)=>{
             toolbox.hide();

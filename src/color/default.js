@@ -4,6 +4,7 @@ function defaultColorRule(pen,recursion = true) {
     let generateColorFunc = generateColor();
     for(let i = 0;i<children.length;i++){
         let child = meta2d.store.pens[children[i]]
+        if(!child)continue
         let nodeColor = undefined
         if(pen.mind.level === 0){
             let nextColor = generateColorFunc.next().value;

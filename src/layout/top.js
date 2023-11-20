@@ -10,6 +10,7 @@ export function top(pen,recursion = true,) {
     toolBoxPlugin.calcChildWandH(pen);
     for(let i = 0;i<children.length;i++){
         let child =  meta2d.store.pens[children[i]]
+        if(!child)continue;
         let childRect = meta2d.getPenRect(child)
         topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
         topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;

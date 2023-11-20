@@ -17,6 +17,7 @@ export function sandglass(pen, recursion = true) {
     // let cutValue = childrenLen / 2
     for(let i = 0;i<children.length;i++){
         let child =  meta2d.store.pens[children[i]]
+        if(!child)continue;
         let childRect = meta2d.getPenRect(child)
         if(i<sandglass.MAXLENGTH){
 

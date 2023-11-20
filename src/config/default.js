@@ -13,6 +13,13 @@ export function* generateColor() {
 
 let funcList =
         [
+            {
+          key: "id",
+              name:'id',
+          setDom(self,pen) {
+            return pen.id
+          }
+            },
   {
     key:'addChildNode',
     name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
@@ -24,7 +31,7 @@ let funcList =
      * @param pen 返回当前操作的pen对象
      * */
     // func: async (self,pen)=>{
-    //   toolBoxPlugin.addNode(pen,0);
+    //   toolBoxPlugin.bottomChildren(pen,0);
     //   },
     openChildDomEvent: 'mouseenter',
     closeShadowDom:true,
@@ -1032,6 +1039,7 @@ let funcList =
             self.direction = e
             self.activeDirection(self,pen,dom)
             self.close()
+            toolBoxPlugin.record(pen)
           }
         },
         style:`<style>
@@ -1192,7 +1200,7 @@ export var defaultFuncs = {
 }
 export let defaultFuncList = {
   'root':funcList.filter(i=>i.key!== 'addSiblingNode'),
-  'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','relayout','relayoutNext','nodeStyle','lineStyle',)
+  'leaf':defaultFuncs.getFunc('id','addChildNode','addSiblingNode','relayout','relayoutNext','nodeStyle','lineStyle',)
 };
 
 export let childrenGap = 20;

@@ -181,7 +181,6 @@ export let toolBoxPlugin = {
             let fromAnchor = child.mind.connect.fromAnchor
             let toAnchor = child.mind.connect.toAnchor
 
-            // 断开连线
             connectLine(from,fromAnchor,line,lineAnchor1)
             connectLine(to,toAnchor,line,lineAnchor2)
             meta2d.canvas.updateLines(child)
@@ -686,7 +685,7 @@ export let toolBoxPlugin = {
             })
 
             meta2d.startAnimate(pens);
-            setTimeout(()=>{meta2d.render()},toolBoxPlugin.animateDuration + 50)
+            // setTimeout(()=>{ toolBoxPlugin.reconnectLines(pen,recursion)},toolBoxPlugin.animateDuration + 50)
         }else{
             meta2d.render();
         }

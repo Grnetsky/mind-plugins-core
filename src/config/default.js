@@ -1033,13 +1033,14 @@ let funcList =
             toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
           },
           setDirection(e){
+            toolBoxPlugin.record(pen)
+
             let root = (window).meta2d.findOne(pen.mind.rootId);
             toolBoxPlugin.resetLayOut(root,e,true);
             toolBoxPlugin.update(root);
             self.direction = e
             self.activeDirection(self,pen,dom)
             self.close()
-            toolBoxPlugin.record(pen)
           }
         },
         style:`<style>

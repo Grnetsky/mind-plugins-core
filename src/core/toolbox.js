@@ -10,6 +10,7 @@ export class ToolBox {
             return ToolBox.instance
         }
         this.box = document.createElement('div');
+        this.box.style.boxSizing = "content-box";
         this.box.style.backgroundColor = '#fff';
         this.box.style.borderRadius = '5px';
         this.box.style.boxShadow = '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)';
@@ -204,7 +205,7 @@ function renderInit(item,pen,dom){
 function renderTitle(item,pen,title) {
     title.innerHTML = ''
     if(typeof item.setDom === 'function'){
-        let re = item.setDom(item,title);
+        let re = item.setDom(item,pen,title);
         switch (typeof re) {
             case "string":
                 title.innerHTML = re
@@ -284,7 +285,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
             //TODO 执行时机是否正确？？？
             i.init?.(i,pen,node)
             if(i.setDom){
-                let re = i.setDom(i,node);
+                let re = i.setDom(i,pen,node);
                 switch (typeof re) {
                     case "string":
                         node.innerHTML = re;

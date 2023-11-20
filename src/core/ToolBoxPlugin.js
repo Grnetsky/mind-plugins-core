@@ -4,7 +4,7 @@ import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
-import {debounce, deepMerge} from "../utils"
+import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 export let toolBoxPlugin = {
     name:'toolBox',
     status: false,
@@ -13,6 +13,11 @@ export let toolBoxPlugin = {
     levelGap: config.levelGap, // 子级间的间距
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map
+    _history:[],
+    activePens:[],
+    animate: true,
+    animateDuration:200,
+    oldPens:[],
     // 计算子节点的颜色和位置
     calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;
@@ -62,7 +67,7 @@ export let toolBoxPlugin = {
         // }
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
-        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false)
+        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,true)
         line.mind = {
             type:'line',
             from:from.id,
@@ -88,6 +93,7 @@ export let toolBoxPlugin = {
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
+            if(!child)continue
             let line = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
@@ -111,8 +117,10 @@ export let toolBoxPlugin = {
         let children = pen.mind.children || [];
         if(!children || children.length === 0 )return;
         let root = meta2d.findOne(pen.mind.rootId)
+        if(!root)return;
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
+            if(!child)continue;
             child.mind.lineStyle = pen.mind.lineStyle
             let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
@@ -136,6 +144,7 @@ export let toolBoxPlugin = {
         };
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
+            if(!child)continue;
             if(!child.connectedLines || child.connectedLines.length === 0)return;
             // 保留lineId
             let line = meta2d.findOne(child.connectedLines[0]?.lineId);
@@ -162,6 +171,7 @@ export let toolBoxPlugin = {
         };
         for(let i = 0 ;i<children.length;i++){
             const child = meta2d.store.pens[children[i]];
+            if(!child)continue;
             let line = meta2d.findOne(child.mind.lineId);
             if(!line)continue
             let lineAnchor1 = line.anchors[0];
@@ -238,7 +248,7 @@ export let toolBoxPlugin = {
             line.locked = 0;
             line && lines.push(line);
         });
-        meta2d.delete(lines,true);
+        meta2d.delete(lines,false);
     },
     getLines(pen){
         if(!pen)return;
@@ -268,8 +278,22 @@ export let toolBoxPlugin = {
 
         // 删除meta2d数据
         // 删除数据单不追加到历史记录
-        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,true);
+        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,false);
 
+    },
+    getChildrenList(pen,recursion = true){
+        if (pen || !pen.mind)return [];
+        let childrenId = pen.mind.children
+        if(!childrenId || childrenId.length === 0)return []
+        let collect = []
+        childrenId.forEach((i)=>{
+            let child = meta2d.store.pens[i]
+            if(!child)return
+            collect.push(child)
+
+            if(recursion)collect.concat(toolBoxPlugin.getChildrenList(child))
+        })
+        return collect
     },
     install:(...args)=>{
         let toolbox = null;
@@ -290,6 +314,15 @@ export let toolBoxPlugin = {
         // 设置颜色生成函数
         toolBoxPlugin.colorFunc.set('default',defaultColorRule)
         // 打开时进行初始化
+        document.addEventListener('keydown',(e)=>{
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                // 阻止默认的撤销行为
+                e.preventDefault();
+                console.log('Ctrl + Z 被按下');
+
+                // 在这里执行你想要的操作
+            }
+        })
         meta2d.on('opened',()=>{
             let {pens} = meta2d.data()
             pens.forEach(i=>{
@@ -301,7 +334,6 @@ export let toolBoxPlugin = {
 
             })
         })
-
         meta2d.on('undo',(e)=>{
             // TODO 删除顺序有问题
             e.pens.reverse().forEach(i=>{
@@ -318,7 +350,9 @@ export let toolBoxPlugin = {
                 }
             })
         })
-
+        meta2d.on('delete',(pens)=>{
+            console.log('批量删除了：',pens)
+        })
         // 添加根节点
         meta2d.on('add',(pens)=>{
             if(pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind){
@@ -344,6 +378,7 @@ export let toolBoxPlugin = {
                 window.MindManager.rootIds.push(pen.id)
                 // 跟随移动
                 toolBoxPlugin.combineToolBox(pen);
+                toolBoxPlugin.combineLifeCircle(pen)
             }
         })
         meta2d.on('inactive',(targetPen)=>{
@@ -377,7 +412,10 @@ export let toolBoxPlugin = {
         this.funcList = funcList;
     },
     calcChildWandH(pen){
-        if(!pen || !pen.mind)return;
+        if(!pen || !pen.mind)return{
+            maxHeight: 0,
+            maxWidth: 0
+        };
         let position = pen.mind.direction;
         let children = pen.mind.children || [];
         let worldRect = meta2d.getPenRect(pen);
@@ -456,14 +494,12 @@ export let toolBoxPlugin = {
     },
 
     //
-    combineToolBox(target,del = false){
-        let toolbox = globalThis.toolbox;
-        // const onMove = (targetPen)=>{
-        //     toolbox.hide();
-        // };
-        const onDestroy = (targetPen)=>{
+    combineLifeCircle(target,del = false){
+        const onBeforeDestroy = (targetPen)=>{
             toolbox?.hide();
+            console.log(targetPen.id)
             toolBoxPlugin.deleteChildrenNode(targetPen);
+            // toolBoxPlugin.deleteNodeOnlyOnce(targetPen);
             if(targetPen.mind.isRoot){
                 let index = MindManager.rootIds.indexOf(targetPen.id)
                 if(index === -1)return
@@ -471,6 +507,36 @@ export let toolBoxPlugin = {
             }
             toolBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
         };
+        // const onBeforeDestroy = (pen)=>{
+        //     if(pen.mind.isRoot)return
+        //    let parent = meta2d.store.pens[pen.mind.preNodeId]
+        //     parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
+        // }
+        const onAdd = (targetPen)=>{
+            if(!meta2d.store.data.locked){
+                toolbox.bindPen(targetPen);
+                toolbox.setFuncList(this.getFuncList(target));
+                toolbox.translatePosition(targetPen);
+                toolbox.show();
+            }
+        }
+        // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
+        setLifeCycleFunc(target,'onAdd',onAdd,del);
+        setLifeCycleFunc(target,'onBeforeDestroy',onBeforeDestroy,del);
+
+
+    },
+    deleteNodeOnlyOnce: debounceFirstOnly(async(pen)=>{
+        let children = toolBoxPlugin.getChildrenList(pen)
+        if(!children || children.length === 0 )return
+        await mate2d.delete(children,true,false)
+    },1000),
+    combineToolBox(target,del = false){
+        let toolbox = globalThis.toolbox;
+        // const onMove = (targetPen)=>{
+        //     toolbox.hide();
+        // };
+
         const onMouseUp = (targetPen)=>{
             if(!meta2d.store.data.locked){
                 toolbox.bindPen(targetPen);
@@ -483,7 +549,6 @@ export let toolBoxPlugin = {
             toolbox.hide();
         }
         // setLifeCycleFunc(target,'onMove',onMove,del);
-        setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onMouseUp',onMouseUp,del);
         setLifeCycleFunc(target,'onMouseDown',onMouseDown,del);
     },
@@ -517,6 +582,10 @@ export let toolBoxPlugin = {
                 lineColor:'',
                 level: pen.mind.level + 1,
             },
+            calculative:{
+                x:pen.x,
+                y:pen.y
+            },
             x:pen.x ,
             y:pen.y ,
             width: pen.width,
@@ -533,7 +602,7 @@ export let toolBoxPlugin = {
         option.height && (option.height *= scale)
 
         opt = deepMerge(opt,option)
-        let newPen = await meta2d.addPen(opt);
+        let newPen = await meta2d.addPen(opt,false);
 
         // 设置连接关系
         newPen.mind.connect =pen.mind.level === 0?
@@ -548,20 +617,26 @@ export let toolBoxPlugin = {
             pen.mind.children.push(newPen.id);
         }
         toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
+        toolBoxPlugin.combineLifeCircle(newPen);
         let rootNode = meta2d.findOne(pen.mind.rootId);
 
-        //TODO 这里似乎性能不太好 d待优化
-
+        //TODO 这里似乎性能不太好 待优化
+        meta2d.store.data.pens.filter(i=>i.mind?.rootId === pen.mind.rootId && i.mind.type === 'node' ).forEach(i=>{
+            i.mind.oldWorldRect = deepClone(i.calculative.worldRect)
+        })
         // 连线
         toolBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
         let line = toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
-        toolBoxPlugin.resetLayOut(pen)
+        toolBoxPlugin.resetLayOut(rootNode)
         // toolBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
         // toolBoxPlugin.update(rootNode,true);
-        globalThis.toolbox.bindPen(newPen);
-        globalThis.toolbox.setFuncList(this.getFuncList(newPen));
-        globalThis.toolbox.translatePosition(newPen);
+        setTimeout(()=>{
+            globalThis.toolbox.bindPen(newPen);
+            globalThis.toolbox.setFuncList(this.getFuncList(newPen));
+            globalThis.toolbox.translatePosition(newPen);
+        },toolBoxPlugin.animateDuration +100)
+
         // toolBoxPlugin.update(rootNode)
         let list = [newPen,line]
         meta2d.canvas.pushHistory({ type: 0, pens: deepClone(list, true) });
@@ -571,15 +646,56 @@ export let toolBoxPlugin = {
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
         toolBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
-        pluginsMessageChannels.publish('update')
+        pluginsMessageChannels.publish('update',{form:'toolBox'})
     },50),
 
 
     render(){
-        meta2d.render();
+        if(toolBoxPlugin.animate){
+            let pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
+            let scale = meta2d.store.data.scale
+
+            pens.forEach(pen=>{
+                let origin = deepClone(pen.calculative.worldRect)
+                let x = pen.calculative.worldRect.x - pen.mind.oldWorldRect.x
+                let y = pen.calculative.worldRect.y - pen.mind.oldWorldRect.y
+                let diff = { x, y }
+                pen.mind.diff = diff;
+                pen.calculative.worldRect.x = pen.mind.oldWorldRect.x
+                pen.calculative.worldRect.y = pen.mind.oldWorldRect.y
+                pen.calculative.worldRect.ex = pen.mind.oldWorldRect.ex;
+                pen.calculative.worldRect.ey = pen.mind.oldWorldRect.ey;
+                pen.calculative.worldRect.width = pen.mind.oldWorldRect.width;
+                pen.calculative.worldRect.height = pen.mind.oldWorldRect.height
+
+                pen.animateCycle = 1;
+                pen.keepAnimateState = true
+                pen.frames = [{
+                        duration: toolBoxPlugin.animateDuration,  // 帧时长
+                        x: pen.mind.diff.x / scale ,
+                        y: pen.mind.diff.y / scale// 变化属性
+                    }]
+                pen.showDuration = meta2d.calcAnimateDuration(pen);
+                //
+                // pen.calculative.worldRect.x = origin.x
+                // pen.calculative.worldRect.y = origin.y
+                // pen.calculative.worldRect.ex = origin.ex;
+                // pen.calculative.worldRect.ey = origin.ey;
+                // pen.calculative.worldRect.width =origin.width;
+                // pen.calculative.worldRect.height = origin.height
+            })
+
+            meta2d.startAnimate(pens);
+            setTimeout(()=>{meta2d.render()},toolBoxPlugin.animateDuration + 50)
+        }else{
+            meta2d.render();
+        }
         pluginsMessageChannels.publish('render')
-    }
+    },
+    record(pen){
+        meta2d.store.data.pens.filter(i=>i.mind?.rootId === pen.mind.rootId && i.mind.type === 'node' ).forEach(i=>{
+            i.mind.oldWorldRect = deepClone(i.calculative.worldRect)
+        })
+    },
 };
-
-
 

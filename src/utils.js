@@ -64,3 +64,23 @@ export function replaceAfterPosition(str, position, regex, replacement) {
 
     return resultString;
 }
+
+
+export function debounceFirstOnly(func, wait) {
+    let timeout;
+    let executed = false; // 标志是否已经执行过一次
+
+    return function(...args) {
+        const context = this;
+
+        if (!executed) {
+            func.apply(context, args);
+            executed = true;
+        }
+
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+            executed = false; // 重置执行标志，使得函数可以在下一次防抖周期首次被触发时执行
+        }, wait);
+    };
+}

@@ -1,8 +1,3 @@
-function visibleChild(children) {
-    if(!Array.isArray(children))return
-    return children.map(i=>i.mind.visible)
-}
-
 
 export function createDom(tag,style = {},event = undefined,func = undefined,className = undefined) {
     // 创建dom

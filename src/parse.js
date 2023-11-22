@@ -56,18 +56,22 @@ export function template(config,{template,scripts,style},output = 'string'){
 
 function parse(html){
     // 函数匹配式
-    let reg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
+    let funcReg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
+    // let varReg = new RegExp()
+    // 变量匹配
+
     //(@|on)(?<event>w+)\s*=s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)s*(s*(?<param>[w.]*)s*)["']
     //(@|on)(?<event>\w+)\s*=\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\s*\(\s*(?<param>[\w\.]*)\s*\)["']// 替换空格 替换@符号
     let reHtml = html.replaceAll('\n','').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');
 
 // 使用 matchAll 来匹配所有结果
-    let matchs = reHtml.matchAll(reg);
+    let funcMatchs = reHtml.matchAll(funcReg);
+    // let varMatchs = reHtml.matchAll(varReg);
 
 // 请注意，没有传递 'g' 标志给 matchAll，因为 reg 已经带有 'g' 标志
 
     let result = [];
-    for (let match of matchs){
+    for (let match of funcMatchs){
         let {event, name, param,} = match.groups;
 
         // 获取参数的具体位置

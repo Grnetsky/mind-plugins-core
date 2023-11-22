@@ -13,13 +13,13 @@ export function* generateColor() {
 
 let funcList =
         [
-            {
-          key: "id",
-              name:'id',
-          setDom(self,pen) {
-            return pen.id
-          }
-            },
+          //   {
+          // key: "id",
+          //     name:'id',
+          // setDom(self,pen) {
+          //   return pen.id
+          // }
+          //   },
   {
     key:'addChildNode',
     name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
@@ -156,7 +156,7 @@ let funcList =
         '    </g>\n' +
         '</svg>',
     event:'click',
-    func(self,pen,dom,father){
+    func(self,pen,dom,e){
       let children = pen.mind?.children || [];
       if(children.length >0){
         toolBoxPlugin.update(pen,true);
@@ -213,7 +213,7 @@ let funcList =
     init(self,pen){
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
       self.width = pen.lineWidth;
-      self.color = pen.color || '#000'
+      self.color = pen.color || '#000000'
     },
     setDom(self){
       let color = self.color
@@ -377,14 +377,18 @@ let funcList =
             }else {
               color = value
             }
-           meta2d.setValue({
-             id:pen.id,
-             color
-           },{render:true})
+            if(color === self.color){
+              color = undefined
+            }else{
+              meta2d.setValue({
+                id:pen.id,
+                color
+              },{render:true})
+            }
            pen.mind.color = color
            self.color = color;
            self.updateAll()
-           toolBoxPlugin.calcChildrenColor(pen)
+           toolBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
            toolBoxPlugin.resetLinesColor(pen)
          }
         },
@@ -496,11 +500,11 @@ let funcList =
     lineStyle: 'mind',
     width: 3,
     init(self,pen){
-      self.color = pen.mind.lineColor || pen.calculative.color || '#000';
+      self.color = pen.mind.lineColor || pen.calculative.color || '#000000';
       self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
       self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
     },
-    setDom(self) {
+    setDom(self,pen) {
       let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
         <title>连线样式</title>
         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -508,7 +512,7 @@ let funcList =
             <g id="编组-2" transform="translate(253.000000, 135.000000)">
               <g id="连线颜色" transform="translate(421.000000, 3.000000)">
                 <rect id="透明底图" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="34" height="34"/>
-                <line x1="7.5" y1="17.5" x2="27.5" y2="17.5" id="直线-9" stroke="${self.color}" stroke-dasharray="${self.dash}" stroke-width="${self.width}" stroke-linecap="round"/>
+                <line x1="7.5" y1="17.5" x2="27.5" y2="17.5" id="直线-9" stroke="${self.color || pen.color}" stroke-dasharray="${self.dash}" stroke-width="${self.width}" stroke-linecap="round"/>
               </g>
             </g>
           </g>
@@ -522,7 +526,7 @@ let funcList =
      * @param pen 返回当前pen对象
      * @param dom 返回此容器dom
      * */
-    colorList:['#00000000','#5757F3','#fa7878','#8C8CFF','#19f1cc',
+    colorList:['#f13097','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
     closeShadowDom: true,
     closeEventOnChild:false,
@@ -656,6 +660,10 @@ let funcList =
             }else {
               color = value
             }
+            if(color === self.color){
+              color = undefined
+            }
+
             pen.connectedLines?.forEach(i=>{
               meta2d.setValue({
                 id:pen.id,
@@ -772,6 +780,7 @@ let funcList =
       self.direction = pen.mind.direction
       self.childrenGap = toolBoxPlugin.childrenGap
       self.levelGap = toolBoxPlugin.levelGap
+      self.animate = toolBoxPlugin.animate
     },
 
     activeDirection(self,pen,dom){
@@ -803,6 +812,7 @@ let funcList =
     closeEventOnChild:false, // 是否在childrenDom中触发事件
     closeChildDomEvent:'none',
     stopPropagation:true,
+    animate:false,
     closeChildDom(self,pen,dom){
       // dom.style.height = 'max-height'
       // dom.style.visibility = 'hidden'
@@ -820,6 +830,7 @@ let funcList =
       dom.style.transform = 'scaleY(1)'
       return true
     },
+    status:'已开启',
     // 设置下拉列表的样式和子元素布局
     setChildrenDom(self,pen){
       let dom = createDom('div',{
@@ -1013,6 +1024,12 @@ let funcList =
                             <input type="number" onchange="setLevelGap(this.value)" value="${self.levelGap}"/>
                         </div>
                     </div>
+                     <div class="number_item" onclick="(e=>{e.stopPropagation()})(event)">
+                        <div class="flag">是否开启动画</div>
+                        <div class="button">                        
+                            <input type="button" onclick="setAnimate()" value="${self.status}"/>
+                        </div>
+                    </div>
                   </div>
                    
                 </div>
@@ -1021,6 +1038,14 @@ let funcList =
         scripts:{
           // 能在这里面获取到dom
           mounted(){ // 生命周期函数
+            // self.animate = toolBoxPlugin.animate
+          },
+          setAnimate(){
+            toolBoxPlugin.animate = !toolBoxPlugin.animate
+            self.animate = toolBoxPlugin.animate
+            self.animate?self.status = '已开启':
+              self.status = '已关闭'
+            self.updateAll()
           },
           setChildGap(value){
             self.childrenGap = value;
@@ -1058,6 +1083,9 @@ let funcList =
             justify-content: space-around;
             align-items: center;
             background-color: #f7f7f9;
+        }
+        .button {
+        
         }
         .number_container{
             display: flex;

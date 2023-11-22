@@ -211,7 +211,7 @@ export let toolBoxPlugin = {
         // 重新设置连线样式
         toolBoxPlugin.resetLinesStyle(pen,recursion)
         toolBoxPlugin.resetLinesColor(pen,recursion)
-        toolBoxPlugin.render();
+        toolBoxPlugin.render(pen.mind.rootId);
 
         // 更新连线
     },
@@ -328,6 +328,7 @@ export let toolBoxPlugin = {
                 if(i.mind && i.mind.type === 'node'){
                     let pen = meta2d.findOne(i.id)
                     toolBoxPlugin.combineToolBox(pen)
+                    toolBoxPlugin.combineLifeCircle(pen)
                     i.mind.isRoot?window.MindManager.rootIds.push(pen.id):''
                 }
 
@@ -349,13 +350,12 @@ export let toolBoxPlugin = {
                 }
             })
         })
-        meta2d.on('delete',(pens)=>{
-            console.log('批量删除了：',pens)
-        })
+
         // 添加根节点
         meta2d.on('add',(pens)=>{
             if(pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind){
                 let pen = pens[0]
+                pen.disableAnchor =  true,
                 pen.mind = {
                     isRoot: true,
                     type:'node',
@@ -378,6 +378,7 @@ export let toolBoxPlugin = {
                 // 跟随移动
                 toolBoxPlugin.combineToolBox(pen);
                 toolBoxPlugin.combineLifeCircle(pen)
+                meta2d.render()
             }
         })
         meta2d.on('inactive',(targetPen)=>{
@@ -494,9 +495,8 @@ export let toolBoxPlugin = {
 
     //
     combineLifeCircle(target,del = false){
-        const onBeforeDestroy = (targetPen)=>{
+        const onDestroy = (targetPen)=>{
             toolbox?.hide();
-            console.log(targetPen.id)
             toolBoxPlugin.deleteChildrenNode(targetPen);
             // toolBoxPlugin.deleteNodeOnlyOnce(targetPen);
             if(targetPen.mind.isRoot){
@@ -521,7 +521,7 @@ export let toolBoxPlugin = {
         }
         // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onAdd',onAdd,del);
-        setLifeCycleFunc(target,'onBeforeDestroy',onBeforeDestroy,del);
+        setLifeCycleFunc(target,'onDestroy',onDestroy,del);
 
 
     },
@@ -564,6 +564,7 @@ export let toolBoxPlugin = {
     async addNode(pen,position = 0, type = "mindNode2",option={}){
         let opt = {
             name:type,
+            disableAnchor: true,
             mind:{
                 type:'node',
                 isRoot: false,
@@ -608,7 +609,7 @@ export let toolBoxPlugin = {
             toolBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
 
-        window.MindManager.pluginsMessageChannels.publish('addNode',newPen);
+        window.MindManager.pluginsMessageChannels.publish('addNode', {plugin:'toolBox',pen,newPen});
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);
@@ -620,9 +621,7 @@ export let toolBoxPlugin = {
         let rootNode = meta2d.findOne(pen.mind.rootId);
 
         //TODO 这里似乎性能不太好 待优化
-        meta2d.store.data.pens.filter(i=>i.mind?.rootId === pen.mind.rootId && i.mind.type === 'node' ).forEach(i=>{
-            i.mind.oldWorldRect = deepClone(i.calculative.worldRect)
-        })
+        toolBoxPlugin.record(pen.mind.rootId)
         // 连线
         toolBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
         let line = toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
@@ -630,11 +629,18 @@ export let toolBoxPlugin = {
         // toolBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
         // toolBoxPlugin.update(rootNode,true);
-        setTimeout(()=>{
+        if(toolBoxPlugin.animate){
+            setTimeout(()=>{
+                globalThis.toolbox.bindPen(newPen);
+                globalThis.toolbox.setFuncList(this.getFuncList(newPen));
+                globalThis.toolbox.translatePosition(newPen);
+            },toolBoxPlugin.animateDuration +100)
+
+        }else {
             globalThis.toolbox.bindPen(newPen);
             globalThis.toolbox.setFuncList(this.getFuncList(newPen));
             globalThis.toolbox.translatePosition(newPen);
-        },toolBoxPlugin.animateDuration +100)
+        }
 
         // toolBoxPlugin.update(rootNode)
         let list = [newPen,line]
@@ -648,52 +654,60 @@ export let toolBoxPlugin = {
         pluginsMessageChannels.publish('update',{form:'toolBox'})
     },50),
 
-
-    render(){
+    // root 为根节点id
+    render(root){
         if(toolBoxPlugin.animate){
-            let pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
+            let pens = []
+            if(root){
+                pens = meta2d.store.data.pens.filter(i=>i.mind?.rootId === root && i.mind.type === 'node')
+            }
+            else {
+                pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
+            }
             let scale = meta2d.store.data.scale
-
             pens.forEach(pen=>{
-                let origin = deepClone(pen.calculative.worldRect)
-                let x = pen.calculative.worldRect.x - pen.mind.oldWorldRect.x
-                let y = pen.calculative.worldRect.y - pen.mind.oldWorldRect.y
-                let diff = { x, y }
-                pen.mind.diff = diff;
-                pen.calculative.worldRect.x = pen.mind.oldWorldRect.x
-                pen.calculative.worldRect.y = pen.mind.oldWorldRect.y
-                pen.calculative.worldRect.ex = pen.mind.oldWorldRect.ex;
-                pen.calculative.worldRect.ey = pen.mind.oldWorldRect.ey;
-                pen.calculative.worldRect.width = pen.mind.oldWorldRect.width;
-                pen.calculative.worldRect.height = pen.mind.oldWorldRect.height
+                let source = deepClone(meta2d.getPenRect(pen))
+
+                let origin = meta2d.store.data.origin;
+
+                let x = source.x  - pen.mind.oldWorldRect.x
+                let y = source.y - pen.mind.oldWorldRect.y
+                pen.calculative.worldRect.x = pen.mind.oldWorldRect.x * scale + origin.x
+                pen.calculative.worldRect.y = pen.mind.oldWorldRect.y * scale + origin.y
+
+                pen.calculative.worldRect.width = pen.mind.oldWorldRect.width * scale;
+                pen.calculative.worldRect.height = pen.mind.oldWorldRect.height * scale
+                pen.calculative.worldRect.ex =pen.calculative.worldRect.x + pen.calculative.worldRect.width;
+                pen.calculative.worldRect.ey = pen.calculative.worldRect.y + pen.calculative.worldRect.height;
 
                 pen.animateCycle = 1;
                 pen.keepAnimateState = true
                 pen.frames = [{
                         duration: toolBoxPlugin.animateDuration,  // 帧时长
-                        x: pen.mind.diff.x / scale ,
-                        y: pen.mind.diff.y / scale// 变化属性
+                        x: x   ,
+                        y: y // 变化属性
                     }]
                 pen.showDuration = meta2d.calcAnimateDuration(pen);
                 //
-                // pen.calculative.worldRect.x = origin.x
-                // pen.calculative.worldRect.y = origin.y
-                // pen.calculative.worldRect.ex = origin.ex;
-                // pen.calculative.worldRect.ey = origin.ey;
-                // pen.calculative.worldRect.width =origin.width;
-                // pen.calculative.worldRect.height = origin.height
             })
 
             meta2d.startAnimate(pens);
-            // setTimeout(()=>{ toolBoxPlugin.reconnectLines(pen,recursion)},toolBoxPlugin.animateDuration + 50)
+            toolBoxPlugin.record(root)
         }else{
             meta2d.render();
         }
         pluginsMessageChannels.publish('render')
     },
-    record(pen){
-        meta2d.store.data.pens.filter(i=>i.mind?.rootId === pen.mind.rootId && i.mind.type === 'node' ).forEach(i=>{
-            i.mind.oldWorldRect = deepClone(i.calculative.worldRect)
+
+    /**
+     * @description 该方法用于记录节点位置坐标信息，用于动画过渡的初始状态
+     * @param {string} root 根节点的id值*/
+    record(root){
+        let pens = [];
+        if(root)pens = meta2d.store.data.pens.filter(i=>i.mind?.rootId === root && i.mind.type === 'node')
+        else pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
+        pens.forEach(i=>{
+            i.mind.oldWorldRect = deepClone(meta2d.getPenRect(i))
         })
     },
 };

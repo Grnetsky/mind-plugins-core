@@ -12,15 +12,11 @@ function defaultColorRule(pen,recursion = true) {
         }else {
             nodeColor = child.mind.color || pen.mind.color || pen.color;
         }
-        if(child.mind.visible){
-            meta2d.setValue({
-                id: child.id,
-                color: nodeColor
-            },{render:false});
-            meta2d.setVisible(child,true,false);
-        }else{
-            meta2d.setVisible(child,false,false);
-        }
+        meta2d.setValue({
+            id: child.id,
+            color: nodeColor
+        },{render:false});
+
         if(recursion) defaultColorRule(child,true);
     }
 }

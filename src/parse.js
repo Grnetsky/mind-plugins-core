@@ -8,6 +8,13 @@ const EVENTTAG = ['@','on']
 import {createDom, replaceAfterPosition} from "./utils";
 
 let LifeCycle = ['mounted']
+/**
+ * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
+ * @param self 此配置项自身
+ * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
+ * @return string dom字符串
+ * */
+
 export function template(config,{template,scripts,style},output = 'string'){
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')

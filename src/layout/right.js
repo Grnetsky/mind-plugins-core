@@ -19,16 +19,12 @@ export function right(pen,recursion = true,) {
         child.mind.connect = right.connectRule(pen,child)
         child.mind.x = worldReact.x + worldReact.width + +levelGap;
         child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-        if(child.mind.visible){
-            meta2d.setValue({
-                id: child.id,
-                x: child.mind.x,
-                y: child.mind.y,
-            },{render:false});
-            meta2d.setVisible(child,true,false);
-        }else{
-            meta2d.setVisible(child,false,false);
-        }
+        meta2d.setValue({
+            id: child.id,
+            x: child.mind.x,
+            y: child.mind.y,
+        },{render:false});
+
         if(recursion) right(child,true);
     }
 }

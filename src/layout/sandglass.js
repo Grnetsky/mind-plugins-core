@@ -26,17 +26,13 @@ export function sandglass(pen, recursion = true) {
             topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
             child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
             child.mind.y = worldReact.y - 1/2 * meta2d.getPenRect(child).height + +levelGap;
-            if(child.mind.visible){
-                meta2d.setValue({
-                    id: child.id,
-                    x: child.mind.x,
-                    y: child.mind.y,
-                    color: child.mind.color
-                },{render:false});
-                // meta2d.setVisible(child,true,false);
-            }else{
-                meta2d.setVisible(child,false,false);
-            }
+            meta2d.setValue({
+                id: child.id,
+                x: child.mind.x,
+                y: child.mind.y,
+                color: child.mind.color
+            },{render:false});
+
             if(recursion)bottom(child,recursion)
             if(i===sandglass.MAXLENGTH-1){
                 topHeight = 0

@@ -17,17 +17,12 @@ export function top(pen,recursion = true,) {
         child.mind.connect = top.connectRule(pen,child)
         child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
         child.mind.y = worldReact.y - 1/2 * meta2d.getPenRect(child).height - +levelGap;
-        if(child.mind.visible){
-            meta2d.setValue({
-                id: child.id,
-                x: child.mind.x,
-                y: child.mind.y,
-                color: child.mind.color
-            },{render:false});
-            meta2d.setVisible(child,true,false);
-        }else{
-            meta2d.setVisible(child,false,false);
-        }
+        meta2d.setValue({
+            id: child.id,
+            x: child.mind.x,
+            y: child.mind.y,
+            color: child.mind.color
+        },{render:false});
         if(recursion) top(child,true);
     }
 }

@@ -17,17 +17,13 @@ export function left(pen,recursion = true,) {
         child.mind.connect = left.connectRule(pen,child)
         child.mind.x = worldReact.x - childRect.width - +levelGap;
         child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-        if(child.mind.visible){
             meta2d.setValue({
                 id: child.id,
                 x: child.mind.x,
                 y: child.mind.y,
                 color: child.mind.color
             },{render:false});
-            meta2d.setVisible(child,true,false);
-        }else{
-            meta2d.setVisible(child,false,false);
-        }
+
         if(recursion) left(child,true);
     }
 }

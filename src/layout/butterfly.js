@@ -25,17 +25,13 @@ export function butterfly(pen, recursion = true) {
             child.mind.connect = butterfly.connectRule(pen,child,i)
             child.mind.x = worldReact.x + worldReact.width + +levelGap;
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-            if(child.mind.visible){
-                meta2d.setValue({
-                    id: child.id,
-                    x: child.mind.x,
-                    y: child.mind.y,
-                    color: child.mind.color
-                },{render:false});
-                // meta2d.setVisible(child,true,false);
-            }else{
-                meta2d.setVisible(child,false,false);
-            }
+            meta2d.setValue({
+                id: child.id,
+                x: child.mind.x,
+                y: child.mind.y,
+                color: child.mind.color
+            },{render:false});
+
             if(recursion)right(child,recursion)
             if(i===butterfly.MAXLENGTH-1){
                 topHeight = 0
@@ -54,17 +50,12 @@ export function butterfly(pen, recursion = true) {
             child.mind.connect =butterfly.connectRule(pen,child,i)
             child.mind.x = worldReact.x - childRect.width - +levelGap;
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
-            if(child.mind.visible){
-                meta2d.setValue({
-                    id: child.id,
-                    x: child.mind.x,
-                    y: child.mind.y,
-                    color: child.mind.color
-                },{render:false});
-                // meta2d.setVisible(child,true,false);
-            }else{
-                meta2d.setVisible(child,false,false);
-            }
+            meta2d.setValue({
+                id: child.id,
+                x: child.mind.x,
+                y: child.mind.y,
+                color: child.mind.color
+            },{render:false});
             if(recursion)left(child,recursion)
         }
         pen.mind.children = children

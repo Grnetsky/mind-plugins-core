@@ -414,6 +414,8 @@ export let toolBoxPlugin = {
     calcChildWandH(pen){
         if(!pen || !pen.mind)return{
             maxHeight: 0,
+            childHeight:0,
+            childWidth:0,
             maxWidth: 0
         };
         let position = pen.mind.direction;
@@ -424,7 +426,9 @@ export let toolBoxPlugin = {
             pen.mind.maxWidth = pen.mind.width ?? worldRect.width;
             return {
                 maxHeight: worldRect.height,
-                maxWidth: worldRect.width
+                maxWidth: worldRect.width,
+                childHeight: 0,
+                childWidth: 0
             };
         }
         let maxHeight = 0;
@@ -442,9 +446,13 @@ export let toolBoxPlugin = {
             maxH = maxHeight > worldRect.height?maxHeight : worldRect.height;
             pen.mind.maxWidth = maxWidth;
             pen.mind.maxHeight = maxH;
+            pen.mind.childHeight = maxHeight;
+            pen.mind.childWidth = maxWidth
             return {
                 maxHeight:maxH,
-                maxWidth
+                maxWidth,
+                childHeight: maxHeight,
+                childWidth: maxWidth
             };
         }else {
             for(let i = 0;i<children.length;i++){
@@ -457,9 +465,12 @@ export let toolBoxPlugin = {
             maxW = maxWidth > worldRect.width?maxWidth : worldRect.width;
             pen.mind.maxHeight = maxHeight;
             pen.mind.maxWidth = maxW;
+            pen.mind.childWidth = maxWidth
             return {
                 maxHeight,
-                maxWidth: maxW
+                maxWidth: maxW,
+                childWidth: maxWidth,
+                childHeight: maxHeight
             };
         }
     },

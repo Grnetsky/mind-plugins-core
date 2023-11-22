@@ -18,7 +18,11 @@ export function right(pen,recursion = true,) {
         topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
         child.mind.connect = right.connectRule(pen,child)
         child.mind.x = worldReact.x + worldReact.width + +levelGap;
-        child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
+        if(worldReact.height > pen.mind.childHeight){
+            child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1/2 * child.mind.maxHeight + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
+        }else {
+            child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
+        }
         meta2d.setValue({
             id: child.id,
             x: child.mind.x,

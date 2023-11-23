@@ -71,8 +71,13 @@ export class ToolBox {
     }
     animate = false
     curItem = null
+    _freezePos = false
+    freezePos(freeze){
+        this._freezePos = freeze
+    }
     translatePosition(pen){
         if(!this.animate)this.hide();
+        if(this._freezePos)return
         const store = pen.calculative.canvas.store;
         const worldRect = pen.calculative.worldRect;
         this.box.style.position = 'absolute';
@@ -267,8 +272,8 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 backgroundColor:'#eee',
                 width: '100%',
                 opacity:0
-            })
-            dom.appendChild(gap)
+            },'','','toolbox_gap')
+            dom.shadowRoot?dom.shadowRoot.appendChild(gap):dom.appendChild(gap)
             keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
 
         }

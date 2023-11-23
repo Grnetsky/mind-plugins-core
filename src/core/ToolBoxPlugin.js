@@ -14,10 +14,8 @@ export let toolBoxPlugin = {
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map
     _history:[],
-    activePens:[],
     animate: true,
     animateDuration:200,
-    oldPens:[],
     // 计算子节点的颜色和位置
     calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;

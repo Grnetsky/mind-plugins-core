@@ -169,7 +169,7 @@ let funcList =
     init(self,pen){
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
       self.width = (+ pen.lineWidth).toFixed(0);
-      self.color = pen.color || '#000000'
+      self.color =pen.mind.color || pen.calculative.color || '#000000'
     },
     setDom(self){
       let color = self.color
@@ -329,7 +329,6 @@ let funcList =
 
           },
          setColor(e,value){
-           e.stopPropagation()
             let color = ''
             if(!value){
               let t = e.target
@@ -345,13 +344,14 @@ let funcList =
               meta2d.setValue({
                 id:pen.id,
                 color
-              },{render:true})
+              },{render:false})
             }
            pen.mind.color = color
-           self.color = color;
-           self.updateAll()
            toolBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
            toolBoxPlugin.resetLinesColor(pen)
+           toolBoxPlugin.render()
+           self.color = color || pen.calculative.color;
+           self.updateAll()
          }
         },
        style:`<style>

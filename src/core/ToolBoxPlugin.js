@@ -334,6 +334,9 @@ export let toolBoxPlugin = {
 
             })
         })
+        // meta2d.on('resize',(pen)=>{
+        //     if(pen.mind && pen.mind.rootId) toolBoxPlugin.record(meta2d.store.pens[pen.mind.rootId])
+        // })
         meta2d.on('undo',(e)=>{
             // TODO 删除顺序有问题
             e.pens.reverse().forEach(i=>{
@@ -425,8 +428,8 @@ export let toolBoxPlugin = {
             pen.mind.maxHeight = pen.mind.height ?? worldRect.height;
             pen.mind.maxWidth = pen.mind.width ?? worldRect.width;
             return {
-                maxHeight: worldRect.height,
-                maxWidth: worldRect.width,
+                maxHeight: pen.mind.maxHeight,
+                maxWidth: pen.mind.maxWidth,
                 childHeight: 0,
                 childWidth: 0
             };
@@ -530,9 +533,13 @@ export let toolBoxPlugin = {
                 toolbox.show();
             }
         }
+        const onResize  = debounce((pen)=>{
+            toolBoxPlugin.record(pen.mind.rootId)
+        },500)
         // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onAdd',onAdd,del);
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
+        setLifeCycleFunc(target, 'onResize',onResize )
 
 
     },
@@ -661,6 +668,7 @@ export let toolBoxPlugin = {
     },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
+        toolBoxPlugin.record(pen)
         toolBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
         pluginsMessageChannels.publish('update',{form:'toolBox'})
     },50),
@@ -683,25 +691,24 @@ export let toolBoxPlugin = {
 
                 let x = source.x  - pen.mind.oldWorldRect.x
                 let y = source.y - pen.mind.oldWorldRect.y
+
+
                 pen.calculative.worldRect.x = pen.mind.oldWorldRect.x * scale + origin.x
                 pen.calculative.worldRect.y = pen.mind.oldWorldRect.y * scale + origin.y
 
-                pen.calculative.worldRect.width = pen.mind.oldWorldRect.width * scale;
-                pen.calculative.worldRect.height = pen.mind.oldWorldRect.height * scale
-                pen.calculative.worldRect.ex =pen.calculative.worldRect.x + pen.calculative.worldRect.width;
-                pen.calculative.worldRect.ey = pen.calculative.worldRect.y + pen.calculative.worldRect.height;
+                pen.calculative.worldRect.ex = pen.calculative.worldRect.x + pen.mind.oldWorldRect.width * scale;
+                pen.calculative.worldRect.ey = pen.calculative.worldRect.y +pen.mind.oldWorldRect.height * scale
 
                 pen.animateCycle = 1;
                 pen.keepAnimateState = true
                 pen.frames = [{
                         duration: toolBoxPlugin.animateDuration,  // 帧时长
                         x: x   ,
-                        y: y // 变化属性
+                        y: y, // 变化属性,
                     }]
                 pen.showDuration = meta2d.calcAnimateDuration(pen);
                 //
             })
-
             meta2d.startAnimate(pens);
             toolBoxPlugin.record(root)
         }else{

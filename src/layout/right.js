@@ -19,7 +19,6 @@ export function right(pen,recursion = true,) {
         child.mind.connect = right.connectRule(pen,child)
         child.mind.x = worldReact.x + worldReact.width + +levelGap;
         if(worldReact.height > pen.mind.childHeight){
-            console.log(worldReact.height)
             child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1/2 * pen.mind.childHeight + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         }else {
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);

@@ -168,7 +168,7 @@ let funcList =
      */
     init(self,pen){
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
-      self.width = pen.lineWidth.toFixed(0);
+      self.width = (+ pen.lineWidth).toFixed(0);
       self.color = pen.color || '#000000'
     },
     setDom(self){

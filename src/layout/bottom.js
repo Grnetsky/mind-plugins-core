@@ -15,13 +15,12 @@ export function bottom(pen,recursion = true,) {
         topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
         child.mind.connect =
             bottom.connectRule(pen,child)
-
         if(worldReact.width > pen.mind.childWidth){
-            child.mind.x = worldReact.x + 1 / 2 * pen.mind.maxWidth + topWidth - 1/2 * child.mind.maxWidth + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
+            child.mind.x = worldReact.x + 1 / 2 * pen.mind.maxWidth + topWidth - 1/2 * pen.mind.childWidth + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
         }else {
             child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
         }
-        child.mind.y = worldReact.y - 1/2 * meta2d.getPenRect(child).height + +levelGap;
+        child.mind.y = worldReact.y + worldReact.height - 1/2 * meta2d.getPenRect(child).height + +levelGap;
         meta2d.setValue({
             id: child.id,
             x: child.mind.x,

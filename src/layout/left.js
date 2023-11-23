@@ -18,7 +18,7 @@ export function left(pen,recursion = true,) {
         child.mind.x = worldReact.x - childRect.width - +levelGap;
 
         if(worldReact.height > pen.mind.childHeight){
-            child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1/2 * child.mind.maxHeight + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
+            child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1/2 * pen.mind.childHeight + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         }else {
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         }

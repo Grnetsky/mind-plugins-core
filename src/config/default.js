@@ -68,7 +68,7 @@ let funcList =
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
         event:'click',
         func(self,pen,dom){
-          toolBoxPlugin.addNode(pen,0,'diamond',{width:150,height:100 })
+          toolBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
         }
       },
       {
@@ -1197,7 +1197,7 @@ let funcList =
       func(self,pen,dom){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
-        toolBoxPlugin.addNode(parent,index+1,'diamond',{width:150,height:100 })
+        toolBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
       }
     },
     {

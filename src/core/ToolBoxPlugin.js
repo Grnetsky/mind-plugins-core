@@ -358,7 +358,8 @@ export let toolBoxPlugin = {
         meta2d.on('add',(pens)=>{
             if(pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind){
                 let pen = pens[0]
-                pen.disableAnchor =  true,
+                pen.disableAnchor =  true
+                pen.disableRotate = true
                 pen.mind = {
                     isRoot: true,
                     type:'node',
@@ -583,6 +584,7 @@ export let toolBoxPlugin = {
         let opt = {
             name:type,
             disableAnchor: true,
+            disableRotate:true,
             mind:{
                 type:'node',
                 isRoot: false,
@@ -612,7 +614,7 @@ export let toolBoxPlugin = {
             // color:generateColor((pen.mind.children[pen.mind.children.length-1])?.calculative.color),
             textColor:'#000',
             lineWidth:3,
-            fontSize:16,
+            fontSize:14,
             borderRadius: pen.borderRadius,
         }
         let scale = pen.calculative.canvas.store.data.scale;

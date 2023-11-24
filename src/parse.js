@@ -16,6 +16,8 @@ let LifeCycle = ['mounted']
  * */
 
 export function template(config,{template,scripts,style},output = 'string'){
+    if(!scripts)scripts = {}
+    if(!style)style = ''
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
     MindManager._env[namespace]? '' : MindManager._env[namespace] = {};

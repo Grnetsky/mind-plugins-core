@@ -1,5 +1,6 @@
-import {createDom, deepMerge, dragElement, isObjectLiteral} from "../utils";
+import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
 import d, {controlStyle, funcListStyle, toolboxStyle} from "../config/default"
+import {template} from "../parse";
 const DIVIDER = 'divider'
 const CONTROL = 'control'
 
@@ -63,31 +64,41 @@ export class ToolBox {
     }
     _setControl(){
         if(this.showControl){
+            let self = this
             let control = createDom('div',{style:controlStyle,className: "toolbox_control"})
-            let icon =  `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
-    <title>上级节点备份</title>
-    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="未固定" transform="translate(-266.000000, -148.000000)" fill="#BCBCC4">
-            <g id="编组-2" transform="translate(253.000000, 135.000000)">
-                <g id="上级节点备份" transform="translate(13.000000, 13.000000)">
-                    <circle id="椭圆形" cx="1" cy="1" r="1"/>
-                    <circle id="椭圆形备份-11" cx="5" cy="1" r="1"/>
-                    <circle id="椭圆形备份-5" cx="1" cy="5" r="1"/>
-                    <circle id="椭圆形备份-8" cx="5" cy="5" r="1"/>
-                    <circle id="椭圆形备份-6" cx="1" cy="9" r="1"/>
-                    <circle id="椭圆形备份-9" cx="5" cy="9" r="1"/>
-                    <circle id="椭圆形备份-7" cx="1" cy="13" r="1"/>
-                    <circle id="椭圆形备份-10" cx="5" cy="13" r="1"/>
-                </g>
-            </g>
-        </g>
-    </g>
-</svg>`
+            let icon =  template({key:'toolbox'},{
+                template:`<svg @click="toggleFreeze()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
+                                <title>上级节点备份</title>
+                                <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g id="未固定" transform="translate(-266.000000, -148.000000)" fill="#BCBCC4">
+                                        <g id="编组-2" transform="translate(253.000000, 135.000000)">
+                                            <g id="上级节点备份" transform="translate(13.000000, 13.000000)">
+                                                <circle id="椭圆形" cx="1" cy="1" r="1"/>
+                                                <circle id="椭圆形备份-11" cx="5" cy="1" r="1"/>
+                                                <circle id="椭圆形备份-5" cx="1" cy="5" r="1"/>
+                                                <circle id="椭圆形备份-8" cx="5" cy="5" r="1"/>
+                                                <circle id="椭圆形备份-6" cx="1" cy="9" r="1"/>
+                                                <circle id="椭圆形备份-9" cx="5" cy="9" r="1"/>
+                                                <circle id="椭圆形备份-7" cx="1" cy="13" r="1"/>
+                                                <circle id="椭圆形备份-10" cx="5" cy="13" r="1"/>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg>`,
+            style:`
+                svg:hover{
+                }
+            `,scripts:{
+                        toggleFreeze(){
+                            self.freezePos(!self._freezePos)
+                        }
+                }}
+            )
             control.innerHTML = icon
             control.id = 'toolbox_control'
             this.box.appendChild(control)
-            // let flat = false
-            dragElement(this.box,control)
+            this._dragElement(control)
         }
     }
     setStyle(style){
@@ -131,7 +142,10 @@ export class ToolBox {
         this.translatePosition(pos)
     }
     translatePosition(pos){
-        if(this._freezePos)return
+        if(this._freezePos) {
+            if(!this.animate)this.show();
+            return
+        }
         if(!this.animate)this.hide();
         this.box.style.left = pos.x
         this.box.style.top =  pos.y
@@ -188,7 +202,7 @@ export class ToolBox {
             item.dom.titleDom = title;
             if(item.children || item.setChildrenDom){
                 // 打开函数
-                title['on'+(item.openChildDomEvent || 'click')] = ()=>{
+                let openFunc = ()=>{
                     // 关闭其他选项
                     if(toolbox.curItem !== item){
                         toolbox.funcList.filter(i=>i.isOpen).forEach(
@@ -208,6 +222,7 @@ export class ToolBox {
                     item.isOpen = true
                     toolbox.curItem = item
                 }
+                    title['on'+(item.openChildDomEvent || 'click')] = openFunc
             }
 
 
@@ -230,8 +245,59 @@ export class ToolBox {
         this.funcList = funcList;
         this.renderFuncList();
     }
+
+    // 点击控制按钮事件
+    onControlClick() {
+    }
+    // 移动控制按钮事件
+    onControlMove(){
+        this.closeAll()
+    }
+    closeAll(){
+        toolbox.funcList.filter(i=>i.isOpen).forEach(
+            i=>{
+                i.close()
+            }
+        )
+    }
     clearFuncList(){
         this.setFuncList([]);
+    }
+    _dragElement(control) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        control.onmousedown = dragMouseDown;
+        let self = this
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // 获取鼠标光标的初始位置
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            self.onControlClick?.()
+            document.addEventListener('mouseup',closeDragElement)
+            // 当鼠标光标移动时调用元素位置调整函数
+            document.addEventListener('mousemove',elementDrag)
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // 计算鼠标的新位置
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            self.onControlMove?.()
+            // 设置元素的新位置
+            self.box.style.top = ( self.box.offsetTop - pos2) + "px";
+            self.box.style.left = ( self.box.offsetLeft - pos1) + "px";
+        }
+        function closeDragElement() {
+            self.freezePos(true)
+            // 停止移动时，移除鼠标事件监听
+            document.removeEventListener('mouseup',closeDragElement)
+            document.removeEventListener('mousemove',elementDrag)
+        }
     }
 }
 
@@ -420,3 +486,5 @@ function extraElement(config) {
         return createDom()
     }
 }
+
+

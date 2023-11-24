@@ -59,16 +59,18 @@ let funcList =
         name:'',
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
         event:'click',
-        func(self,pen,dom){
+        func(self,pen,dom,father){
           toolBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
+          father.close()
         }
       },
       {
         name:'',
         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
         event:'click',
-        func(self,pen,dom){
+        func(self,pen,dom,father){
           toolBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
+          father.close()
         }
       },
       {
@@ -82,13 +84,16 @@ let funcList =
             '    </g>\n' +
             '</svg>',
         event:'click',
-        func(self,pen,dom){
+        func(self,pen,dom,father){
           toolBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
+          father.close()
         }
       }
     ],
     img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=',
 
+  }, {
+    key:'divider',
   },
   {
     key:'relayout',
@@ -151,6 +156,8 @@ let funcList =
         toolBoxPlugin.update(pen,false);
       }
     }
+  },{
+    key:'divider'
   },
   {
     key:'nodeStyle',
@@ -160,7 +167,7 @@ let funcList =
     width:4,
     colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a','#fa7878'],
-    openChildDomEvent:'mouseenter',
+    openChildDomEvent:'mouseover',
     /**
      * @description 初始化函数
      * @param self 配置项本身
@@ -210,27 +217,27 @@ let funcList =
     },
     setChildrenDom(self, pen) {
       let dom = createDom('div',{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position:'absolute',
-        top:'50px',
-        backgroundColor:'#fff',
-        borderRadius:'5px',
-        padding:'16px',
-        width: '140px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+        style:{display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          position:'absolute',
+          top:'40px',
+          backgroundColor:'#fff',
+          borderRadius:'5px',
+          padding:'16px',
+          width: '140px',
+          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'}
       });
       dom.attachShadow({mode:'open'})
-      let gap = createDom('div',{
+      let gap = createDom('div',{style:{
         width:'100%',
         height:'20px',
         backgroundColor:'red',
         position:'absolute',
         top:'-10px',
         opacity:0
-      })
+      }})
       dom.shadowRoot.appendChild(gap)
       /**
        * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
@@ -513,19 +520,19 @@ let funcList =
       return true
     },
     setChildrenDom(self, pen){
-      let dom = createDom('div',{
+      let dom = createDom('div',{style:{
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         position:'absolute',
-        top:'50px',
+        top:'40px',
         backgroundColor:'#fff',
         borderRadius:'5px',
         padding:'16px',
         width: '140px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-      });
+      }});
       dom.attachShadow({mode:'open'})
       let str = template(self,{
         template:`
@@ -714,14 +721,14 @@ let funcList =
     </style> 
         `
       })
-      let gap = createDom('div',{
+      let gap = createDom('div',{style:{
         width:'100%',
         height:'20px',
         backgroundColor:'red',
         position:'absolute',
         top:'-10px',
         opacity:0
-      })
+      }})
       dom.shadowRoot.innerHTML = str
       dom.shadowRoot.appendChild(gap)
       return dom ;
@@ -730,10 +737,12 @@ let funcList =
     func(self,pen,dom){
       self.open = true
     }
+  },{
+    key:'divider'
   },
   {
     key:'layoutDirection',
-    name:'布局方式',
+    name:'基本设置',
     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
     direction:'right',
     childrenGap:20,
@@ -795,20 +804,20 @@ let funcList =
     status:'已开启',
     // 设置下拉列表的样式和子元素布局
     setChildrenDom(self,pen){
-      let dom = createDom('div',{
+      let dom = createDom('div',{style:{
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         position:'absolute',
-        top:'50px',
+        top:'40px',
         backgroundColor:'#fff',
         borderRadius:'5px',
         padding:'16px',
         zIndex: 999,
         width: '170px',
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-      },'',undefined,'root');
+      },event:'',func: undefined,className:'root'});
 
       let str = template(self,{
         template:`
@@ -1184,20 +1193,22 @@ let funcList =
       name:'',
       icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
       event:'click',
-      func(self,pen,dom){
+      func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
         toolBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
+        father.close()
       }
     },
     {
       name:'',
       icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
       event:'click',
-      func(self,pen,dom){
+      func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
         toolBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
+        father.close()
       }
     },
     {
@@ -1211,10 +1222,11 @@ let funcList =
           '    </g>\n' +
           '</svg>',
       event:'click',
-      func(self,pen,dom){
+      func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
         toolBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
+        father.close()
       }
     }
   ],
@@ -1253,7 +1265,7 @@ export var defaultFuncs = {
 }
 export let defaultFuncList = {
   'root':funcList.filter(i=>i.key!== 'addSiblingNode'),
-  'leaf':defaultFuncs.getFunc('id','addChildNode','addSiblingNode','relayout','relayoutNext','nodeStyle','lineStyle',)
+  'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','divider','relayout','relayoutNext','divider','nodeStyle','lineStyle',)
 };
 
 export let childrenGap = 20;
@@ -1268,10 +1280,54 @@ export let defaultFuncConfig = {
   setDom:undefined
 }
 
+export let toolboxStyle = {
+  backgroundColor: '#fff',
+  borderRadius: '5px',
+  boxShadow:'0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+  transform: 'translateX(-50%)',
+  left:'-9999px',
+  top:'-9999px',
+  position:'absolute',
+  outline:'none',
+  userSelect:'none',
+  visibility: 'visibility',
+  zIndex:999,
+  display:'flex',
+  flexDirection:'row',
+}
+export let funcListStyle = {
+  boxSizing: 'content-box',
+  width:'max-content',
+  height: '30px',
+  padding:'6px',
+  display: 'flex',
+  alignItems:'center',
+}
+export let controlStyle = {
+  width:'30px',
+  opacity:'0.5',
+  display:'flex',
+  cursor: 'pointer',
+  alignItems:'center',
+  justifyContent:'center',
+  height:'inherit',
+  backgroundColor:"#5b5a5a",
+  borderRadius:'5px 0 0 5px'
+}
+export let dividerStyle = {
+  width:'1px',
+  height:'60%',
+  borderRadius:'5px',
+  margin:'0 4px',
+  backgroundColor:'rgba(18,17,42,.1)',
+}
+
 export default {
   childrenGap,
   levelGap,
   funcList,
   colorList,
+  dividerStyle,
   defaultFuncList
 }
+

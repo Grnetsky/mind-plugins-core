@@ -94,37 +94,3 @@ export function isObjectLiteral(value) {
 }
 
 
-export function dragElement(element,control) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    control.onmousedown = dragMouseDown;
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // 获取鼠标光标的初始位置
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.addEventListener('mouseup',closeDragElement)
-        // 当鼠标光标移动时调用元素位置调整函数
-        document.addEventListener('mousemove',elementDrag)
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // 计算鼠标的新位置
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        // 设置元素的新位置
-        element.style.top = (element.offsetTop - pos2) + "px";
-        element.style.left = (element.offsetLeft - pos1) + "px";
-    }
-
-    function closeDragElement() {
-        // 停止移动时，移除鼠标事件监听
-        document.removeEventListener('mouseup',closeDragElement)
-        document.removeEventListener('mousemove',elementDrag)
-    }
-}
-

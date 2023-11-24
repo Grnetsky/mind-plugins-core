@@ -1,4 +1,4 @@
-import { setLifeCycleFunc,pluginsMessageChannels } from "mind-diagram";
+import {setLifeCycleFunc, messageChannel, MindManager} from "mind-diagram";
 import {disconnectLine,connectLine,deepClone} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
@@ -47,7 +47,7 @@ export let toolBoxPlugin = {
         //     throw new Error(`[toolBoxPlugin calcChildrenPos] error : ${e.message}`)
         // }
     },
-    connectLine(pen,newPen,style = 'polyline'){
+    connectLine(pen,newPen,style = 'mind'){
         // let line = null;
         // switch (option.position){
         //     case 'right':
@@ -325,12 +325,17 @@ export let toolBoxPlugin = {
             pens.forEach(i=>{
                 if(i.mind && i.mind.type === 'node'){
                     let pen = meta2d.findOne(i.id)
+                    window.MindManager.messageChannel.publish('open',pen)
                     toolBoxPlugin.combineToolBox(pen)
                     toolBoxPlugin.combineLifeCircle(pen)
                     i.mind.isRoot?window.MindManager.rootIds.push(pen.id):''
+
                 }
 
             })
+        })
+        meta2d.on('scale',()=>{
+            if(toolbox.open)toolbox.translateWithPen()
         })
         // meta2d.on('resize',(pen)=>{
         //     if(pen.mind && pen.mind.rootId) toolBoxPlugin.record(meta2d.store.pens[pen.mind.rootId])
@@ -380,6 +385,7 @@ export let toolBoxPlugin = {
                 // 跟随移动
                 toolBoxPlugin.combineToolBox(pen);
                 toolBoxPlugin.combineLifeCircle(pen)
+                MindManager.messageChannel.publish('open',pen)
                 meta2d.render()
             }
         })
@@ -528,7 +534,7 @@ export let toolBoxPlugin = {
             if(!meta2d.store.data.locked){
                 toolbox.bindPen(targetPen);
                 toolbox.setFuncList(this.getFuncList(target));
-                toolbox.translatePosition(targetPen);
+                toolbox.translateWithPen(targetPen);
                 toolbox.show();
             }
         }
@@ -557,7 +563,7 @@ export let toolBoxPlugin = {
             if(!meta2d.store.data.locked){
                 toolbox.bindPen(targetPen);
                 toolbox.setFuncList(this.getFuncList(target));
-                toolbox.translatePosition(targetPen);
+                toolbox.translateWithPen(targetPen);
                 toolbox.show()
             }
         }
@@ -627,7 +633,7 @@ export let toolBoxPlugin = {
             toolBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
 
-        window.MindManager.pluginsMessageChannels.publish('addNode', {plugin:'toolBox',pen,newPen});
+        window.MindManager.messageChannel.publish('addNode', {plugin:'toolBox',pen,newPen});
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);
@@ -651,13 +657,13 @@ export let toolBoxPlugin = {
             setTimeout(()=>{
                 globalThis.toolbox.bindPen(newPen);
                 globalThis.toolbox.setFuncList(this.getFuncList(newPen));
-                globalThis.toolbox.translatePosition(newPen);
+                globalThis.toolbox.translateWithPen(newPen);
             },toolBoxPlugin.animateDuration +100)
 
         }else {
             globalThis.toolbox.bindPen(newPen);
             globalThis.toolbox.setFuncList(this.getFuncList(newPen));
-            globalThis.toolbox.translatePosition(newPen);
+            globalThis.toolbox.translateWithPen(newPen);
         }
 
         // toolBoxPlugin.update(rootNode)
@@ -670,7 +676,7 @@ export let toolBoxPlugin = {
         if(!pen)return;
         toolBoxPlugin.record(pen)
         toolBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
-        pluginsMessageChannels.publish('update',{form:'toolBox'})
+        messageChannel.publish('update',{form:'toolBox'})
     },50),
 
     // root 为根节点id
@@ -714,7 +720,7 @@ export let toolBoxPlugin = {
         }else{
             meta2d.render();
         }
-        pluginsMessageChannels.publish('render')
+        messageChannel.publish('render')
     },
 
     /**

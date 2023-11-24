@@ -1,33 +1,48 @@
-import {createDom} from "../utils";
+import {createDom, deepMerge, dragElement, isObjectLiteral} from "../utils";
+import d, {controlStyle, funcListStyle, toolboxStyle} from "../config/default"
+const DIVIDER = 'divider'
+const CONTROL = 'control'
 
+function configValid(config) {
+    if(config.key)return true
+    return false
+}
 export class ToolBox {
     static instance = null
-    constructor(parentHtml,style = {}, dom = null) {
+    open = false
+    distance = 80
+    showControl = true
+    parentHtml = null
+    constructor(parentHtml,config = {},style = {},) {
         // 单例模式
         if(!ToolBox.instance){
             ToolBox.instance = this
         }else{
             return ToolBox.instance
         }
-        this.box = document.createElement('div');
-        this.box.style.boxSizing = "content-box";
-        this.box.style.backgroundColor = '#fff';
-        this.box.style.borderRadius = '5px';
-        this.box.style.boxShadow = '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)';
-        this.box.style.width = 'max-content';
-        this.box.style.height = '40px';
-        this.box.style.padding = '6px';
-        this.box.className = 'toolBox';
-        this.box.style.zIndex = '999';
-        this.box.style.display = 'flex';
-        this.box.style.visibility = 'hidden'
-        this.box.style.justifyContent = 'center';
-        this.box.style.alignItems = 'center';
-        // this.box.style.transition = 'all 1s ease';
-        this.box.style.position = 'relative';
-        this.box.style.transform = 'translateX(-50%)';
+        this.parentHtml = parentHtml
+        this._loadConfig(config)
+        this._init(style)
+        this.parentHtml.appendChild(this.box);
+    }
+    _loadConfig(config){
+        if(!isObjectLiteral(config))return
+        for (const conf in config) {
+            if(this[conf]){
+                this[conf] = config[conf]
+            }
+        }
+    }
+    _init(style){
+        this.box = createDom('div',{style:toolboxStyle,className: 'toolBox'})
+        this.box.id = 'toolbox'
+        this._setControl()
+        let funcContainer = createDom('div',{style: funcListStyle,className: 'toolbox_func'})
+        this.box.appendChild(funcContainer)
+        this._funcDom = funcContainer
         this.setStyle(style);
         let stylesheet = document.styleSheets[0]; // 选择第一个样式表
+        // toolbox_item是否交给用户设置
         stylesheet.insertRule(".toolbox_item {" +
             "display: flex;" +
             "justify-content: center;" +
@@ -36,7 +51,8 @@ export class ToolBox {
             "margin: 0 1px;" +
             "cursor: pointer;" +
             "border-radius: 5px;" +
-            "padding: 0 5px;" +
+            "margin: 0 5px;" +
+            "padding: 0 3px;" +
             "}", 0);
         stylesheet.insertRule(".toolbox_item:hover {" +
             "background-color: #eee;" +
@@ -44,8 +60,35 @@ export class ToolBox {
         stylesheet.insertRule(".toolbox_slider_item:hover {" +
             "background-color: #eee;" +
             "}", 0);
-
-        parentHtml.appendChild(this.box);
+    }
+    _setControl(){
+        if(this.showControl){
+            let control = createDom('div',{style:controlStyle,className: "toolbox_control"})
+            let icon =  `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
+    <title>上级节点备份</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="未固定" transform="translate(-266.000000, -148.000000)" fill="#BCBCC4">
+            <g id="编组-2" transform="translate(253.000000, 135.000000)">
+                <g id="上级节点备份" transform="translate(13.000000, 13.000000)">
+                    <circle id="椭圆形" cx="1" cy="1" r="1"/>
+                    <circle id="椭圆形备份-11" cx="5" cy="1" r="1"/>
+                    <circle id="椭圆形备份-5" cx="1" cy="5" r="1"/>
+                    <circle id="椭圆形备份-8" cx="5" cy="5" r="1"/>
+                    <circle id="椭圆形备份-6" cx="1" cy="9" r="1"/>
+                    <circle id="椭圆形备份-9" cx="5" cy="9" r="1"/>
+                    <circle id="椭圆形备份-7" cx="1" cy="13" r="1"/>
+                    <circle id="椭圆形备份-10" cx="5" cy="13" r="1"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>`
+            control.innerHTML = icon
+            control.id = 'toolbox_control'
+            this.box.appendChild(control)
+            // let flat = false
+            dragElement(this.box,control)
+        }
     }
     setStyle(style){
         Object.keys(style).forEach(i=>{
@@ -59,12 +102,14 @@ export class ToolBox {
     }
     hide(){
         this.box.style.visibility = 'hidden';
+        this.open = false
     }
     bindPen(pen){
         this.pen = pen;
     }
     show(){
         this.box.style.visibility = 'visible';
+        this.open = true
     }
     destroy(){
         this.box.parentNode.removeChild(this.box)
@@ -75,30 +120,42 @@ export class ToolBox {
     freezePos(freeze){
         this._freezePos = freeze
     }
-    translatePosition(pen){
-        if(!this.animate)this.hide();
-        if(this._freezePos)return
+    translateWithPen(pen){
+        if(!pen)pen = this.pen;
         const store = pen.calculative.canvas.store;
         const worldRect = pen.calculative.worldRect;
-        this.box.style.position = 'absolute';
-        this.box.style.outline = 'none';
-        this.box.style.left = worldRect.x + store.data.x + worldRect.width /2 + 'px';
-        this.box.style.top = worldRect.y + store.data.y + -80 + 'px';
-        this.box.style.userSelect = 'none';
+        let pos =  {
+            x:worldRect.x + store.data.x + worldRect.width /2 + 'px',
+            y:worldRect.y + store.data.y + -this.distance + 'px'
+        }
+        this.translatePosition(pos)
+    }
+    translatePosition(pos){
+        if(this._freezePos)return
+        if(!this.animate)this.hide();
+        this.box.style.left = pos.x
+        this.box.style.top =  pos.y
         if(!this.animate)this.show();
     }
+
     renderFuncList(){
         const fragmentChild = new DocumentFragment();
-        this.box.innerHTML = '';
+        this._funcDom.innerHTML = '';
         this.funcList.forEach(i=>{
+            // 预处理
             preprocess(i,this.pen)
-            if(i.name){
+            const extraEle = extraElement(i)
+            if(extraEle){
+                fragmentChild.appendChild(extraEle)
+                return
+            }
+            if(configValid(i)){
                 let itemsSpan =this.setChildDom(this.pen,i);
                 itemsSpan.className = 'toolbox_item';
                 fragmentChild.appendChild(itemsSpan);
             }
         });
-        this.box.appendChild(fragmentChild);
+        this._funcDom.appendChild(fragmentChild);
     }
     /**
      * @description 创造子节点  设置样式 配置事件函数等；
@@ -123,7 +180,7 @@ export class ToolBox {
             item.init?.(item,pen,dom)
 
             // 初始化titleDOM
-            let title = createDom('div',{},undefined,undefined,'toolbox_title')
+            let title = createDom('div',{className:'toolbox_title'})
             // 执行titleDom
             title = renderTitle(item,pen,title);
 
@@ -253,26 +310,26 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 keepOpen?(item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
             }
         }else{
-            containerDom = createDom('div',{
+            containerDom = createDom('div',{style:{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 position:'absolute',
-                top:'50px',
+                top:'40px',
                 backgroundColor:'#fff',
                 borderRadius:'5px',
                 padding:'3px',
                 width:'max-content',
                 boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-            });
-            let gap = createDom('div',{
+            }});
+            let gap = createDom('div',{style:{
                 position:'absolute',
                 height:'10px',
                 bottom:'-10px',
                 backgroundColor:'#eee',
                 width: '100%',
                 opacity:0
-            },'','','toolbox_gap')
+            },className:'toolbox_gap'})
             dom.shadowRoot?dom.shadowRoot.appendChild(gap):dom.appendChild(gap)
             keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
 
@@ -280,12 +337,12 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
         let fragment = new DocumentFragment();
         for(let i of item.children || []){
             let node = createDom('div',
-                {
+                {style:{
                     margin: '5px 8px'
-                },i.event,function(e){
+                },event:i.event,func:function(e){
                     i.stopPropagation?e.stopPropagation():'';
                     i.func(i, this, dom, item,e);
-                }.bind(pen),'toolbox_item');
+                }.bind(pen),className:'toolbox_item'});
 
             //TODO 执行时机是否正确？？？
             i.init?.(i,pen,node)
@@ -332,6 +389,8 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 
 // 配置项预处理
 function preprocess(item,pen) {
+    // 分隔符则返回
+    if(item.key === DIVIDER)return
     if(item.openEventOnTitle == null){
         item.openEventOnTitle = true
     }
@@ -348,4 +407,16 @@ function preprocess(item,pen) {
         }
     }
 
+}
+
+function extraElement(config) {
+    if(config.key === DIVIDER){
+        // 设置分隔符
+        let style = deepMerge(d.dividerStyle,config.style)
+        return createDom('span',{style:style})
+    }
+    if(config.key === CONTROL){
+        let style = deepMerge(d.controlStyle,config.style)
+        return createDom()
+    }
 }

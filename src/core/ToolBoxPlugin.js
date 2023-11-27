@@ -386,6 +386,7 @@ export let toolBoxPlugin = {
                 toolBoxPlugin.combineToolBox(pen);
                 toolBoxPlugin.combineLifeCircle(pen)
                 MindManager.messageChannel.publish('open',pen)
+                toolBoxPlugin.record(pen.id)
                 meta2d.render()
             }
         })

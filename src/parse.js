@@ -18,7 +18,6 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
 
     scripts.$update = ()=>{
         if(!root)root = res
-        console.log(234)
         // 直接进行dom替换 有问题  事件不生效
         root.innerHTML = Component(config,{template,style,scripts:MindManager._env[namespace]},output,root).innerHTML
     }

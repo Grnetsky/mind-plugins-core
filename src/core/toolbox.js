@@ -108,10 +108,7 @@ export class ToolBox {
                             </div>
                             </div>
                            `,
-            style:`
-                svg:hover{
-                }
-            `,scripts:{
+              scripts:{
                 rivetVisible: 'none',
                 toggleFreeze(v){
                     if(!v){
@@ -150,14 +147,17 @@ export class ToolBox {
         return dom
     }
     hide(){
-        this.box.style.visibility = 'hidden';
+        // this.box.style.visibility = 'hidden';
+        this.box.style.display = 'none'
         this.open = false
     }
     bindPen(pen){
         this.pen = pen;
     }
     show(){
-        this.box.style.visibility = 'visible';
+        // this.box.style.visibility = 'visible';
+        this.box.style.display = 'flex'
+
         this.open = true
     }
     destroy(){

@@ -1,6 +1,6 @@
 import { createDom } from "../utils";
 import {toolBoxPlugin} from "../core";
-import {template} from "../parse";
+import { Component } from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
@@ -245,7 +245,7 @@ let funcList =
        * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
        * @return string dom字符串
        * */
-     let str = template(self,{
+     let str = Component(self,{
        template:`
           <div class="container">
               <div class="item">
@@ -257,7 +257,7 @@ let funcList =
                   <div class="item">
                 <div class="title">边框样式</div>
                 <div class="main_style ">
-                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" @click="setOutLineStyle(true)">
+                  <div class="style_item {{lineactive}}" data-style="直线" @click="setOutLineStyle(true)">
                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -266,7 +266,7 @@ let funcList =
                         </g>
                     </svg>
                   </div>
-                  <div class="style_item ${self.dash !== '0,0'?'style_active':''}" data-style="虚线" @click="setOutLineStyle(false)">
+                  <div class="style_item {{dashActive}}" data-style="虚线" @click="setOutLineStyle(false)">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -312,6 +312,8 @@ let funcList =
          mounted(){ // 生命周期函数
          },
          value:10,
+         lineactive:'style_active',
+         dashActive: '',
          setOutLineStyle(style){
            let res = style?[0,0]:[5,5]
            meta2d.setValue({
@@ -320,9 +322,16 @@ let funcList =
            },{render:true})
            // toolbox.renderFuncList()
            self.dash = res.join(',')
+           if(self.dash === '0,0'){
+             this.lineactive = 'style_active'
+             this.dashActive = ''
+           }else {
+             this.lineactive = ''
+             this.dashActive = 'style_active'
+           }
            self.update('title')
-           self.update('child',true)
-           self.close()
+           this.$update()
+           // self.close()
          },
           sliderChange: (value)=>{
             self.width = value
@@ -534,7 +543,7 @@ let funcList =
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       }});
       dom.attachShadow({mode:'open'})
-      let str = template(self,{
+      let str = Component(self,{
         template:`
           <div class="container">
                 <div class="item">
@@ -720,7 +729,7 @@ let funcList =
         }
     </style> 
         `
-      })
+      },'string')
       let gap = createDom('div',{style:{
         width:'100%',
         height:'20px',
@@ -819,7 +828,7 @@ let funcList =
         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
       },event:'',func: undefined,className:'root'});
 
-      let str = template(self,{
+      let str = Component(self,{
         template:`
           <div class="container">
               <div class="item">
@@ -1139,10 +1148,10 @@ let funcList =
         }
     </style> 
         `
-      })
+      },'dom')
 
 
-      dom.innerHTML = str
+      dom.appendChild(str)
       // dom.addEventListener('click',(e)=>{
       //   dom.childNodes.forEach((i)=>{
       //     if(i.tagName !== 'style' && i.nodeType == 1){
@@ -1304,14 +1313,16 @@ export let funcListStyle = {
   alignItems:'center',
 }
 export let controlStyle = {
-  width:'30px',
+  minWidth:'30px',
   opacity:'0.5',
   display:'flex',
   cursor: 'pointer',
   alignItems:'center',
   justifyContent:'center',
+  zIndex:999,
   height:'inherit',
-  backgroundColor:"#5b5a5a",
+  backgroundColor:"#efefef",
+  flexDirection:'column',
   borderRadius:'5px 0 0 5px'
 }
 export let dividerStyle = {

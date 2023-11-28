@@ -1,11 +1,9 @@
 
 // 模板解析，注册函数并返回返回dom对象
 // TODO 此处只能处理返回字符串的信息
-
-
 const EVENTTAG = ['@','on']
 
-import {createDom, replaceAfterPosition} from "./utils";
+import {createDom, removeDuplicates, replaceAfterPosition} from "./utils";
 
 let LifeCycle = ['mounted']
 /**
@@ -15,27 +13,40 @@ let LifeCycle = ['mounted']
  * @return string dom字符串
  * */
 
-export function template(config,{template,scripts,style},output = 'string'){
+export function Component(config,{template,scripts,style},output = 'dom',root = null){
+    let res = createDom('div')
+
+    scripts.$update = ()=>{
+        if(!root)root = res
+        console.log(234)
+        // 直接进行dom替换 有问题  事件不生效
+        root.innerHTML = Component(config,{template,style,scripts:MindManager._env[namespace]},output,root).innerHTML
+    }
+
     if(!scripts)scripts = {}
     if(!style)style = ''
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
     MindManager._env[namespace]? '' : MindManager._env[namespace] = {};
-    let {dom, funcObjs} = parse(template)
-
+    let {dom, funcObjs,varObj} = parse(template)
     let keys = Object.keys(scripts)
 
     // 暂不考虑 传其他参数情况
-    keys.forEach(i=>{
-        // 将script的函数传递到全局环境
-        MindManager._env[namespace][i] = scripts[i]
-
-        // 执行生命周期函数 放入微队列依次执行
-        LifeCycle.includes(i)? Promise.resolve().then(()=>{scripts[i]()}):'';
+    // keys.forEach(i=>{
+    //     // 将script的函数传递到全局环境
+    //     MindManager._env[namespace][i] = scripts[i]
+    //
+    //     // 执行生命周期函数 放入微队列依次执行
+    //
+    // })
+    MindManager._env[namespace] = scripts
+    LifeCycle.forEach(i=>{
+        Object.keys(scripts).includes(i)?scripts[i]():''
     })
     funcObjs.forEach(i=>{
         // 出现的函数在script中定义了 则转换
         if(keys.indexOf(i.name) !== -1){
+            // 处理函数传参的变量
             i.params.forEach(((j)=>{
                 //TODO 应该还要过滤一遍字面量  此处仅仅处理了变量
                 if(!j.param.startsWith('this') && j.param!=='event' && !isLiteral(j.param)){
@@ -44,7 +55,17 @@ export function template(config,{template,scripts,style},output = 'string'){
                     dom = replaceAfterPosition(dom,j.index,j.param,`MindManager._env.${namespace}.${j.param}`)
                 }
             }));
+            // 处理函数名
             dom = dom.replaceAll(i.name+"(",`MindManager._env.${namespace}.${i.name}(`)
+        }
+    })
+
+    varObj.forEach(i=>{
+        //TODO 暂时不支持表达式
+        if(keys.indexOf(i.name) !== -1){
+            let regex = new RegExp(`\\{\\{\\s*${i.name}\\s*\\}\\}`)
+            // 处理变量
+            dom = replaceAfterPosition(dom,i.index,regex,MindManager._env[namespace][i.name])
         }
     })
 
@@ -56,8 +77,8 @@ export function template(config,{template,scripts,style},output = 'string'){
     if(output === 'string'){
         return  dom + sty
     }else if(output === 'dom'){
-        let res = createDom('div')
         res.innerHTML = dom + sty
+        res.expose = scripts
         return res
     }
 }
@@ -66,16 +87,20 @@ export function template(config,{template,scripts,style},output = 'string'){
 function parse(html){
     // 函数匹配式
     let funcReg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
-    // let varReg = new RegExp()
+    let varReg = /\{\{\s*(?<variable>\w+)\s*\}\}/g
     // 变量匹配
 
-    //(@|on)(?<event>w+)\s*=s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)s*(s*(?<param>[w.]*)s*)["']
-    //(@|on)(?<event>\w+)\s*=\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\s*\(\s*(?<param>[\w\.]*)\s*\)["']// 替换空格 替换@符号
     let reHtml = html.replaceAll('\n','').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');
 
 // 使用 matchAll 来匹配所有结果
     let funcMatchs = reHtml.matchAll(funcReg);
-    // let varMatchs = reHtml.matchAll(varReg);
+    let varMaths = reHtml.matchAll(varReg);
+    let varResult = []
+    for(let match of varMaths){
+        let { variable } = match.groups;
+        let strIndex = match.index
+        varResult.push({name:variable,index:strIndex})
+    }
 
 // 请注意，没有传递 'g' 标志给 matchAll，因为 reg 已经带有 'g' 标志
 
@@ -85,7 +110,7 @@ function parse(html){
 
         // 获取参数的具体位置
 
-        let params = param.replace(/\s/g, '').split(',');
+        let params = param.replaceAll(/\s/g, '').split(',');
         let lastIndex = 0
         params = params.map(i=>{
             let strIndex = match[0].indexOf(i,lastIndex);
@@ -102,15 +127,9 @@ function parse(html){
     }
 
 // 去重逻辑
-    const uniqueResults = [];
-    const uniqueNames = new Set();
-    for (const res of result) {
-        if (!uniqueNames.has(res.name)) {
-            uniqueNames.add(res.name);
-            uniqueResults.push(res);
-        }
-    }
-    return {dom:reHtml,funcObjs:uniqueResults}
+    let funcObjs = removeDuplicates(result)
+    // let varObj = removeDuplicates(varResult)
+    return {dom:reHtml,funcObjs,varObj:varResult}
 }
 
 

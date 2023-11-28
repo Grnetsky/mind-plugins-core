@@ -1,6 +1,6 @@
 import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
 import d, {controlStyle, funcListStyle, toolboxStyle} from "../config/default"
-import {template} from "../parse";
+import { Component } from "../parse";
 const DIVIDER = 'divider'
 const CONTROL = 'control'
 
@@ -61,13 +61,19 @@ export class ToolBox {
         stylesheet.insertRule(".toolbox_slider_item:hover {" +
             "background-color: #eee;" +
             "}", 0);
+        stylesheet.insertRule(`.toolbox_control_move {
+            outline: solid 2px #8585ff !important;
+        }`)
     }
     _setControl(){
         if(this.showControl){
             let self = this
             let control = createDom('div',{style:controlStyle,className: "toolbox_control"})
-            let icon =  template({key:'toolbox'},{
-                template:`<svg @click="toggleFreeze()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
+
+            let icon =  Component({key:'toolbox'},{
+                template:`
+<div style="display: flex;flex-direction: row"">
+<div style="display: flex;justify-content: center;align-items: center"><svg style="margin: 0 10px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
                                 <title>上级节点备份</title>
                                 <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                                     <g id="未固定" transform="translate(-266.000000, -148.000000)" fill="#BCBCC4">
@@ -85,20 +91,52 @@ export class ToolBox {
                                         </g>
                                     </g>
                                 </g>
-                            </svg>`,
+                            </svg></div>
+                           <div id="rivet" style="display: {{rivetVisible}};margin: 0 10px 0 0;justify-content: center;align-items: center" onclick="toggleFreeze(false)">
+                               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="8px" height="16px" viewBox="0 0 8 16" version="1.1">
+                                    <title>钉子</title>
+                                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                        <g id="固定" transform="translate(-212.000000, -37.000000)" fill="#4D4DFF" fill-rule="nonzero">
+                                            <g id="编组-2备份" transform="translate(182.000000, 24.000000)">
+                                                <g id="固定,图钉" transform="translate(30.000000, 13.000000)">
+                                                    <path d="M7.87291263,9.16048419 C7.77010858,9.29012105 7.61515755,9.36196798 7.45573678,9.36196798 L7.45126705,9.36196798 L4.82901885,9.3432253 L4.00658646,15.9500195 L4.0006268,16 L3.99466715,15.9500195 L3.17223476,9.3432253 L0.54998656,9.36196798 L0.545516831,9.36196798 C0.384606145,9.36196798 0.229655117,9.29012105 0.128340979,9.16048419 C0.0255369263,9.02928544 -0.00277143338,8.87465834 0.000208395526,8.73408825 C0.00616805333,8.52948067 0.0851334745,8.33424444 0.214755972,8.18117923 L1.13701259,7.0894182 C1.36645931,6.81764936 1.50651119,6.47559548 1.53332964,6.11323702 L1.83578213,2.20070284 C1.84472162,2.07887544 1.80300403,1.95704802 1.71956885,1.87114408 L1.14446216,1.26825459 C0.850949145,1.00741898 0.818171042,0.743459594 0.879257504,0.524795 C0.967162412,0.210855125 1.24726619,0 1.55865817,0 L1.56163799,0 L3.99466715,0.00780945312 L4.00658646,0.00780945312 L6.43961561,0 L6.44259544,0 C6.75398741,0 7.03409119,0.210855141 7.1219961,0.524795 C7.18308257,0.743459578 7.15030446,1.00741897 6.85679145,1.26825459 L6.28019484,1.87114408 C6.19675968,1.95860991 6.15504209,2.07887544 6.16398156,2.20070284 L6.46643406,6.11323702 C6.49474242,6.47559547 6.6333044,6.81764936 6.86275111,7.0894182 L7.78500772,8.18117923 C7.91463022,8.33424444 7.99210572,8.52948067 7.9995553,8.73408825 C8.00402504,8.87465834 7.97571668,9.02928544 7.87291263,9.16048419 Z" id="路径"/>
+                                                </g>
+                                            </g>
+                                        </g>
+                                    </g>
+                                </svg>
+                            </div>
+                            </div>
+                           `,
             style:`
                 svg:hover{
                 }
             `,scripts:{
-                        toggleFreeze(){
-                            self.freezePos(!self._freezePos)
-                        }
-                }}
-            )
-            control.innerHTML = icon
+                rivetVisible: 'none',
+                toggleFreeze(v){
+                    if(!v){
+                        self.freezePos(false)
+                    }
+                    if(self._freezePos){
+                        this.rivetVisible = 'flex'
+                    }else {
+                        this.rivetVisible = 'none'
+                    }
+                    this.$update()
+                }
+                }
+                }
+            ,"dom")
+            control.addEventListener('mouseup',()=>{
+                icon.expose.rivetVisible = 'flex'
+            })
+            control.addEventListener('click',()=>{
+                icon.expose.$update()
+            })
+            control.appendChild(icon)
             control.id = 'toolbox_control'
             this.box.appendChild(control)
-            this._dragElement(control)
+            this._dragElement(control,icon)
         }
     }
     setStyle(style){
@@ -251,7 +289,13 @@ export class ToolBox {
     }
     // 移动控制按钮事件
     onControlMove(){
+        // 默认行为
+        this.box.classList.add('toolbox_control_move')
         this.closeAll()
+    }
+
+    onControlUp(){
+        this.box.classList.remove('toolbox_control_move')
     }
     closeAll(){
         toolbox.funcList.filter(i=>i.isOpen).forEach(
@@ -263,7 +307,7 @@ export class ToolBox {
     clearFuncList(){
         this.setFuncList([]);
     }
-    _dragElement(control) {
+    _dragElement(control,icon) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         control.onmousedown = dragMouseDown;
         let self = this
@@ -288,12 +332,13 @@ export class ToolBox {
             pos3 = e.clientX;
             pos4 = e.clientY;
             self.onControlMove?.()
+            self.freezePos(true)
             // 设置元素的新位置
             self.box.style.top = ( self.box.offsetTop - pos2) + "px";
             self.box.style.left = ( self.box.offsetLeft - pos1) + "px";
         }
         function closeDragElement() {
-            self.freezePos(true)
+            self.onControlUp?.()
             // 停止移动时，移除鼠标事件监听
             document.removeEventListener('mouseup',closeDragElement)
             document.removeEventListener('mousemove',elementDrag)

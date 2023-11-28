@@ -94,3 +94,14 @@ export function isObjectLiteral(value) {
 }
 
 
+export function removeDuplicates(list){
+    const uniqueResults = [];
+    const uniqueNames = new Set();
+    for (const res of list) {
+        if (!uniqueNames.has(res.name)) {
+            uniqueNames.add(res.name);
+            uniqueResults.push(res);
+        }
+    }
+    return uniqueResults
+}

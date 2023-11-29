@@ -3,7 +3,7 @@
 // TODO 此处只能处理返回字符串的信息
 const EVENTTAG = ['@','on']
 
-import {createDom, removeDuplicates, replaceAfterPosition} from "./utils";
+import {createDom, escapeRegExp, removeDuplicates, replaceAfterPosition, scopedEval} from "./utils";
 
 let LifeCycle = ['mounted']
 /**
@@ -15,7 +15,6 @@ let LifeCycle = ['mounted']
 
 export function Component(config,{template,scripts,style},output = 'dom',root = null){
     let res = createDom('div')
-
     scripts.$update = ()=>{
         if(!root)root = res
         // 直接进行dom替换 有问题  事件不生效
@@ -60,12 +59,11 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
     })
 
     varObj.forEach(i=>{
-        //TODO 暂时不支持表达式
-        if(keys.indexOf(i.name) !== -1){
-            let regex = new RegExp(`\\{\\{\\s*${i.name}\\s*\\}\\}`)
-            // 处理变量
-            dom = replaceAfterPosition(dom,i.index,regex,PluginManager._env[namespace][i.name])
-        }
+        // 支持简单的表达式
+        let res = scopedEval(window.PluginManager._env[namespace],i.name)
+        let regex = new RegExp(`\\{\\{\\s*${escapeRegExp(i.name)}\\s*\\}\\}`)
+        // 处理变量
+        dom = replaceAfterPosition(dom,i.index,regex,res)
     })
 
 
@@ -86,7 +84,7 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
 function parse(html){
     // 函数匹配式
     let funcReg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
-    let varReg = /\{\{\s*(?<variable>\w+)\s*\}\}/g
+    let varReg = /\{\{\s*(?<variable>.+?)\s*\}\}/g
     // 变量匹配
 
     let reHtml = html.replaceAll('\n','').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');

@@ -56,48 +56,50 @@ let funcList =
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    children:[
-      {
-        menu:{
-          name:'',
-          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+    popup:{
+      list:[
+        {
+          menu:{
+            text:'矩形',
+            icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+          },
+          event:'click',
+          func(self,pen,dom,father){
+            mindBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
+            father.close()
+          }
         },
-        event:'click',
-        func(self,pen,dom,father){
-          mindBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
-          father.close()
-        }
-      },
-      {
-       menu:{
-         name:'',
-         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
-       },
-        event:'click',
-        func(self,pen,dom,father){
-          mindBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
-          father.close()
-        }
-      },
-      {
-        menu:{
-          name:'',
-          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
-              '    <title>椭圆形备份 12</title>\n' +
-              '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-              '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
-              '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
-              '        </g>\n' +
-              '    </g>\n' +
-              '</svg>',
+        {
+          menu:{
+            text:'菱形',
+            icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+          },
+          event:'click',
+          func(self,pen,dom,father){
+            mindBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
+            father.close()
+          }
         },
-        event:'click',
-        func(self,pen,dom,father){
-          mindBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
-          father.close()
+        {
+          menu:{
+            text:'椭圆',
+            icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+                '    <title>椭圆形备份 12</title>\n' +
+                '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+                '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+                '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+                '        </g>\n' +
+                '    </g>\n' +
+                '</svg>',
+          },
+          event:'click',
+          func(self,pen,dom,father){
+            mindBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
+            father.close()
+          }
         }
-      }
-    ],
+      ],
+    }
   }, {
     key:'divider',
   },
@@ -228,38 +230,39 @@ let funcList =
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    setChildrenDom(self, pen) {
-      let dom = createDom('div',{
-        style:{display: 'flex',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-start',
-          position:'absolute',
-          top:'40px',
-          backgroundColor:'#fff',
-          borderRadius:'5px',
-          padding:'16px',
-          width: '140px',
-          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'}
-      });
-      dom.attachShadow({mode:'open'})
-      let gap = createDom('div',{style:{
-        width:'100%',
-        height:'20px',
-        backgroundColor:'red',
-        position:'absolute',
-        top:'-10px',
-        opacity:0
-      }})
-      dom.shadowRoot.appendChild(gap)
-      /**
-       * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
-       * @param self 此配置项自身
-       * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
-       * @return string dom字符串
-       * */
-     let str = Component(self,{
-       template:`
+    popup:{
+      dom(self, pen) {
+        let dom = createDom('div',{
+          style:{display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+            position:'absolute',
+            top:'40px',
+            backgroundColor:'#fff',
+            borderRadius:'5px',
+            padding:'16px',
+            width: '140px',
+            boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'}
+        });
+        dom.attachShadow({mode:'open'})
+        let gap = createDom('div',{style:{
+            width:'100%',
+            height:'20px',
+            backgroundColor:'red',
+            position:'absolute',
+            top:'-10px',
+            opacity:0
+          }})
+        dom.shadowRoot.appendChild(gap)
+        /**
+         * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
+         * @param self 此配置项自身
+         * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
+         * @return string dom字符串
+         * */
+        let str = Component(self,{
+          template:`
           <div class="container">
               <div class="item">
                 <div class="title">边框粗细</div>
@@ -320,70 +323,70 @@ let funcList =
                 </div>
               </div>
           </div>`,
-       scripts:{
-         // 能在这里面获取到dom
-         mounted(){ // 生命周期函数
-         },
-         value:10,
-         lineactive:'style_active',
-         dashActive: '',
-         setOutLineStyle(style){
-           let res = style?[0,0]:[5,5]
-           meta2d.setValue({
-             id:pen.id,
-             lineDash: res
-           },{render:true})
-           // toolbox.renderFuncList()
-           self.dash = res.join(',')
-           if(self.dash === '0,0'){
-             this.lineactive = 'style_active'
-             this.dashActive = ''
-           }else {
-             this.lineactive = ''
-             this.dashActive = 'style_active'
-           }
-           self.update('title')
-           this.$update()
-           // self.close()
-         },
-          sliderChange: (value)=>{
-            self.width = value
-            // toolbox.renderFuncList()
-            meta2d.setValue({
-              id:pen.id,
-              lineWidth: value
-            },{render:true})
-            self.update('title')
-            self.update('child',true)
-
-          },
-         setColor(e,value){
-            let color = ''
-            if(!value){
-              let t = e.target
-              let list = dom.shadowRoot.querySelector('.colorList')
-              if(t === list)return
-              color = t.dataset.color
-            }else {
-              color = value
-            }
-            if(color === self.color){
-              color = undefined
-            }else{
+          scripts:{
+            // 能在这里面获取到dom
+            mounted(){ // 生命周期函数
+            },
+            value:10,
+            lineactive:'style_active',
+            dashActive: '',
+            setOutLineStyle(style){
+              let res = style?[0,0]:[5,5]
               meta2d.setValue({
                 id:pen.id,
-                color
-              },{render:false})
+                lineDash: res
+              },{render:true})
+              // toolbox.renderFuncList()
+              self.dash = res.join(',')
+              if(self.dash === '0,0'){
+                this.lineactive = 'style_active'
+                this.dashActive = ''
+              }else {
+                this.lineactive = ''
+                this.dashActive = 'style_active'
+              }
+              self.update('title')
+              this.$update()
+              // self.close()
+            },
+            sliderChange: (value)=>{
+              self.width = value
+              // toolbox.renderFuncList()
+              meta2d.setValue({
+                id:pen.id,
+                lineWidth: value
+              },{render:true})
+              self.update('title')
+              self.update('popup',true)
+
+            },
+            setColor(e,value){
+              let color = ''
+              if(!value){
+                let t = e.target
+                let list = dom.shadowRoot.querySelector('.colorList')
+                if(t === list)return
+                color = t.dataset.color
+              }else {
+                color = value
+              }
+              if(color === self.color){
+                color = undefined
+              }else{
+                meta2d.setValue({
+                  id:pen.id,
+                  color
+                },{render:false})
+              }
+              pen.mind.color = color
+              mindBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
+              mindBoxPlugin.resetLinesColor(pen)
+              mindBoxPlugin.render()
+              self.color = color || pen.calculative.color;
+              self.updateAll()
             }
-           pen.mind.color = color
-           mindBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
-           mindBoxPlugin.resetLinesColor(pen)
-           mindBoxPlugin.render()
-           self.color = color || pen.calculative.color;
-           self.updateAll()
-         }
-        },
-       style:`<style>
+          },
+          style:`<style>
         .container {
             overflow: hidden;
         }
@@ -459,10 +462,12 @@ let funcList =
         }
     </style> 
         `
-     },'dom')
-      dom.shadowRoot.appendChild(str)
-      return dom
+        },'dom')
+        dom.shadowRoot.appendChild(str)
+        return dom
       },
+    },
+
     // children: [
     //   {
     //     name:'直线',
@@ -544,23 +549,24 @@ let funcList =
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    setChildrenDom(self, pen){
-      let dom = createDom('div',{style:{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position:'absolute',
-        top:'40px',
-        backgroundColor:'#fff',
-        borderRadius:'5px',
-        padding:'16px',
-        width: '140px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-      }});
-      dom.attachShadow({mode:'open'})
-      let str = Component(self,{
-        template:`
+    popup: {
+      dom(self, pen){
+        let dom = createDom('div',{style:{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+            position:'absolute',
+            top:'40px',
+            backgroundColor:'#fff',
+            borderRadius:'5px',
+            padding:'16px',
+            width: '140px',
+            boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+          }});
+        dom.attachShadow({mode:'open'})
+        let str = Component(self,{
+          template:`
           <div class="container">
                 <div class="item">
                 <div class="title">线条粗细</div>
@@ -617,59 +623,59 @@ let funcList =
                 </div>
               </div>
           </div>`,
-        scripts:{
-          sliderChange: (value)=>{
-            dom.shadowRoot.querySelector('#t').innerHTML = value
-            self.width = value
-            // toolbox.renderFuncList()
-            // pen.connectedLines?.forEach(i=>{
-            //   meta2d.setValue({
-            //     id:i.lineId,
-            //     lineWidth: value
-            //   })
-            // })
-            let root = meta2d.findOne(pen.mind.rootId)
-            root.mind.lineWidth = value
-            mindBoxPlugin.resetLinesStyle(root);
-            self.update('title')
-          },
-          setLineStyle(value){
-            let res = value?'mind':'polyline'
-            // toolbox.renderFuncList()
+          scripts:{
+            sliderChange: (value)=>{
+              dom.shadowRoot.querySelector('#t').innerHTML = value
+              self.width = value
+              // toolbox.renderFuncList()
+              // pen.connectedLines?.forEach(i=>{
+              //   meta2d.setValue({
+              //     id:i.lineId,
+              //     lineWidth: value
+              //   })
+              // })
+              let root = meta2d.findOne(pen.mind.rootId)
+              root.mind.lineWidth = value
+              mindBoxPlugin.resetLinesStyle(root);
+              self.update('title')
+            },
+            setLineStyle(value){
+              let res = value?'mind':'polyline'
+              // toolbox.renderFuncList()
 
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            root.mind.lineStyle = res
-            mindBoxPlugin.resetLinesStyle(root);
-            self.lineStyle = res
-            // mindBoxPlugin.update(root);
-            self.updateAll()
-          },
-          setColor(e,value){
-            let color = ''
-            if(!value){
-              let t = e.target
-              let list = dom.shadowRoot.querySelector('.colorList')
-              if(t === list)return
-              color = t.dataset.color
-            }else {
-              color = value
-            }
-            if(color === self.color){
-              color = undefined
-            }
+              let root = (window).meta2d.findOne(pen.mind.rootId);
+              root.mind.lineStyle = res
+              mindBoxPlugin.resetLinesStyle(root);
+              self.lineStyle = res
+              // mindBoxPlugin.update(root);
+              self.updateAll()
+            },
+            setColor(e,value){
+              let color = ''
+              if(!value){
+                let t = e.target
+                let list = dom.shadowRoot.querySelector('.colorList')
+                if(t === list)return
+                color = t.dataset.color
+              }else {
+                color = value
+              }
+              if(color === self.color){
+                color = undefined
+              }
 
-            pen.connectedLines?.forEach(i=>{
-              meta2d.setValue({
-                id:pen.id,
-                'mind.lineColor':color
-              },{render:true})
-            })
-            self.color = color
-            mindBoxPlugin.resetLinesColor(pen,true)
-            self.updateAll()
-          }
-        },
-        style:`<style>
+              pen.connectedLines?.forEach(i=>{
+                meta2d.setValue({
+                  id:pen.id,
+                  'mind.lineColor':color
+                },{render:true})
+              })
+              self.color = color
+              mindBoxPlugin.resetLinesColor(pen,true)
+              self.updateAll()
+            }
+          },
+          style:`<style>
         .container {
             overflow: hidden;
         }
@@ -745,18 +751,19 @@ let funcList =
         }
     </style> 
         `
-      },'string')
-      let gap = createDom('div',{style:{
-        width:'100%',
-        height:'20px',
-        backgroundColor:'red',
-        position:'absolute',
-        top:'-10px',
-        opacity:0
-      }})
-      dom.shadowRoot.innerHTML = str
-      dom.shadowRoot.appendChild(gap)
-      return dom ;
+        },'string')
+        let gap = createDom('div',{style:{
+            width:'100%',
+            height:'20px',
+            backgroundColor:'red',
+            position:'absolute',
+            top:'-10px',
+            opacity:0
+          }})
+        dom.shadowRoot.innerHTML = str
+        dom.shadowRoot.appendChild(gap)
+        return dom ;
+      },
     },
     event: 'mouseenter',
     func(self,pen,dom){
@@ -770,7 +777,6 @@ let funcList =
     menu:{
       name:'基本设置',
       icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
-
     },
     direction:'right',
     childrenGap:20,
@@ -831,24 +837,25 @@ let funcList =
     },
     status:'已开启',
     // 设置下拉列表的样式和子元素布局
-    setChildrenDom(self,pen){
-      let dom = createDom('div',{style:{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position:'absolute',
-        top:'40px',
-        backgroundColor:'#fff',
-        borderRadius:'5px',
-        padding:'16px',
-        zIndex: 999,
-        width: '170px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-      },event:'',func: undefined,className:'root'});
+    popup: {
+      dom(self,pen){
+        let dom = createDom('div',{style:{
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-start',
+            position:'absolute',
+            top:'40px',
+            backgroundColor:'#fff',
+            borderRadius:'5px',
+            padding:'16px',
+            zIndex: 999,
+            width: '170px',
+            boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+          },event:'',func: undefined,className:'root'});
 
-      let str = Component(self,{
-        template:`
+        let str = Component(self,{
+          template:`
           <div class="container">
               <div class="item">
                 <div class="title">布局方向</div>
@@ -1034,40 +1041,41 @@ let funcList =
                 </div>
               </div>
           </div>`,
-        scripts:{
-          // 能在这里面获取到dom
-          mounted(){ // 生命周期函数
-            // self.animate = mindBoxPlugin.animate
-          },
-          setAnimate(){
-            mindBoxPlugin.animate = !mindBoxPlugin.animate
-            self.animate = mindBoxPlugin.animate
-            self.animate?self.status = '已开启':
-              self.status = '已关闭'
-            self.updateAll()
-          },
-          setChildGap(value){
-            self.childrenGap = value;
-            mindBoxPlugin.childrenGap = value;
-            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
-          },
-          setLevelGap(value){
-            self.levelGap = value;
-            mindBoxPlugin.levelGap = value;
-            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
-          },
-          setDirection(e){
-            mindBoxPlugin.record(pen)
+          scripts:{
+            // 能在这里面获取到dom
+            mounted(){ // 生命周期函数
+              // self.animate = mindBoxPlugin.animate
+            },
+            status:'已开启',
+            setAnimate(){
+              mindBoxPlugin.animate = !mindBoxPlugin.animate
+              self.animate = mindBoxPlugin.animate
+              self.animate?self.status = '已开启':
+                  self.status = '已关闭'
+              self.updateAll()
+            },
+            setChildGap(value){
+              self.childrenGap = value;
+              mindBoxPlugin.childrenGap = value;
+              mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+            },
+            setLevelGap(value){
+              self.levelGap = value;
+              mindBoxPlugin.levelGap = value;
+              mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+            },
+            setDirection(e){
+              mindBoxPlugin.record(pen)
 
-            let root = (window).meta2d.findOne(pen.mind.rootId);
-            mindBoxPlugin.resetLayOut(root,e,true);
-            mindBoxPlugin.update(root);
-            self.direction = e
-            self.activeDirection(self,pen,dom)
-            self.close()
-          }
-        },
-        style:`<style>
+              let root = (window).meta2d.findOne(pen.mind.rootId);
+              mindBoxPlugin.resetLayOut(root,e,true);
+              mindBoxPlugin.update(root);
+              self.direction = e
+              self.activeDirection(self,pen,dom)
+              self.close()
+            }
+          },
+          style:`<style>
         .container {
             overflow: hidden;
         }
@@ -1167,20 +1175,22 @@ let funcList =
         }
     </style> 
         `
-      },'dom')
+        },'dom')
 
 
-      dom.appendChild(str)
-      // dom.addEventListener('click',(e)=>{
-      //   dom.childNodes.forEach((i)=>{
-      //     if(i.tagName !== 'style' && i.nodeType == 1){
-      //       i.classList.remove('active');
-      //     }
-      //   });
-      //   e.target.classList.add('active');
-      // });
-      return dom ;
-    },
+        dom.appendChild(str)
+        // dom.addEventListener('click',(e)=>{
+        //   dom.childNodes.forEach((i)=>{
+        //     if(i.tagName !== 'style' && i.nodeType == 1){
+        //       i.classList.remove('active');
+        //     }
+        //   });
+        //   e.target.classList.add('active');
+        // });
+        return dom ;
+      },
+
+    }
   },
 {
   key:'addSiblingNode',
@@ -1220,55 +1230,58 @@ let funcList =
     dom.style.transform = 'scaleY(1)'
     return true
   },
-  children:[
-    {
-      menu:{
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+  popup: {
+    list:[
+  {
+    menu:{
+      name:'',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
 
-      },
-      event:'click',
-      func(self,pen,dom,father){
-        let parent = (window).meta2d.findOne(pen.mind.preNodeId);
-        let index = parent.mind.children.indexOf(pen.id);
-        mindBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
-        father.close()
-      }
     },
-    {
-      menu:{
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
-      },
-      event:'click',
-      func(self,pen,dom,father){
-        let parent = (window).meta2d.findOne(pen.mind.preNodeId);
-        let index = parent.mind.children.indexOf(pen.id);
-        mindBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
-        father.close()
-      }
-    },
-    {
-      menu:{
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
-            '    <title>椭圆形备份 12</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
-            '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
-      },
-      event:'click',
-      func(self,pen,dom,father){
-        let parent = (window).meta2d.findOne(pen.mind.preNodeId);
-        let index = parent.mind.children.indexOf(pen.id);
-        mindBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
-        father.close()
-      }
+    event:'click',
+    func(self,pen,dom,father){
+      let parent = (window).meta2d.findOne(pen.mind.preNodeId);
+      let index = parent.mind.children.indexOf(pen.id);
+      mindBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
+      father.close()
     }
-  ],
+  },
+  {
+    menu:{
+      name:'',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+    },
+    event:'click',
+    func(self,pen,dom,father){
+      let parent = (window).meta2d.findOne(pen.mind.preNodeId);
+      let index = parent.mind.children.indexOf(pen.id);
+      mindBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
+      father.close()
+    }
+  },
+  {
+    menu:{
+      name:'',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+          '    <title>椭圆形备份 12</title>\n' +
+          '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+          '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+          '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+          '        </g>\n' +
+          '    </g>\n' +
+          '</svg>',
+    },
+    event:'click',
+    func(self,pen,dom,father){
+      let parent = (window).meta2d.findOne(pen.mind.preNodeId);
+      let index = parent.mind.children.indexOf(pen.id);
+      mindBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
+      father.close()
+    }
+  }
+],
+
+}
   },
  // {
  //   name:'button',

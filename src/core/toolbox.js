@@ -34,7 +34,7 @@ export class ToolBox {
         this.setStyle(config.style)
     }
     _init(style){
-        this.box = createDom('div',{style:toolboxStyle,className: 'toolBox'})
+        this.box = createDom('div',{style:{...toolboxStyle,left:'-9999px'},className: 'toolBox'})
         this.box.id = 'toolbox'
         this._setControl()
         let funcContainer = createDom('div',{style: funcListStyle,className: 'toolbox_func'})
@@ -223,7 +223,7 @@ export class ToolBox {
             if(target === 'title'){
                 renderTitle(item,pen,dom.titleDom)
                 return
-            }else if(target === 'child'){
+            }else if(target === 'popup'){
                 renderChildDom(item,pen,dom,dom.childrenDom,keepOpen)
                 return;
             }
@@ -239,7 +239,7 @@ export class ToolBox {
 
             item.dom = dom
             item.dom.titleDom = title;
-            if(item.children || item.setChildrenDom){
+            if(item.popup.list || item.popup.dom){
                 // 打开函数
                 let openFunc = ()=>{
                     // 关闭其他选项
@@ -275,7 +275,7 @@ export class ToolBox {
         }
         item.updateAll = (keepOpen = true)=>{
             item.update('title');
-            item.update('child',keepOpen)
+            item.update('popup',keepOpen)
         }
         item.update()
         return dom;
@@ -399,14 +399,14 @@ function renderTitle(item,pen,title) {
 
 function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(dom.childrenDom)dom.shadowRoot?dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom)
-    if(item.children && item.children.length > 0 || item.setChildrenDom){
+    if((item.popup.list && item.popup.list.length > 0) || item.popup.dom){
         // 是否重写dom
         if(
-            typeof item.setChildrenDom === 'function'
+            typeof item.popup.dom === 'function'
         ){
             // 重新childDom
 
-            let childDom = item.setChildrenDom(item,pen,dom);
+            let childDom = item.popup.dom(item,pen,dom);
 
             /**
              * @description 若返回的是字符串，则在外部包裹一层div作为其container
@@ -448,7 +448,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 
         }
         let fragment = new DocumentFragment();
-        for(let i of item.children || []){
+        for(let i of item.popup.list || []){
             let node = createDom('div',
                 {style:{
                     margin: '5px 8px'
@@ -485,7 +485,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 // 添加样式到元素
     }
 
-    if(item.children || item.setChildrenDom || item.closeOther){
+    if(item.popup.list || item.popup.dom || item.closeOther){
         // 关闭下拉菜单
         if(!item.closeOther){
             item.closeChildDomEvent?((item.closeEventOnChild?dom.childrenDom: dom)['on'+(item.closeChildDomEvent)] = (()=>{
@@ -507,7 +507,10 @@ function preprocess(item,pen) {
     if(item.openEventOnTitle == null){
         item.openEventOnTitle = true
     }
-    if(item.children || item.setChildrenDom){
+    if(!item.popup){
+        item.popup = {}
+    }
+    if(item.popup.list || item.popup.dom){
         item.isOpen = false
         item.closeOther = false
         item.close = ()=>{

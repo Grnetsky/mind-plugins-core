@@ -105,3 +105,19 @@ export function removeDuplicates(list){
     }
     return uniqueResults
 }
+
+export function scopedEval(scope, expr) {
+    const scopeKeys = Object.keys(scope);
+    const scopeValues = Object.values(scope);
+
+    // 函数的参数名称与作用域的键相匹配，函数体是表达式
+    const func = new Function(...scopeKeys, `return ${expr};`);
+
+    // 将作用域的值作为参数传递
+    return func(...scopeValues);
+}
+
+export function escapeRegExp(string) {
+    // RegExp.escape的提案用法，替换所有可能的特殊字符
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

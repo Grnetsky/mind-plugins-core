@@ -1,13 +1,13 @@
 import { createDom } from "../utils";
-import {toolBoxPlugin} from "../core";
+import {mindBoxPlugin} from "../core";
 import { Component } from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor() {
   let index = 0;
   while(true) {
-    yield toolBoxPlugin.colorList[index];
-    index = (index + 1) % toolBoxPlugin.colorList.length;
+    yield mindBoxPlugin.colorList[index];
+    index = (index + 1) % mindBoxPlugin.colorList.length;
   }
 }
 
@@ -22,8 +22,10 @@ let funcList =
           //   },
   {
     key:'addChildNode',
-    name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
-    // 监听事件名
+    menu:{
+      name: '新增子级节点',// 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
+      img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=',
+    },   // 监听事件名
     // event: 'click',
     /**
      * @description 事件对应的回调函数
@@ -31,7 +33,7 @@ let funcList =
      * @param pen 返回当前操作的pen对象
      * */
     // func: async (self,pen)=>{
-    //   toolBoxPlugin.bottomChildren(pen,0);
+    //   mindBoxPlugin.bottomChildren(pen,0);
     //   },
     openChildDomEvent: 'mouseenter',
     closeShadowDom:true,
@@ -56,71 +58,77 @@ let funcList =
     },
     children:[
       {
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+        menu:{
+          name:'',
+          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+        },
         event:'click',
         func(self,pen,dom,father){
-          toolBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
+          mindBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
           father.close()
         }
       },
       {
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+       menu:{
+         name:'',
+         icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+       },
         event:'click',
         func(self,pen,dom,father){
-          toolBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
+          mindBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
           father.close()
         }
       },
       {
-        name:'',
-        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
-            '    <title>椭圆形备份 12</title>\n' +
-            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-            '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
-            '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
-            '        </g>\n' +
-            '    </g>\n' +
-            '</svg>',
+        menu:{
+          name:'',
+          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+              '    <title>椭圆形备份 12</title>\n' +
+              '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+              '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+              '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+              '        </g>\n' +
+              '    </g>\n' +
+              '</svg>',
+        },
         event:'click',
         func(self,pen,dom,father){
-          toolBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
+          mindBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
           father.close()
         }
       }
     ],
-    img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=',
-
   }, {
     key:'divider',
   },
   {
     key:'relayout',
-    name:'重新布局',
-    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局</title>\n' +
-        '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-        '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
-        '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
-        '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
-        '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
-        '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
-        '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
-        '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
-        '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
-        '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
-        '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
-        '                </g>\n' +
-        '            </g>\n' +
-        '        </g>\n' +
-        '    </g>\n' +
-        '</svg>',
+   menu:{
+     name:'重新布局',
+     icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+         '    <title>重新布局</title>\n' +
+         '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+         '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' +
+         '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+         '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' +
+         '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
+         '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+         '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' +
+         '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' +
+         '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+         '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' +
+         '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' +
+         '                </g>\n' +
+         '            </g>\n' +
+         '        </g>\n' +
+         '    </g>\n' +
+         '</svg>',
+   },
     event:'click',
     func(self,pen,dom,e){
       let children = pen.mind?.children || [];
       if(children.length >0){
-        toolBoxPlugin.update(pen,true);
+        mindBoxPlugin.update(pen,true);
       }
     },
     // setDom(self,dom){
@@ -134,26 +142,28 @@ let funcList =
     key:'relayoutNext',
     description:'',
     closeOther: true,
-    name:'重新布局下一级',
-    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
-        '    <title>重新布局下一级</title>\n' +
-        '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-        '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
-        '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
-        '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' +
-        '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
-        '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
-        '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
-        '                </g>\n' +
-        '            </g>\n' +
-        '        </g>\n' +
-        '    </g>\n' +
-        '</svg>',
+    menu:{
+      name:'重新布局下一级',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+          '    <title>重新布局下一级</title>\n' +
+          '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+          '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' +
+          '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+          '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' +
+          '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' +
+          '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' +
+          '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' +
+          '                </g>\n' +
+          '            </g>\n' +
+          '        </g>\n' +
+          '    </g>\n' +
+          '</svg>',
+    },
     event:'click',
     func(self,pen){
       let children = pen.mind?.children || [];
       if(children.length >0){
-        toolBoxPlugin.update(pen,false);
+        mindBoxPlugin.update(pen,false);
       }
     }
   },{
@@ -161,7 +171,28 @@ let funcList =
   },
   {
     key:'nodeStyle',
-    name:'边框样式',
+    menu:{
+      name:'边框样式',
+      dom(self){
+        let color = self.color
+        let dash = self.dash;
+        let width = self.width;
+        let HTML = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
+                    <title>边框样式</title>
+                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="未固定" transform="translate(-628.000000, -138.000000)">
+                            <g id="编组-2" transform="translate(253.000000, 135.000000)">
+                                <g id="边框颜色" transform="translate(375.000000, 3.000000)">
+                                    <rect id="透明底图" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="34" height="34"/>
+                                    <circle id="椭圆形" stroke="${color}" stroke-width="${width}" cx="17" cy="17" r="8" stroke-dasharray="${dash}"/>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg>`
+        return HTML
+      },
+    },
     color:'#4D4DFF',
     dash:'5,5',
     width:4,
@@ -178,25 +209,7 @@ let funcList =
       self.width = (+ pen.lineWidth).toFixed(0);
       self.color =pen.mind.color || pen.calculative.color || '#000000'
     },
-    setDom(self){
-      let color = self.color
-      let dash = self.dash;
-      let width = self.width;
-      let HTML = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
-                    <title>边框样式</title>
-                    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g id="未固定" transform="translate(-628.000000, -138.000000)">
-                            <g id="编组-2" transform="translate(253.000000, 135.000000)">
-                                <g id="边框颜色" transform="translate(375.000000, 3.000000)">
-                                    <rect id="透明底图" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="34" height="34"/>
-                                    <circle id="椭圆形" stroke="${color}" stroke-width="${width}" cx="17" cy="17" r="8" stroke-dasharray="${dash}"/>
-                                </g>
-                            </g>
-                        </g>
-                    </g>
-                </svg>`
-      return HTML
-    },
+
     stopPropagation:true,
     closeChildDom(self,pen,dom){
       // dom.style.height = 'max-height'
@@ -363,9 +376,9 @@ let funcList =
               },{render:false})
             }
            pen.mind.color = color
-           toolBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
-           toolBoxPlugin.resetLinesColor(pen)
-           toolBoxPlugin.render()
+           mindBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen)
+           mindBoxPlugin.resetLinesColor(pen)
+           mindBoxPlugin.render()
            self.color = color || pen.calculative.color;
            self.updateAll()
          }
@@ -473,17 +486,10 @@ let funcList =
   },
   {
     key:'lineStyle',
-    name:'线条样式',
-    color:'#4D4DFF',
-    lineStyle: 'mind',
-    width: 3,
-    init(self,pen){
-      self.color = pen.mind.lineColor || pen.calculative.color || '#000000';
-      self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
-      self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
-    },
-    setDom(self,pen) {
-      let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
+    menu:{
+      name:'线条样式',
+      dom(self,pen) {
+        let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
         <title>连线样式</title>
         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <g id="未固定" transform="translate(-674.000000, -138.000000)">
@@ -496,8 +502,18 @@ let funcList =
           </g>
         </g>
       </svg>`
-      return html
+        return html
+      },
     },
+    color:'#4D4DFF',
+    lineStyle: 'mind',
+    width: 3,
+    init(self,pen){
+      self.color = pen.mind.lineColor || pen.calculative.color || '#000000';
+      self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
+      self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
+    },
+
     /**
      * @description 设置下拉框的样式，你也可以使用webComponent，或者将vue组件转换为webComponent
      * @param self 本配置对象
@@ -614,7 +630,7 @@ let funcList =
             // })
             let root = meta2d.findOne(pen.mind.rootId)
             root.mind.lineWidth = value
-            toolBoxPlugin.resetLinesStyle(root);
+            mindBoxPlugin.resetLinesStyle(root);
             self.update('title')
           },
           setLineStyle(value){
@@ -623,9 +639,9 @@ let funcList =
 
             let root = (window).meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res
-            toolBoxPlugin.resetLinesStyle(root);
+            mindBoxPlugin.resetLinesStyle(root);
             self.lineStyle = res
-            // toolBoxPlugin.update(root);
+            // mindBoxPlugin.update(root);
             self.updateAll()
           },
           setColor(e,value){
@@ -649,7 +665,7 @@ let funcList =
               },{render:true})
             })
             self.color = color
-            toolBoxPlugin.resetLinesColor(pen,true)
+            mindBoxPlugin.resetLinesColor(pen,true)
             self.updateAll()
           }
         },
@@ -751,16 +767,19 @@ let funcList =
   },
   {
     key:'layoutDirection',
-    name:'基本设置',
-    icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
+    menu:{
+      name:'基本设置',
+      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
+
+    },
     direction:'right',
     childrenGap:20,
     levelGap: 0,
     init(self,pen){
       self.direction = pen.mind.direction
-      self.childrenGap = toolBoxPlugin.childrenGap
-      self.levelGap = toolBoxPlugin.levelGap
-      self.animate = toolBoxPlugin.animate
+      self.childrenGap = mindBoxPlugin.childrenGap
+      self.levelGap = mindBoxPlugin.levelGap
+      self.animate = mindBoxPlugin.animate
     },
 
     activeDirection(self,pen,dom){
@@ -785,8 +804,8 @@ let funcList =
     },
     onOpenChildDom(self,pen,dom){
       self.activeDirection(self,pen,dom);
-      self.childrenGap = toolBoxPlugin.childrenGap
-      self.levelGap = toolBoxPlugin.levelGap
+      self.childrenGap = mindBoxPlugin.childrenGap
+      self.levelGap = mindBoxPlugin.levelGap
     },
     openChildDomEvent: 'mouseenter',
     closeEventOnChild:false, // 是否在childrenDom中触发事件
@@ -1018,31 +1037,31 @@ let funcList =
         scripts:{
           // 能在这里面获取到dom
           mounted(){ // 生命周期函数
-            // self.animate = toolBoxPlugin.animate
+            // self.animate = mindBoxPlugin.animate
           },
           setAnimate(){
-            toolBoxPlugin.animate = !toolBoxPlugin.animate
-            self.animate = toolBoxPlugin.animate
+            mindBoxPlugin.animate = !mindBoxPlugin.animate
+            self.animate = mindBoxPlugin.animate
             self.animate?self.status = '已开启':
               self.status = '已关闭'
             self.updateAll()
           },
           setChildGap(value){
             self.childrenGap = value;
-            toolBoxPlugin.childrenGap = value;
-            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+            mindBoxPlugin.childrenGap = value;
+            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
           },
           setLevelGap(value){
             self.levelGap = value;
-            toolBoxPlugin.levelGap = value;
-            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
+            mindBoxPlugin.levelGap = value;
+            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
           },
           setDirection(e){
-            toolBoxPlugin.record(pen)
+            mindBoxPlugin.record(pen)
 
             let root = (window).meta2d.findOne(pen.mind.rootId);
-            toolBoxPlugin.resetLayOut(root,e,true);
-            toolBoxPlugin.update(root);
+            mindBoxPlugin.resetLayOut(root,e,true);
+            mindBoxPlugin.update(root);
             self.direction = e
             self.activeDirection(self,pen,dom)
             self.close()
@@ -1165,7 +1184,11 @@ let funcList =
   },
 {
   key:'addSiblingNode',
-  name: '新增同级节点',
+  menu:{
+    name: '新增同级节点',
+    img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
+
+  },
   // 监听事件名
   // event: 'click',
   /**
@@ -1174,7 +1197,7 @@ let funcList =
    * @param pen 返回当前操作的pen对象
    * */
   // func: async (self,pen)=>{
-  //   toolBoxPlugin.bottomChildren(pen,0);
+  //   mindBoxPlugin.bottomChildren(pen,0);
   //   },
   openChildDomEvent: 'mouseenter',
   closeShadowDom:true,
@@ -1199,47 +1222,53 @@ let funcList =
   },
   children:[
     {
-      name:'',
-      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+      menu:{
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+
+      },
       event:'click',
       func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
-        toolBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
+        mindBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
         father.close()
       }
     },
     {
-      name:'',
-      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+      menu:{
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+      },
       event:'click',
       func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
-        toolBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
+        mindBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
         father.close()
       }
     },
     {
-      name:'',
-      icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
-          '    <title>椭圆形备份 12</title>\n' +
-          '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
-          '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
-          '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
-          '        </g>\n' +
-          '    </g>\n' +
-          '</svg>',
+      menu:{
+        name:'',
+        icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+            '    <title>椭圆形备份 12</title>\n' +
+            '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+            '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+            '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+            '        </g>\n' +
+            '    </g>\n' +
+            '</svg>',
+      },
       event:'click',
       func(self,pen,dom,father){
         let parent = (window).meta2d.findOne(pen.mind.preNodeId);
         let index = parent.mind.children.indexOf(pen.id);
-        toolBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
+        mindBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
         father.close()
       }
     }
   ],
-  img:'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
   },
  // {
  //   name:'button',
@@ -1259,7 +1288,7 @@ let funcList =
 export var defaultFuncs = {
   funcList,
   getAllFuncDocs(){
-    return this.funcList.map(i=>({name:i.name,key:i.key,description:i.description||'暂无描述'}))
+    return this.funcList.map(i=>({name:i.menu.text || '暂无名称',key:i.key,description:i.description||'暂无描述'}))
   },
   getFunc(...key){
     let result = []
@@ -1294,8 +1323,6 @@ export let toolboxStyle = {
   borderRadius: '5px',
   boxShadow:'0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
   transform: 'translateX(-50%)',
-  left:'-9999px',
-  top:'-9999px',
   position:'absolute',
   outline:'none',
   userSelect:'none',

@@ -1,10 +1,10 @@
-import {toolBoxPlugin} from "../core/ToolBoxPlugin";
+import {mindBoxPlugin} from "../core/MindBoxPlugin";
 import {top} from "./top"
 import {bottom} from "./bottom";
 export function sandglass(pen, recursion = true) {
     pen.mind.direction = 'sandglass'
-    let childrenGap = toolBoxPlugin.childrenGap
-    let levelGap = toolBoxPlugin.levelGap
+    let childrenGap = mindBoxPlugin.childrenGap
+    let levelGap = mindBoxPlugin.levelGap
     let children = JSON.parse(JSON.stringify(pen.mind.children || []));
     let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     let topHeight = 0;
@@ -12,7 +12,7 @@ export function sandglass(pen, recursion = true) {
     let bottomChildren = pen.mind.children.splice(0,sandglass.MAXLENGTH)
     let leftChildren = pen.mind.children
     pen.mind.children = bottomChildren
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     // let childrenLen = children.length;
     // let cutValue = childrenLen / 2
     for(let i = 0;i<children.length;i++){
@@ -38,7 +38,7 @@ export function sandglass(pen, recursion = true) {
                 topHeight = 0
                 topWidth = 0
                 pen.mind.children = leftChildren
-                toolBoxPlugin.calcChildWandH(pen);
+                mindBoxPlugin.calcChildWandH(pen);
             }
         }else{
             topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;

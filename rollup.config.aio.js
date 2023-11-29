@@ -3,7 +3,7 @@
 var nodeResolve = require('rollup-plugin-node-resolve');
 var commonjs = require('rollup-plugin-commonjs');
 
-var common = require('./rollup.js');
+var common = require('./config/rollup.js');
 
 module.exports = {
     input: 'index.js',

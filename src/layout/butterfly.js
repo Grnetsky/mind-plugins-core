@@ -1,10 +1,10 @@
-import {toolBoxPlugin} from "../core/ToolBoxPlugin";
+import {mindBoxPlugin} from "../core/MindBoxPlugin";
 import {left} from "./left";
 import {right} from "./right";
 export function butterfly(pen, recursion = true) {
     pen.mind.direction = 'butterfly'
-    let childrenGap = toolBoxPlugin.childrenGap
-    let levelGap = toolBoxPlugin.levelGap
+    let childrenGap = mindBoxPlugin.childrenGap
+    let levelGap = mindBoxPlugin.levelGap
     let children = JSON.parse(JSON.stringify(pen.mind.children || []));
     let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     let topHeight = 0;
@@ -12,7 +12,7 @@ export function butterfly(pen, recursion = true) {
     let rightChildren = pen.mind.children.splice(0,butterfly.MAXLENGTH)
     let leftChildren = pen.mind.children
     pen.mind.children = rightChildren
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     // let childrenLen = children.length;
     // let cutValue = childrenLen / 2
     for(let i = 0;i<children.length;i++){
@@ -37,7 +37,7 @@ export function butterfly(pen, recursion = true) {
                 topHeight = 0
                 topWidth = 0
                 pen.mind.children = leftChildren
-                toolBoxPlugin.calcChildWandH(pen);
+                mindBoxPlugin.calcChildWandH(pen);
             }
         }else{
             topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;

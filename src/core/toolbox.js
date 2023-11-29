@@ -14,7 +14,7 @@ export class ToolBox {
     distance = 80
     showControl = true
     parentHtml = null
-    constructor(parentHtml,config = {},style = {},) {
+    constructor(parentHtml,config = {},) {
         // 单例模式
         if(!ToolBox.instance){
             ToolBox.instance = this
@@ -22,17 +22,16 @@ export class ToolBox {
             return ToolBox.instance
         }
         this.parentHtml = parentHtml
+        this._init()
         this._loadConfig(config)
-        this._init(style)
         this.parentHtml.appendChild(this.box);
     }
     _loadConfig(config){
-        if(!isObjectLiteral(config))return
+        if(!isObjectLiteral(config) && !(config == null))return
+        config == null ? config = {}:''
         for (const conf in config) {
-            if(this[conf]){
-                this[conf] = config[conf]
-            }
         }
+        this.setStyle(config.style)
     }
     _init(style){
         this.box = createDom('div',{style:toolboxStyle,className: 'toolBox'})
@@ -41,7 +40,6 @@ export class ToolBox {
         let funcContainer = createDom('div',{style: funcListStyle,className: 'toolbox_func'})
         this.box.appendChild(funcContainer)
         this._funcDom = funcContainer
-        this.setStyle(style);
         let stylesheet = document.styleSheets[0]; // 选择第一个样式表
         // toolbox_item是否交给用户设置
         stylesheet.insertRule(".toolbox_item {" +
@@ -120,6 +118,7 @@ export class ToolBox {
                         this.rivetVisible = 'none'
                     }
                     this.$update()
+                    self.translateWithPen(self.pen)
                 }
                 }
                 }
@@ -137,6 +136,9 @@ export class ToolBox {
         }
     }
     setStyle(style){
+        if (!style){
+            style = toolboxStyle
+        }
         Object.keys(style).forEach(i=>{
             this.box.style[i] = style[i];
         });
@@ -154,8 +156,7 @@ export class ToolBox {
     bindPen(pen){
         this.pen = pen;
     }
-    show(){
-        // this.box.style.visibility = 'visible';
+    show(){// this.box.style.visibility = 'visible';
         this.box.style.display = 'flex'
 
         this.open = true
@@ -377,8 +378,9 @@ function renderInit(item,pen,dom){
 
 function renderTitle(item,pen,title) {
     title.innerHTML = ''
-    if(typeof item.setDom === 'function'){
-        let re = item.setDom(item,pen,title);
+    if(typeof item.menu?.dom === 'function'){
+        // 根据dom渲染 menu?Title
+        let re = item.menu?.dom(item,pen,title);
         switch (typeof re) {
             case "string":
                 title.innerHTML = re
@@ -390,7 +392,7 @@ function renderTitle(item,pen,title) {
                 throw new Error('function setDom must return string or node object');
         }
     }else {
-        title.innerHTML = (item.icon? item.icon : (item.img?`<img src="${item.img}" title="${item.name}" />` : item.name))
+        title.innerHTML = (item.menu?.icon? item.menu?.icon : (item.menu?.img?`<img src="${item.menu?.img}" title="${item.menu?.text}" />` : item.menu?.text))
     }
     return title
 }
@@ -457,8 +459,8 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 
             //TODO 执行时机是否正确？？？
             i.init?.(i,pen,node)
-            if(i.setDom){
-                let re = i.setDom(i,pen,node);
+            if(i.menu?.dom){
+                let re = i.menu?.dom(i,pen,node);
                 switch (typeof re) {
                     case "string":
                         node.innerHTML = re;
@@ -470,7 +472,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                         throw new Error('function setDom must return string or node object');
                 }
             }else {
-                node.innerHTML = (i.icon && i.name) || (i.img && i.name)? '<span style="padding-right: 30px;width: max-content" >'+ (i.icon || `<img src="${i.img}"/>`)+'</span> <span>'+i.name+'</span>' :'<span>'+(i.name || i.icon)+'</span>';
+                node.innerHTML = (i.menu?.icon && i.menu?.text) || (i.menu?.img && i.menu?.text)? '<span style="padding-right: 30px;width: max-content" >'+ (i.menu?.icon || `<img src="${i.menu?.img}"/>`)+'</span> <span>'+i.menu?.text+'</span>' :'<span>'+(i.menu?.text || i.menu?.icon)+'</span>';
             }
             fragment.appendChild(node);
         }

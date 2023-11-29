@@ -1,15 +1,15 @@
-import {toolBoxPlugin} from "../core/ToolBoxPlugin";
+import {mindBoxPlugin} from "../core/MindBoxPlugin";
 import { calcInView } from "@meta2d/core"
 
 export function right(pen,recursion = true,) {
     pen.mind.direction = 'right'
-    let childrenGap = toolBoxPlugin.childrenGap
-    let levelGap = toolBoxPlugin.levelGap
+    let childrenGap = mindBoxPlugin.childrenGap
+    let levelGap = mindBoxPlugin.levelGap
     let children = pen.mind.children || [];
     let worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     let topHeight = 0;
     let topWidth = 0;
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     for(let i = 0;i<children.length;i++){
         let child =  meta2d.store.pens[children[i]]
         if(!child)continue

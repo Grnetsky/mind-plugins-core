@@ -1,12 +1,15 @@
-import {setLifeCycleFunc, messageChannel, MindManager} from "mind-diagram";
+import {setLifeCycleFunc, messageChannel, PluginManager} from "mind-diagram";
 import {disconnectLine,connectLine,deepClone} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
 import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
 import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, debounceFirstOnly, deepMerge} from "../utils"
-export let toolBoxPlugin = {
-    name:'toolBox',
+
+
+let userOption = {}
+export let mindBoxPlugin = {
+    name:'mindBox',
     status: false,
     colorList:colorList,
     childrenGap: config.childrenGap, // 子节点间的间距
@@ -19,32 +22,32 @@ export let toolBoxPlugin = {
     // 计算子节点的颜色和位置
     calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;
-        let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
-        let colorFunc = toolBoxPlugin.colorFunc.get(color)
-        if(!layoutFunc)throw new Error('toolBoxPlugin error : The layout function does not exist')
+        let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
+        let colorFunc = mindBoxPlugin.colorFunc.get(color)
+        if(!layoutFunc)throw new Error('mindBoxPlugin error : The layout function does not exist')
         try{
             layoutFunc(pen, recursion)
             colorFunc(pen, recursion)
         }catch (e){
-            throw new Error(`toolBoxPlugin error : ${e.message}`)
+            throw new Error(`mindBoxPlugin error : ${e.message}`)
         }
     },
     calcChildrenColor(pen,type = 'default',recursion = true){
-        let colorFunc = toolBoxPlugin.colorFunc.get(type)
+        let colorFunc = mindBoxPlugin.colorFunc.get(type)
         if(!colorFunc)return
         try{
             colorFunc(pen,recursion)
         }catch (e){
-            throw new Error(`toolBoxPlugin error : ${e.message}`)
+            throw new Error(`mindBoxPlugin error : ${e.message}`)
         }
     },
     calcChildrenPos(pen,position = pen.mind.direction || 'right',recursion = true){
-        let layoutFunc = toolBoxPlugin.layoutFunc.get(position)
+        let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
         if(!layoutFunc)return
         // try{
             layoutFunc(pen, recursion)
         // }catch (e){
-        //     throw new Error(`[toolBoxPlugin calcChildrenPos] error : ${e.message}`)
+        //     throw new Error(`[mindBoxPlugin calcChildrenPos] error : ${e.message}`)
         // }
     },
     connectLine(pen,newPen,style = 'mind'){
@@ -106,7 +109,7 @@ export let toolBoxPlugin = {
                 },{render:false});
             }
             if(recursion){
-                toolBoxPlugin.resetLinesColor(child,true);
+                mindBoxPlugin.resetLinesColor(child,true);
             }
         }
     },
@@ -131,7 +134,7 @@ export let toolBoxPlugin = {
                 })
             }
             if(recursion){
-                toolBoxPlugin.resetLinesStyle(child,true);
+                mindBoxPlugin.resetLinesStyle(child,true);
             }
         }
     },
@@ -158,7 +161,7 @@ export let toolBoxPlugin = {
             disconnectLine(from,fromAnchor,line,lineAnchor1)
             disconnectLine(to,toAnchor,line,lineAnchor2)
             if(recursion){
-                toolBoxPlugin.disconnectLines(child,true);
+                mindBoxPlugin.disconnectLines(child,true);
             }
         }
     },
@@ -183,7 +186,7 @@ export let toolBoxPlugin = {
             connectLine(to,toAnchor,line,lineAnchor2)
             meta2d.canvas.updateLines(child)
             if(recursion){
-                toolBoxPlugin.reconnectLines(child,true);
+                mindBoxPlugin.reconnectLines(child,true);
             }
         }
         meta2d.canvas.updateLines(pen)
@@ -193,23 +196,23 @@ export let toolBoxPlugin = {
         if(!pen)return
         if(!pos)pos = pen.mind.direction
         // 断开连线
-        toolBoxPlugin.disconnectLines(pen,recursion)
+        mindBoxPlugin.disconnectLines(pen,recursion)
         // 执行布局函数
-        // let layoutFunc = toolBoxPlugin.layoutFunc.get(pos)
+        // let layoutFunc = mindBoxPlugin.layoutFunc.get(pos)
         // layoutFunc(pen,recursion)
 
         // 计算子级节点位置
-        toolBoxPlugin.calcChildrenPos(pen,pos,recursion)
+        mindBoxPlugin.calcChildrenPos(pen,pos,recursion)
 
         // 重新连线
-        toolBoxPlugin.reconnectLines(pen,recursion)
+        mindBoxPlugin.reconnectLines(pen,recursion)
 
         // 计算子级节点颜色  按默认颜色规则进行配置
-        toolBoxPlugin.calcChildrenColor(pen,'default',recursion)
+        mindBoxPlugin.calcChildrenColor(pen,'default',recursion)
         // 重新设置连线样式
-        toolBoxPlugin.resetLinesStyle(pen,recursion)
-        toolBoxPlugin.resetLinesColor(pen,recursion)
-        toolBoxPlugin.render(pen.mind.rootId);
+        mindBoxPlugin.resetLinesStyle(pen,recursion)
+        mindBoxPlugin.resetLinesColor(pen,recursion)
+        mindBoxPlugin.render(pen.mind.rootId);
 
         // 更新连线
     },
@@ -222,7 +225,7 @@ export let toolBoxPlugin = {
     //         child.mind.direction = direction;
     //         this.connectLine()
     //         if(recursion){
-    //             toolBoxPlugin.resetDirection(child,direction,true);
+    //             mindBoxPlugin.resetDirection(child,direction,true);
     //         }
     //     }
     // },
@@ -264,7 +267,7 @@ export let toolBoxPlugin = {
     // 删除node下的子节点
     async deleteChildrenNode(pen){
         // 删除与之相关的线
-        let lines = toolBoxPlugin.getLines(pen);
+        let lines = mindBoxPlugin.getLines(pen);
 
         // 查找到对应的父级，删除其在父级中的子级列表数据
         let parent = meta2d.findOne(pen.mind.preNodeId);
@@ -288,117 +291,147 @@ export let toolBoxPlugin = {
             if(!child)return
             collect.push(child)
 
-            if(recursion)collect.concat(toolBoxPlugin.getChildrenList(child))
+            if(recursion)collect.concat(mindBoxPlugin.getChildrenList(child))
         })
         return collect
     },
-    install:(...args)=>{
-        let toolbox = null;
-        if(!globalThis.toolbox){
-            toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,...args);
-            globalThis.toolbox = toolbox;
-        }
+    install:(()=>{
+        // 是否是第一次安装，第一次安装则进行初始化
+        let isInit = false
 
-        // 初始化布局函数
-        toolBoxPlugin.layoutFunc.set('right',right)
-        toolBoxPlugin.layoutFunc.set('left',left)
-        toolBoxPlugin.layoutFunc.set('top',top)
-        toolBoxPlugin.layoutFunc.set('bottom',bottom)
-        toolBoxPlugin.layoutFunc.set('butterfly',butterfly)
-        toolBoxPlugin.layoutFunc.set('sandglass',sandglass)
+        return (pen,options)=>{
+            if(!isInit){
+
+                // 初始化布局函数
+                mindBoxPlugin.layoutFunc.set('right',right)
+                mindBoxPlugin.layoutFunc.set('left',left)
+                mindBoxPlugin.layoutFunc.set('top',top)
+                mindBoxPlugin.layoutFunc.set('bottom',bottom)
+                mindBoxPlugin.layoutFunc.set('butterfly',butterfly)
+                mindBoxPlugin.layoutFunc.set('sandglass',sandglass)
 
 
-        // 设置颜色生成函数
-        toolBoxPlugin.colorFunc.set('default',defaultColorRule)
-        // 打开时进行初始化
-        document.addEventListener('keydown',(e)=>{
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                // 阻止默认的撤销行为
-                e.preventDefault();
-                console.log('Ctrl + Z 被按下');
+                // 设置颜色生成函数
+                mindBoxPlugin.colorFunc.set('default',defaultColorRule)
+                // 打开时进行初始化
+                document.addEventListener('keydown',(e)=>{
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                        // 阻止默认的撤销行为
+                        e.preventDefault();
+                        console.log('Ctrl + Z 被按下');
 
-                // 在这里执行你想要的操作
-            }
-        })
-        meta2d.on('opened',()=>{
-            let {pens} = meta2d.data()
-            pens.forEach(i=>{
-                if(i.mind && i.mind.type === 'node'){
-                    let pen = meta2d.findOne(i.id)
-                    window.MindManager.messageChannel.publish('open',pen)
-                    toolBoxPlugin.combineToolBox(pen)
-                    toolBoxPlugin.combineLifeCircle(pen)
-                    i.mind.isRoot?window.MindManager.rootIds.push(pen.id):''
-
-                }
-
-            })
-        })
-        meta2d.on('scale',()=>{
-            if(toolbox.open)toolbox.translateWithPen()
-        })
-        // meta2d.on('resize',(pen)=>{
-        //     if(pen.mind && pen.mind.rootId) toolBoxPlugin.record(meta2d.store.pens[pen.mind.rootId])
-        // })
-        meta2d.on('undo',(e)=>{
-            // TODO 删除顺序有问题
-            e.pens.reverse().forEach(i=>{
-                if(i.mind){
-                    // 撤回节点
-                    if(i.mind.type === 'node'){
-                        let preNode = meta2d.findOne(i.mind.preNodeId)
-                        preNode && (preNode.mind.children.push(i.id))
-                        toolBoxPlugin.update(preNode)
-                    }else{
-                        let preNode = meta2d.findOne(i.mind.from)
-                        toolBoxPlugin.update(preNode)
+                        // 在这里执行你想要的操作
                     }
-                }
-            })
-        })
+                })
+                meta2d.on('opened',()=>{
+                    let {pens} = meta2d.data()
+                    pens.forEach(i=>{
+                        if(i.mind && i.mind.type === 'node'){
+                            let pen = meta2d.findOne(i.id)
+                            window.PluginManager.messageChannel.publish('open',pen)
+                            mindBoxPlugin.combineToolBox(pen)
+                            mindBoxPlugin.combineLifeCircle(pen)
+                            i.mind.isRoot?window.PluginManager.rootIds.push(pen.id):''
 
-        // 添加根节点
-        meta2d.on('add',(pens)=>{
-            if(pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind){
-                let pen = pens[0]
-                pen.disableAnchor =  true
-                pen.disableRotate = true
-                pen.mind = {
-                    isRoot: true,
-                    type:'node',
-                    preNodeId:null,
-                    rootId: pen.id,
-                    children: [],
-                    width: 0,
-                    height: 0,
-                    maxWidth:0, // 包含了自己和子节点的最大宽度
-                    maxHeight:0, // 包含了自己和子节点的最大高度
-                    direction:'right',
-                    lineStyle: 'mind',
-                    lineColor:'',
-                    childrenVisible: true,
-                    visible: true,
-                    lineWidth: 2,
-                    level:0,
-                };
-                window.MindManager.rootIds.push(pen.id)
-                // 跟随移动
-                toolBoxPlugin.combineToolBox(pen);
-                toolBoxPlugin.combineLifeCircle(pen)
-                MindManager.messageChannel.publish('open',pen)
-                toolBoxPlugin.record(pen.id)
-                meta2d.render()
+                        }
+
+                    })
+                })
+                meta2d.on('scale',()=>{
+                    if(toolbox.open)toolbox.translateWithPen()
+                })
+                // meta2d.on('resize',(pen)=>{
+                //     if(pen.mind && pen.mind.rootId) mindBoxPlugin.record(meta2d.store.pens[pen.mind.rootId])
+                // })
+                meta2d.on('undo',(e)=>{
+                    // TODO 删除顺序有问题
+                    e.pens.reverse().forEach(i=>{
+                        if(i.mind){
+                            // 撤回节点
+                            if(i.mind.type === 'node'){
+                                let preNode = meta2d.findOne(i.mind.preNodeId)
+                                preNode && (preNode.mind.children.push(i.id))
+                                mindBoxPlugin.update(preNode)
+                            }else{
+                                let preNode = meta2d.findOne(i.mind.from)
+                                mindBoxPlugin.update(preNode)
+                            }
+                        }
+                    })
+                })
+
+                meta2d.on('inactive',(targetPen)=>{
+                    globalThis.toolbox?.hide();
+                });
+                isInit = true
             }
-        })
-        meta2d.on('inactive',(targetPen)=>{
-            globalThis.toolbox?.hide();
-        });
-    },
+            let target = null
+            let isTag = false
+            if(pen.name){
+                target = pen.name
+            }else if(pen.tag){
+                isTag = true
+                target = pen.tag
+            }else if(pen.pen){
+                target = pen
+            }
+            let toolbox = null;
+            if(!globalThis.toolbox){
+                toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,options.toolbox);
+                globalThis.toolbox = toolbox;
+            }
+
+            if(typeof target === 'object'){
+                let pen = target
+                mindBoxPlugin.combineToolBox(pen);
+                mindBoxPlugin.combineLifeCircle(pen)
+                PluginManager.messageChannel.publish('open',pen)
+                mindBoxPlugin.record(pen.id)
+                meta2d.render()
+                return
+            }else {
+                meta2d.on('add',(pens)=>{
+                    if(pens && pens.length === 1 &&  (isTag?(pens[0].tag === target) : (pens[0].name === target)) && !pens[0].mind){
+                        let pen = pens[0]
+                        pen.disableAnchor =  true
+                        pen.disableRotate = true
+                        pen.mind = {
+                            isRoot: true,
+                            type:'node',
+                            preNodeId:null,
+                            rootId: pen.id,
+                            children: [],
+                            width: 0,
+                            height: 0,
+                            maxWidth:0, // 包含了自己和子节点的最大宽度
+                            maxHeight:0, // 包含了自己和子节点的最大高度
+                            direction:'right',
+                            lineStyle: 'mind',
+                            lineColor:'',
+                            childrenVisible: true,
+                            visible: true,
+                            lineWidth: 2,
+                            level:0,
+                        };
+                        // 跟随移动
+                        pen.mind.mindboxOption = options
+                        mindBoxPlugin.combineToolBox(pen);
+                        mindBoxPlugin.combineLifeCircle(pen)
+                        PluginManager.messageChannel.publish('open',pen)
+                        mindBoxPlugin.record(pen.id)
+                        meta2d.render()
+                    }
+                })
+            // 添加根节点
+
+
+        }
+    }})(),
     uninstall(){
         globalThis.toolbox.destroy()
         globalThis.toolbox = null;
         // 解绑生命周期
-        window.MindManager.rootIds?.forEach(i=>{
+        window.PluginManager.rootIds?.forEach(i=>{
             let root = meta2d.findOne(i)
             this.unCombineToolBox(root)
         })
@@ -447,11 +480,11 @@ export let toolBoxPlugin = {
         if(position === 'right' || position === 'left' || position === 'butterfly'){
             for(let i = 0;i<children.length;i++){
                 let child = meta2d.store.pens[children[i]];
-                let maxObj = toolBoxPlugin.calcChildWandH(child,position);
+                let maxObj = mindBoxPlugin.calcChildWandH(child,position);
                 maxHeight += maxObj.maxHeight;
                 maxWidth = maxWidth > maxObj.maxWidth? maxWidth : maxObj.maxWidth;
             }
-            maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
+            maxHeight += +mindBoxPlugin.childrenGap * (children.length - 1);
             maxH = maxHeight > worldRect.height?maxHeight : worldRect.height;
             pen.mind.maxWidth = maxWidth;
             pen.mind.maxHeight = maxH;
@@ -466,11 +499,11 @@ export let toolBoxPlugin = {
         }else {
             for(let i = 0;i<children.length;i++){
                 let child = meta2d.store.pens[children[i]];
-                let maxObj = toolBoxPlugin.calcChildWandH(child,position);
+                let maxObj = mindBoxPlugin.calcChildWandH(child,position);
                 maxWidth += maxObj.maxWidth;
                 maxHeight = maxHeight > maxObj.maxHeight? maxHeight : maxObj.maxHeight;
             }
-            maxWidth += +toolBoxPlugin.childrenGap * (children.length - 1);
+            maxWidth += +mindBoxPlugin.childrenGap * (children.length - 1);
             maxW = maxWidth > worldRect.width?maxWidth : worldRect.width;
             pen.mind.maxHeight = maxHeight;
             pen.mind.maxWidth = maxW;
@@ -487,7 +520,7 @@ export let toolBoxPlugin = {
      * @description 自定义获取功能列表函数  返回值为最终展示的列表
      * @param pen 当前pen图元*/
     getFuncList(pen){
-        return pen.mind.isRoot?toolBoxPlugin.funcList['root']:toolBoxPlugin.funcList['leaf']
+        return pen.mind.isRoot?mindBoxPlugin.funcList['root']:mindBoxPlugin.funcList['leaf']
     },
 
     /**
@@ -517,14 +550,14 @@ export let toolBoxPlugin = {
     combineLifeCircle(target,del = false){
         const onDestroy = (targetPen)=>{
             toolbox?.hide();
-            toolBoxPlugin.deleteChildrenNode(targetPen);
-            // toolBoxPlugin.deleteNodeOnlyOnce(targetPen);
+            mindBoxPlugin.deleteChildrenNode(targetPen);
+            // mindBoxPlugin.deleteNodeOnlyOnce(targetPen);
             if(targetPen.mind.isRoot){
-                let index = MindManager.rootIds.indexOf(targetPen.id)
+                let index = PluginManager.rootIds.indexOf(targetPen.id)
                 if(index === -1)return
-                MindManager.rootIds.splice(index,1)
+                PluginManager.rootIds.splice(index,1)
             }
-            toolBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
+            mindBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId])
         };
         // const onBeforeDestroy = (pen)=>{
         //     if(pen.mind.isRoot)return
@@ -540,7 +573,7 @@ export let toolBoxPlugin = {
             }
         }
         const onResize  = debounce((pen)=>{
-            toolBoxPlugin.record(pen.mind.rootId)
+            mindBoxPlugin.record(pen.mind.rootId)
         },500)
         // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onAdd',onAdd,del);
@@ -550,18 +583,23 @@ export let toolBoxPlugin = {
 
     },
     deleteNodeOnlyOnce: debounceFirstOnly(async(pen)=>{
-        let children = toolBoxPlugin.getChildrenList(pen)
+        let children = mindBoxPlugin.getChildrenList(pen)
         if(!children || children.length === 0 )return
         await mate2d.delete(children,true,false)
     },1000),
     combineToolBox(target,del = false){
-        let toolbox = globalThis.toolbox;
-        // const onMove = (targetPen)=>{
-        //     toolbox.hide();
-        // };
+        let option = meta2d.store.pens[target.mind.rootId].mind.mindboxOption
+        let showTrigger = option.trigger?.show || 'onMouseUp'
+        let hideTrigger = option.trigger?.hide || 'onMouseDown'
 
+
+        let toolbox = globalThis.toolbox;
         const onMouseUp = (targetPen)=>{
             if(!meta2d.store.data.locked){
+                mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
+                if(toolbox){
+                    toolbox._loadConfig(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption.toolbox)
+                }
                 toolbox.bindPen(targetPen);
                 toolbox.setFuncList(this.getFuncList(target));
                 toolbox.translateWithPen(targetPen);
@@ -572,8 +610,8 @@ export let toolBoxPlugin = {
             toolbox.hide();
         }
         // setLifeCycleFunc(target,'onMove',onMove,del);
-        setLifeCycleFunc(target,'onMouseUp',onMouseUp,del);
-        setLifeCycleFunc(target,'onMouseDown',onMouseDown,del);
+        setLifeCycleFunc(target,showTrigger,onMouseUp,del);
+        setLifeCycleFunc(target,hideTrigger,onMouseDown,del);
     },
 
     // setDirection(pen,direction){
@@ -631,35 +669,35 @@ export let toolBoxPlugin = {
 
         // 设置连接关系
         newPen.mind.connect =pen.mind.level === 0?
-            toolBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
+            mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
 
-        window.MindManager.messageChannel.publish('addNode', {plugin:'toolBox',pen,newPen});
+        window.PluginManager.messageChannel.publish('addNode', {plugin:'toolBox',pen,newPen});
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);
         }else{
             pen.mind.children.push(newPen.id);
         }
-        toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
-        toolBoxPlugin.combineLifeCircle(newPen);
+        mindBoxPlugin.combineToolBox(newPen); // 重写生命周期
+        mindBoxPlugin.combineLifeCircle(newPen);
         let rootNode = meta2d.findOne(pen.mind.rootId);
 
         //TODO 这里似乎性能不太好 待优化
-        toolBoxPlugin.record(pen.mind.rootId)
+        mindBoxPlugin.record(pen.mind.rootId)
         // 连线
-        toolBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
-        let line = toolBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
-        toolBoxPlugin.resetLayOut(rootNode)
-        // toolBoxPlugin.resetLayOut(rootNode)
+        mindBoxPlugin.calcChildrenPos(pen,pen.mind.direction,true)
+        let line = mindBoxPlugin.connectLine(pen,newPen,{position:pen.mind.direction,style: rootNode.mind.lineStyle});
+        mindBoxPlugin.resetLayOut(rootNode)
+        // mindBoxPlugin.resetLayOut(rootNode)
         // 从根节点更新
-        // toolBoxPlugin.update(rootNode,true);
-        if(toolBoxPlugin.animate){
+        // mindBoxPlugin.update(rootNode,true);
+        if(mindBoxPlugin.animate){
             setTimeout(()=>{
                 globalThis.toolbox.bindPen(newPen);
                 globalThis.toolbox.setFuncList(this.getFuncList(newPen));
                 globalThis.toolbox.translateWithPen(newPen);
-            },toolBoxPlugin.animateDuration +100)
+            },mindBoxPlugin.animateDuration +100)
 
         }else {
             globalThis.toolbox.bindPen(newPen);
@@ -667,7 +705,7 @@ export let toolBoxPlugin = {
             globalThis.toolbox.translateWithPen(newPen);
         }
 
-        // toolBoxPlugin.update(rootNode)
+        // mindBoxPlugin.update(rootNode)
         let list = [newPen,line]
         meta2d.canvas.pushHistory({ type: 0, pens: deepClone(list, true) });
 
@@ -675,14 +713,14 @@ export let toolBoxPlugin = {
     },
     update: debounce((pen,recursion = true)=>{
         if(!pen)return;
-        toolBoxPlugin.record(pen)
-        toolBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
+        mindBoxPlugin.record(pen)
+        mindBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
         messageChannel.publish('update',{form:'toolBox'})
     },50),
 
     // root 为根节点id
     render(root){
-        if(toolBoxPlugin.animate){
+        if(mindBoxPlugin.animate){
             let pens = []
             if(root){
                 pens = meta2d.store.data.pens.filter(i=>i.mind?.rootId === root && i.mind.type === 'node')
@@ -709,7 +747,7 @@ export let toolBoxPlugin = {
                 pen.animateCycle = 1;
                 pen.keepAnimateState = true
                 pen.frames = [{
-                        duration: toolBoxPlugin.animateDuration,  // 帧时长
+                        duration: mindBoxPlugin.animateDuration,  // 帧时长
                         x: x   ,
                         y: y, // 变化属性,
                     }]
@@ -717,7 +755,7 @@ export let toolBoxPlugin = {
                 //
             })
             meta2d.startAnimate(pens);
-            toolBoxPlugin.record(root)
+            mindBoxPlugin.record(root)
         }else{
             meta2d.render();
         }
@@ -735,5 +773,21 @@ export let toolBoxPlugin = {
             i.mind.oldWorldRect = deepClone(meta2d.getPenRect(i))
         })
     },
+    loadOptions(options){
+        if(!options.funcList){
+            this.setFuncList(defaultFuncList)
+        }
+        for(let option in options){
+            if(option === 'funcList'){
+                this.setFuncList(deepClone(options[option]))
+            }
+            if(option === 'getFuncList'){
+                this.getFuncList = options[option]
+            }
+            if(option === 'setFuncList'){
+
+            }
+        }
+    }
 };
 

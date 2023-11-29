@@ -19,26 +19,26 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
     scripts.$update = ()=>{
         if(!root)root = res
         // 直接进行dom替换 有问题  事件不生效
-        root.innerHTML = Component(config,{template,style,scripts:MindManager._env[namespace]},output,root).innerHTML
+        root.innerHTML = Component(config,{template,style,scripts:PluginManager._env[namespace]},output,root).innerHTML
     }
 
     if(!scripts)scripts = {}
     if(!style)style = ''
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
-    MindManager._env[namespace]? '' : MindManager._env[namespace] = {};
+    PluginManager._env[namespace]? '' : PluginManager._env[namespace] = {};
     let {dom, funcObjs,varObj} = parse(template)
     let keys = Object.keys(scripts)
 
     // 暂不考虑 传其他参数情况
     // keys.forEach(i=>{
     //     // 将script的函数传递到全局环境
-    //     MindManager._env[namespace][i] = scripts[i]
+    //     PluginManager._env[namespace][i] = scripts[i]
     //
     //     // 执行生命周期函数 放入微队列依次执行
     //
     // })
-    MindManager._env[namespace] = scripts
+    PluginManager._env[namespace] = scripts
     LifeCycle.forEach(i=>{
         Object.keys(scripts).includes(i)?scripts[i]():''
     })
@@ -50,12 +50,12 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
                 //TODO 应该还要过滤一遍字面量  此处仅仅处理了变量
                 if(!j.param.startsWith('this') && j.param!=='event' && !isLiteral(j.param)){
                     // TODO 此处应当根据字符的具体位置来替换，而非全部替换
-                    // dom = dom.replaceAll(j.param,`MindManager._env.${namespace}.${j}`)
-                    dom = replaceAfterPosition(dom,j.index,j.param,`MindManager._env.${namespace}.${j.param}`)
+                    // dom = dom.replaceAll(j.param,`PluginManager._env.${namespace}.${j}`)
+                    dom = replaceAfterPosition(dom,j.index,j.param,`PluginManager._env.${namespace}.${j.param}`)
                 }
             }));
             // 处理函数名
-            dom = dom.replaceAll(i.name+"(",`MindManager._env.${namespace}.${i.name}(`)
+            dom = dom.replaceAll(i.name+"(",`PluginManager._env.${namespace}.${i.name}(`)
         }
     })
 
@@ -64,7 +64,7 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
         if(keys.indexOf(i.name) !== -1){
             let regex = new RegExp(`\\{\\{\\s*${i.name}\\s*\\}\\}`)
             // 处理变量
-            dom = replaceAfterPosition(dom,i.index,regex,MindManager._env[namespace][i.name])
+            dom = replaceAfterPosition(dom,i.index,regex,PluginManager._env[namespace][i.name])
         }
     })
 

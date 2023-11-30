@@ -4,7 +4,7 @@ import { Component } from "../parse";
 const DIVIDER = 'divider'
 const CONTROL = 'control'
 
-let CONFIGS = ['showControl','distance','style']
+let CONFIGS = ['showControl','offset','style']
 function configValid(config) {
     if(config.key)return true
     return false
@@ -12,7 +12,7 @@ function configValid(config) {
 export class ToolBox {
     static instance = null
     open = false
-    distance = 80
+    offset = 80
     showControl = true
     parentHtml = null
     constructor(parentHtml,config = {},) {
@@ -188,7 +188,7 @@ export class ToolBox {
         const worldRect = pen.calculative.worldRect;
         let pos =  {
             x:worldRect.x + store.data.x + worldRect.width /2 + 'px',
-            y:worldRect.y + store.data.y + -this.distance + 'px'
+            y:worldRect.y + store.data.y + -this.offset + 'px'
         }
         this.translatePosition(pos)
     }
@@ -498,6 +498,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
         containerDom?.appendChild(fragment);
         containerDom.classList.add('toolbox_container')
         containerDom.style.position = 'absolute';
+        item.mounted?.(item,pen,containerDom)
         item.closeShadowDom?dom.appendChild(containerDom):dom.shadowRoot.appendChild(containerDom);
         dom.childrenDom = containerDom;
 // 添加样式到元素
@@ -506,7 +507,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(item.popup.list || item.popup.dom || item.closeOther){
         // 关闭下拉菜单
         if(!item.closeOther){
-            item.closeChildDomEvent?((item.closeEventOnChild?dom.childrenDom: dom)['on'+(item.closeChildDomEvent)] = (()=>{
+            item.closeChildDomEvent?((item.closeEventOnChild?dom.childrenDom: item.dom.titleDom)['on'+(item.closeChildDomEvent)] = (()=>{
                 dom.offsetHeight
                 // 可手动派发隐藏函数
                 item.onCloseChildDom?.(item,pen,item.dom.childrenDom)

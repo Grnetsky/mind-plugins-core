@@ -524,7 +524,7 @@ let funcList =
     closeEventOnChild:false,
     openEventOnTitle:true,
     openChildDomEvent: 'mouseenter',
-    closeChildDomEvent:'mouseleave',
+    closeChildDomEvent:'click',
     closeChildDom(self,pen,dom){
       dom.style.transform = 'scaleY(0)'
       return true
@@ -778,7 +778,7 @@ let funcList =
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
-      let index = ['right','left','top','bottom','butterfly','sandglass'].findIndex(i=>i === self.direction);
+      let index = ['right','left','top','bottom','butterfly','sandglass'].findIndex(i=>i === self.direction)
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
           i.setAttribute('fill','#DDDDE1');
@@ -808,6 +808,9 @@ let funcList =
     closeChildDom(self,pen,dom){
       dom.style.transform = 'scaleY(0)'
       return true
+    },
+    mounted(self,pen,dom){
+      self.activeDirection(self,pen,dom)
     },
     openChildDom(self,pen,dom){
       dom.style.transform = 'scaleY(1)'
@@ -1023,10 +1026,6 @@ let funcList =
           </div>`,
           scripts:{
             // 能在这里面获取到dom
-            mounted(){ // 生命周期函数
-              // self.animate = mindBoxPlugin.animate
-              self.status =  mindBoxPlugin.animate?'已开启':'已关闭'
-            },
             status:'已开启',
             setAnimate(){
               mindBoxPlugin.animate = !mindBoxPlugin.animate
@@ -1034,7 +1033,6 @@ let funcList =
               self.animate = mindBoxPlugin.animate
               self.animate?self.status = '已开启':
                   self.status = '已关闭'
-
               self.updateAll()
             },
             setChildGap(value){
@@ -1296,7 +1294,7 @@ export let defaultFuncList = {
   'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','divider','relayout','relayoutNext','divider','nodeStyle','lineStyle',)
 };
 export const toolboxDefault = {
-  distance: 80,
+  offset: 80,
   showControl:true
 }
 export let pluginDefault = {

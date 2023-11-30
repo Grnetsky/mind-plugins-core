@@ -780,8 +780,6 @@ export let mindBoxPlugin = {
         for (const optionsKey of Object.keys(pluginDefault)) {
             this[optionsKey] = pluginDefault[optionsKey]
         }
-        console.log('loadConfig')
-
         // 加载特定的配置并作相关处理
         if(!options.funcList){
             this.setFuncList(defaultFuncList)

@@ -5,7 +5,7 @@ const EVENTTAG = ['@','on']
 
 import {createDom, escapeRegExp, removeDuplicates, replaceAfterPosition, scopedEval} from "./utils";
 
-let LifeCycle = ['mounted']
+let LifeCycle = ['beforeMounted']
 /**
  * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
  * @param self 此配置项自身

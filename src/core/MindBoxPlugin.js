@@ -1,19 +1,19 @@
 import {setLifeCycleFunc, messageChannel, PluginManager} from "mind-diagram";
 import {disconnectLine,connectLine,deepClone} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
-import config,{colorList, defaultFuncList, generateColor} from "../config/default.js";
+import {colorList, defaultFuncList, generateColor, pluginDefault} from "../config/default.js";
 import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 
 
-let userOption = {}
+let CONFIGS = ['animate','animateDuration','childrenGap','leveGap','colorList']
 export let mindBoxPlugin = {
     name:'mindBox',
     status: false,
-    colorList:colorList,
-    childrenGap: config.childrenGap, // 子节点间的间距
-    levelGap: config.levelGap, // 子级间的间距
+    colorList:pluginDefault.colorList,
+    childrenGap: pluginDefault.childrenGap, // 子节点间的间距
+    levelGap: pluginDefault.levelGap, // 子级间的间距
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map
     _history:[],
@@ -377,7 +377,7 @@ export let mindBoxPlugin = {
             }
             let toolbox = null;
             if(!globalThis.toolbox){
-                toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,options.toolbox);
+                toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,options);
                 globalThis.toolbox = toolbox;
             }
 
@@ -567,7 +567,7 @@ export let mindBoxPlugin = {
         const onAdd = (targetPen)=>{
             if(!meta2d.store.data.locked){
                 toolbox.bindPen(targetPen);
-                toolbox.setFuncList(this.getFuncList(target));
+                toolbox.setFuncList(deepClone(this.getFuncList(target)));
                 toolbox.translateWithPen(targetPen);
                 toolbox.show();
             }
@@ -598,10 +598,10 @@ export let mindBoxPlugin = {
             if(!meta2d.store.data.locked){
                 mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
                 if(toolbox){
-                    toolbox._loadConfig(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption.toolbox)
+                    toolbox._loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
                 }
                 toolbox.bindPen(targetPen);
-                toolbox.setFuncList(this.getFuncList(target));
+                toolbox.setFuncList(deepClone(this.getFuncList(target)));
                 toolbox.translateWithPen(targetPen);
                 toolbox.show()
             }
@@ -695,13 +695,13 @@ export let mindBoxPlugin = {
         if(mindBoxPlugin.animate){
             setTimeout(()=>{
                 globalThis.toolbox.bindPen(newPen);
-                globalThis.toolbox.setFuncList(this.getFuncList(newPen));
+                globalThis.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
                 globalThis.toolbox.translateWithPen(newPen);
             },mindBoxPlugin.animateDuration +100)
 
         }else {
             globalThis.toolbox.bindPen(newPen);
-            globalThis.toolbox.setFuncList(this.getFuncList(newPen));
+            globalThis.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
             globalThis.toolbox.translateWithPen(newPen);
         }
 
@@ -773,19 +773,30 @@ export let mindBoxPlugin = {
             i.mind.oldWorldRect = deepClone(meta2d.getPenRect(i))
         })
     },
+
+    //  TODO 逻辑重写
     loadOptions(options){
+        //加载系统自带的配置项
+        for (const optionsKey of Object.keys(pluginDefault)) {
+            this[optionsKey] = pluginDefault[optionsKey]
+        }
+        console.log('loadConfig')
+
+        // 加载特定的配置并作相关处理
         if(!options.funcList){
             this.setFuncList(defaultFuncList)
         }
         for(let option in options){
             if(option === 'funcList'){
-                this.setFuncList(deepClone(options[option]))
+                this.setFuncList(deepClone(options.funcList))
+                continue
             }
             if(option === 'getFuncList'){
                 this.getFuncList = options[option]
+                continue
             }
-            if(option === 'setFuncList'){
-
+            if(CONFIGS.includes(option)){
+                this[option] = options[option]
             }
         }
     }

@@ -3389,7 +3389,7 @@
   var defaultFuncs = {
     funcList: funcList,
     getAllFuncDocs: function getAllFuncDocs() {
-      return this.funcList.map(function (i) {
+      return defaultFuncList.map(function (i) {
         return {
           name: i.name,
           key: i.key,

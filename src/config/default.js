@@ -214,15 +214,6 @@ let funcList =
 
     stopPropagation:true,
     closeChildDom(self,pen,dom){
-      // dom.style.height = 'max-height'
-      // dom.style.visibility = 'hidden'
-      // dom.style.overflow = 'hidden'
-      // dom.style.transition = '.3s'
-      // dom.style.height = 0'
-      dom.style.transformOrigin = 'top';
-      dom.offsetHeight
-      dom.style.transition = 'all .3s'
-
       dom.style.transform = 'scaleY(0)'
       return true
     },
@@ -237,6 +228,8 @@ let funcList =
             flexDirection: 'row',
             flexWrap: 'wrap',
             justifyContent: 'flex-start',
+            transformOrigin:'top',
+            transition:'all .3s',
             position:'absolute',
             top:'40px',
             backgroundColor:'#fff',
@@ -533,15 +526,6 @@ let funcList =
     openChildDomEvent: 'mouseenter',
     closeChildDomEvent:'mouseleave',
     closeChildDom(self,pen,dom){
-      // dom.style.height = 'max-height'
-      // dom.style.visibility = 'hidden'
-      // dom.style.overflow = 'hidden'
-      // dom.style.transition = '.3s'
-      // dom.style.height = 0'
-      dom.style.transformOrigin = 'top';
-      dom.offsetHeight
-      dom.style.transition = 'all .3s'
-
       dom.style.transform = 'scaleY(0)'
       return true
     },
@@ -555,6 +539,8 @@ let funcList =
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'wrap',
+            transformOrigin:'top',
+            transition:'all .3s',
             justifyContent: 'flex-start',
             position:'absolute',
             top:'40px',
@@ -786,6 +772,7 @@ let funcList =
       self.childrenGap = mindBoxPlugin.childrenGap
       self.levelGap = mindBoxPlugin.levelGap
       self.animate = mindBoxPlugin.animate
+      self.status = self.animate?'已开启':'已关闭'
     },
 
     activeDirection(self,pen,dom){
@@ -819,15 +806,6 @@ let funcList =
     stopPropagation:true,
     animate:false,
     closeChildDom(self,pen,dom){
-      // dom.style.height = 'max-height'
-      // dom.style.visibility = 'hidden'
-      // dom.style.overflow = 'hidden'
-      // dom.style.transition = '.3s'
-      // dom.style.height = 0'
-      dom.style.transformOrigin = 'top';
-      dom.offsetHeight
-      dom.style.transition = 'all .3s'
-
       dom.style.transform = 'scaleY(0)'
       return true
     },
@@ -842,6 +820,8 @@ let funcList =
         let dom = createDom('div',{style:{
             display: 'flex',
             flexDirection: 'row',
+            transformOrigin:'top',
+            transition:'all .3s',
             flexWrap: 'wrap',
             justifyContent: 'flex-start',
             position:'absolute',
@@ -1045,13 +1025,16 @@ let funcList =
             // 能在这里面获取到dom
             mounted(){ // 生命周期函数
               // self.animate = mindBoxPlugin.animate
+              self.status =  mindBoxPlugin.animate?'已开启':'已关闭'
             },
             status:'已开启',
             setAnimate(){
               mindBoxPlugin.animate = !mindBoxPlugin.animate
+              pen.mind.mindboxOption.animate = mindBoxPlugin.animate
               self.animate = mindBoxPlugin.animate
               self.animate?self.status = '已开启':
                   self.status = '已关闭'
+
               self.updateAll()
             },
             setChildGap(value){
@@ -1214,13 +1197,7 @@ let funcList =
   closeEventOnChild:false, // 是否在childrenDom中触发事件
   stopPropagation:true,
   closeChildDom(self,pen,dom){
-    // dom.style.height = 'max-height'
-    // dom.style.visibility = 'hidden'
-    // dom.style.overflow = 'hidden'
-    // dom.style.transition = '.3s'
-    // dom.style.height = 0'
     dom.style.transformOrigin = 'top';
-    dom.offsetHeight
     dom.style.transition = 'all .3s'
 
     dom.style.transform = 'scaleY(0)'
@@ -1301,13 +1278,13 @@ let funcList =
 export var defaultFuncs = {
   funcList,
   getAllFuncDocs(){
-    return this.funcList.map(i=>({name:i.menu.text || '暂无名称',key:i.key,description:i.description||'暂无描述'}))
+    return defaultFuncs.funcList.map(i=>({name:i.menu.text || '暂无名称',key:i.key,description:i.description||'暂无描述'}))
   },
   getFunc(...key){
     let result = []
     if(Array.isArray(key)){
       key.forEach((i)=>{
-        let func =this.funcList.find(j=> j.key === i)
+        let func =defaultFuncs.funcList.find(j=> j.key === i)
         func ? result.push(func) : console.warn(`[defaultFuncs warn]：No matching options ${i}`)
       })
     }
@@ -1318,18 +1295,22 @@ export let defaultFuncList = {
   'root':funcList.filter(i=>i.key!== 'addSiblingNode'),
   'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','divider','relayout','relayoutNext','divider','nodeStyle','lineStyle',)
 };
-
-export let childrenGap = 20;
-
-export let levelGap = 200;
-
-export let defaultFuncConfig = {
-  key:"",
-  name:"",
-  img:undefined,
-  icon:undefined,
-  setDom:undefined
+export const toolboxDefault = {
+  distance: 80,
+  showControl:true
 }
+export let pluginDefault = {
+  animate: true,
+  animateDuration:200,
+  childrenGap: 20,
+  levelGap:200,
+  funcList,
+  colorList:colorList,
+  getFuncList(pen){
+    return pen.mind.isRoot?mindBoxPlugin.funcList['root']:mindBoxPlugin.funcList['leaf']
+  }
+}
+
 
 export let toolboxStyle = {
   backgroundColor: '#fff',
@@ -1374,8 +1355,6 @@ export let dividerStyle = {
 }
 
 export default {
-  childrenGap,
-  levelGap,
   funcList,
   colorList,
   dividerStyle,

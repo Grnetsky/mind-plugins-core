@@ -1,9 +1,10 @@
 import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
-import d, {controlStyle, funcListStyle, toolboxStyle} from "../config/default"
+import d, {controlStyle, funcListStyle, toolboxDefault, toolboxStyle} from "../config/default"
 import { Component } from "../parse";
 const DIVIDER = 'divider'
 const CONTROL = 'control'
 
+let CONFIGS = ['showControl','distance','style']
 function configValid(config) {
     if(config.key)return true
     return false
@@ -23,13 +24,24 @@ export class ToolBox {
         }
         this.parentHtml = parentHtml
         this._init()
-        this._loadConfig(config)
+        this._loadOptions(config)
         this.parentHtml.appendChild(this.box);
     }
-    _loadConfig(config){
+    _loadOptions(config){
         if(!isObjectLiteral(config) && !(config == null))return
         config == null ? config = {}:''
+        // 加载默认配置项
+        for (const conf in toolboxDefault) {
+            this[conf] = toolboxDefault[conf]
+        }
+
+        // 加载用户配置项
         for (const conf in config) {
+            if(CONFIGS.includes(conf)){
+                this[conf] = config[conf]
+            }else{
+
+            }
         }
         this.setStyle(config.style)
     }
@@ -414,13 +426,17 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
             if(typeof childDom === 'string'){
                 let div = document.createElement('div');
                 // 默认隐藏节点
-                keepOpen? (item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (div.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,div) || (div.style.visibility = 'hidden'));
+                if(typeof keepOpen === 'boolean'){
+                    keepOpen? (item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (div.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,div) || (div.style.visibility = 'hidden'));
+                }
                 div.innerHTML = childDom;
                 dom.shadowRoot?dom.shadowRoot.appendChild(div):dom.appendChild(div);
                 containerDom = div
             }else{
                 containerDom = childDom;
-                keepOpen?(item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
+                if(typeof keepOpen == 'boolean'){
+                    keepOpen?(item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
+                }
             }
         }else{
             containerDom = createDom('div',{style:{
@@ -444,7 +460,9 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 opacity:0
             },className:'toolbox_gap'})
             dom.shadowRoot?dom.shadowRoot.appendChild(gap):dom.appendChild(gap)
-            keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
+            if(typeof keepOpen === 'boolean'){
+                keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
+            }
 
         }
         let fragment = new DocumentFragment();

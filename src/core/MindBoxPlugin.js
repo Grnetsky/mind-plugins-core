@@ -6,8 +6,7 @@ import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 
-
-let CONFIGS = ['animate','animateDuration','childrenGap','leveGap','colorList']
+let CONFIGS = ['animate','animateDuration','childrenGap','levelGap','colorList']
 export let mindBoxPlugin = {
     name:'mindBox',
     status: false,
@@ -18,7 +17,7 @@ export let mindBoxPlugin = {
     colorFunc:new Map(), // 布局颜色函数map
     _history:[],
     animate: true,
-    animateDuration:200,
+    animateDuration:1000,
     // 计算子节点的颜色和位置
     calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
         if(!pen)return;
@@ -44,11 +43,11 @@ export let mindBoxPlugin = {
     calcChildrenPos(pen,position = pen.mind.direction || 'right',recursion = true){
         let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
         if(!layoutFunc)return
-        // try{
+        try{
             layoutFunc(pen, recursion)
-        // }catch (e){
-        //     throw new Error(`[mindBoxPlugin calcChildrenPos] error : ${e.message}`)
-        // }
+        }catch (e){
+            throw new Error(`[mindBoxPlugin calcChildrenPos] error : ${e.message}`)
+        }
     },
     connectLine(pen,newPen,style = 'mind'){
         // let line = null;
@@ -414,9 +413,9 @@ export let mindBoxPlugin = {
                             level:0,
                         };
                         // 跟随移动
-                        pen.mind.mindboxOption = options
+                        pen.mind.mindboxOption = deepClone(options);
                         mindBoxPlugin.combineToolBox(pen);
-                        mindBoxPlugin.combineLifeCircle(pen)
+                        mindBoxPlugin.combineLifeCircle(pen);
                         PluginManager.messageChannel.publish('open',pen)
                         mindBoxPlugin.record(pen.id)
                         meta2d.render()
@@ -449,7 +448,7 @@ export let mindBoxPlugin = {
     funcList: defaultFuncList,
     setFuncList(funcList){
         if(Object.prototype.toString.call(funcList) !== '[object Object]'){
-            throw new Error('The setFuncList function must take function arguments\n')
+            throw new Error(`The setFuncList function must take function arguments, get ${funcList}\n`)
         }
         this.funcList = funcList;
     },

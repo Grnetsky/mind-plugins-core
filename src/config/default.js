@@ -35,11 +35,11 @@ let funcList =
     // func: async (self,pen)=>{
     //   mindBoxPlugin.bottomChildren(pen,0);
     //   },
-    openChildDomEvent: 'mouseenter',
+    popupEvent: 'mouseenter',
     closeShadowDom:true,
-    closeEventOnChild:false, // 是否在childrenDom中触发事件
+    collapseEventOnChild:false, // 是否在childrenDom中触发事件
     stopPropagation:true,
-    closeChildDom(self,pen,dom){
+    collapseAnimate(self,pen,dom){
       // dom.style.height = 'max-height'
       // dom.style.visibility = 'hidden'
       // dom.style.overflow = 'hidden'
@@ -52,12 +52,11 @@ let funcList =
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    openChildDom(self,pen,dom){
+    popupAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    popup:{
-      list:[
+    popup:[
         {
           menu:{
             text:'矩形',
@@ -99,7 +98,6 @@ let funcList =
           }
         }
       ],
-    }
   }, {
     key:'divider',
   },
@@ -200,7 +198,7 @@ let funcList =
     width:4,
     colorList:['#5757F3','#FD42DD','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a','#fa7878'],
-    openChildDomEvent:'mouseover',
+    popupEvent:'mouseover',
     /**
      * @description 初始化函数
      * @param self 配置项本身
@@ -213,16 +211,15 @@ let funcList =
     },
 
     stopPropagation:true,
-    closeChildDom(self,pen,dom){
+    collapseAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    openChildDom(self,pen,dom){
+    popupAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    popup:{
-      dom(self, pen) {
+    popup(self, pen) {
         let dom = createDom('div',{
           style:{display: 'flex',
             flexDirection: 'row',
@@ -266,7 +263,7 @@ let funcList =
                   <div class="item">
                 <div class="title">边框样式</div>
                 <div class="main_style ">
-                  <div class="style_item {{lineactive}}" data-style="直线" @click="setOutLineStyle(true)">
+                  <div class="style_item ${self.dash === '0,0'?'style_active':''}" data-style="直线" @click="setOutLineStyle(true)">
                      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -275,7 +272,7 @@ let funcList =
                         </g>
                     </svg>
                   </div>
-                  <div class="style_item {{dashActive}}" data-style="虚线" @click="setOutLineStyle(false)">
+                  <div class="style_item  ${self.dash === '5,5'?'style_active':''}" data-style="虚线" @click="setOutLineStyle(false)">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="2px" viewBox="0 0 78 2" version="1.1">
                         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-dasharray="4" stroke-linecap="round">
                             <g id="未固定" transform="translate(-402.000000, -306.000000)" stroke="#000000" stroke-width="2">
@@ -318,7 +315,16 @@ let funcList =
           </div>`,
           scripts:{
             // 能在这里面获取到dom
-            mounted(){ // 生命周期函数
+            mounted(){ // 生命周
+              // 期函数
+              self.dash = pen.dash.join(',')
+              if(self.dash === '0,0'){
+                this.lineactive = 'style_active'
+                this.dashActive = ''
+              }else {
+                this.lineactive = ''
+                this.dashActive = 'style_active'
+              }
             },
             value:10,
             lineactive:'style_active',
@@ -331,15 +337,14 @@ let funcList =
               },{render:true})
               // toolbox.renderFuncList()
               self.dash = res.join(',')
-              if(self.dash === '0,0'){
-                this.lineactive = 'style_active'
-                this.dashActive = ''
-              }else {
-                this.lineactive = ''
-                this.dashActive = 'style_active'
-              }
-              self.update('title')
-              this.$update()
+              // if(self.dash === '0,0'){
+              //   this.lineactive = 'style_active'
+              //   this.dashActive = ''
+              // }else {
+              //   this.lineactive = ''
+              //   this.dashActive = 'style_active'
+              // }
+              self.updateAll()
               // self.close()
             },
             sliderChange: (value)=>{
@@ -458,8 +463,7 @@ let funcList =
         },'dom')
         dom.shadowRoot.appendChild(str)
         return dom
-      },
-    },
+      }
 
     // children: [
     //   {
@@ -521,20 +525,19 @@ let funcList =
     colorList:['#f13097','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
     closeShadowDom: true,
-    closeEventOnChild:false,
+    collapseEventOnChild:false,
     openEventOnTitle:true,
-    openChildDomEvent: 'mouseenter',
-    closeChildDomEvent:'click',
-    closeChildDom(self,pen,dom){
+    popupEvent: 'mouseenter',
+    collapseEvent:'click',
+    collapseAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    openChildDom(self,pen,dom){
+    popupAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    popup: {
-      dom(self, pen){
+    popup(self, pen){
         let dom = createDom('div',{style:{
             display: 'flex',
             flexDirection: 'row',
@@ -749,7 +752,6 @@ let funcList =
         dom.shadowRoot.innerHTML = str
         dom.shadowRoot.appendChild(gap)
         return dom ;
-      },
     },
     event: 'mouseenter',
     func(self,pen,dom){
@@ -772,9 +774,9 @@ let funcList =
       self.childrenGap = mindBoxPlugin.childrenGap
       self.levelGap = mindBoxPlugin.levelGap
       self.animate = mindBoxPlugin.animate
+      pen.locked = 0
       self.status = self.animate?'已开启':'已关闭'
     },
-
     activeDirection(self,pen,dom){
       let rootDom = dom.querySelector('.main');
       let divs = rootDom.querySelectorAll('div');
@@ -795,31 +797,34 @@ let funcList =
       divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
       divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
     },
-    onOpenChildDom(self,pen,dom){
-      self.activeDirection(self,pen,dom);
-      self.childrenGap = mindBoxPlugin.childrenGap
-      self.levelGap = mindBoxPlugin.levelGap
-    },
-    openChildDomEvent: 'mouseenter',
-    closeEventOnChild:false, // 是否在childrenDom中触发事件
-    closeChildDomEvent:'none',
+    popupEvent: 'mouseenter',
+    collapseEventOnChild:false, // 是否在childrenDom中触发事件
+    collapseEvent:'none',
     stopPropagation:true,
     animate:false,
-    closeChildDom(self,pen,dom){
+    collapseAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(0)'
       return true
     },
     mounted(self,pen,dom){
       self.activeDirection(self,pen,dom)
     },
-    openChildDom(self,pen,dom){
+    popupAnimate(self,pen,dom){
       dom.style.transform = 'scaleY(1)'
       return true
     },
+    onPopup(self,pen,dom){
+      self.activeDirection(self,pen,dom);
+      self.childrenGap = mindBoxPlugin.childrenGap
+      self.levelGap = mindBoxPlugin.levelGap
+      pen.locked = 1
+    },
+    onCollapse(self,pen){
+      pen.locked = 0
+    },
     status:'已开启',
     // 设置下拉列表的样式和子元素布局
-    popup: {
-      dom(self,pen){
+    popup(self,pen){
         let dom = createDom('div',{style:{
             display: 'flex',
             flexDirection: 'row',
@@ -1038,11 +1043,13 @@ let funcList =
             setChildGap(value){
               self.childrenGap = value;
               mindBoxPlugin.childrenGap = value;
+              pen.mind.mindboxOption.childrenGap = value
               mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
             },
             setLevelGap(value){
               self.levelGap = value;
               mindBoxPlugin.levelGap = value;
+              pen.mind.mindboxOption.levelGap = value;
               mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
             },
             setDirection(e){
@@ -1169,8 +1176,6 @@ let funcList =
         //   e.target.classList.add('active');
         // });
         return dom ;
-      },
-
     }
   },
 {
@@ -1190,23 +1195,22 @@ let funcList =
   // func: async (self,pen)=>{
   //   mindBoxPlugin.bottomChildren(pen,0);
   //   },
-  openChildDomEvent: 'mouseenter',
+  popupEvent: 'mouseenter',
   closeShadowDom:true,
-  closeEventOnChild:false, // 是否在childrenDom中触发事件
+  collapseEventOnChild:false, // 是否在childrenDom中触发事件
   stopPropagation:true,
-  closeChildDom(self,pen,dom){
+  collapseAnimate(self,pen,dom){
     dom.style.transformOrigin = 'top';
     dom.style.transition = 'all .3s'
 
     dom.style.transform = 'scaleY(0)'
     return true
   },
-  openChildDom(self,pen,dom){
+  popupAnimate(self,pen,dom){
     dom.style.transform = 'scaleY(1)'
     return true
   },
-  popup: {
-    list:[
+  popup:[
   {
     menu:{
       name:'',
@@ -1255,16 +1259,14 @@ let funcList =
     }
   }
 ],
-
-}
   },
  // {
  //   name:'button',
  //   event: 'click',
  //   func(){
  //   },
- //   openChildDomEvent:'mouseenter',
- //   closeChildDomEvent: 'mouseleave',
+ //   popupEvent:'mouseenter',
+ //   collapseEvent: 'mouseleave',
  //
  //  setChildrenDom(){
  //    // return '<ele-button></ele-button'
@@ -1352,10 +1354,16 @@ export let dividerStyle = {
   backgroundColor:'rgba(18,17,42,.1)',
 }
 
+export let basicFuncConfig = {
+  collapseEventOnChild:true,
+  collapseEvent:'click',
+}
 export default {
   funcList,
   colorList,
+  controlStyle,
   dividerStyle,
-  defaultFuncList
+  defaultFuncList,
+  basicFuncConfig
 }
 

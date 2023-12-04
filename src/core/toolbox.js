@@ -1,8 +1,11 @@
 import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
-import d, {controlStyle, funcListStyle, toolboxDefault, toolboxStyle} from "../config/default"
+import d, {basicFuncConfig, controlStyle, funcListStyle, toolboxDefault, toolboxStyle} from "../config/default"
 import { Component } from "../parse";
 const DIVIDER = 'divider'
 const CONTROL = 'control'
+
+let mouseMoved = false;
+
 
 let CONFIGS = ['showControl','offset','style']
 function configValid(config) {
@@ -121,6 +124,7 @@ export class ToolBox {
               scripts:{
                 rivetVisible: 'none',
                 toggleFreeze(v){
+                    if(mouseMoved)return
                     if(!v){
                         self.freezePos(false)
                     }
@@ -128,12 +132,11 @@ export class ToolBox {
                         this.rivetVisible = 'flex'
                     }else {
                         this.rivetVisible = 'none'
+                        self.translateWithPen(self.pen)
                     }
                     this.$update()
-                    self.translateWithPen(self.pen)
                 }
-                }
-                }
+              }}
             ,"dom")
             control.addEventListener('mouseup',()=>{
                 icon.expose.rivetVisible = 'flex'
@@ -251,7 +254,7 @@ export class ToolBox {
 
             item.dom = dom
             item.dom.titleDom = title;
-            if(item.popup.list || item.popup.dom){
+            if(item.popup){
                 // 打开函数
                 let openFunc = ()=>{
                     // 关闭其他选项
@@ -261,19 +264,17 @@ export class ToolBox {
                                 i.close()
                             }
                         )
-                        // toolbox.curItem?.closeChildDom?.(toolbox.curItem,pen,toolbox.curItem.dom.childrenDom) || (toolbox.curItem?.dom.childrenDom && ( toolbox.curItem.dom.childrenDom.style.visibility = 'hidden' ))
-                        // toolbox.curItem?.isOpen? (toolbox.curItem.isOpen = false): ''
                     }
                     if((toolbox.curItem === item) && item.isOpen)return
                     // 将打开逻辑交给用户 或者
-                    item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'));
+                    item.popupAnimate?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'));
 
                     // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-                    item.onOpenChildDom?.(item,pen,item.dom.childrenDom)
+                    item.onPopup?.(item,pen,item.dom.childrenDom)
                     item.isOpen = true
                     toolbox.curItem = item
                 }
-                    title['on'+(item.openChildDomEvent || 'click')] = openFunc
+                    title['on'+(item.popupEvent || 'click')] = openFunc
             }
 
 
@@ -339,6 +340,7 @@ export class ToolBox {
         function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
+            mouseMoved = true
             // 计算鼠标的新位置
             pos1 = pos3 - e.clientX;
             pos2 = pos4 - e.clientY;
@@ -352,6 +354,7 @@ export class ToolBox {
         }
         function closeDragElement() {
             self.onControlUp?.()
+            mouseMoved = false
             // 停止移动时，移除鼠标事件监听
             document.removeEventListener('mouseup',closeDragElement)
             document.removeEventListener('mousemove',elementDrag)
@@ -404,21 +407,21 @@ function renderTitle(item,pen,title) {
                 throw new Error('function setDom must return string or node object');
         }
     }else {
-        title.innerHTML = (item.menu?.icon? item.menu?.icon : (item.menu?.img?`<img src="${item.menu?.img}" title="${item.menu?.text}" />` : item.menu?.text))
+        title.innerHTML = (item.menu?.icon? item.menu?.icon : (item.menu?.img?`<img src="${item.menu?.img}" title="${item.menu?.text || '图标'}" />` : item.menu?.text))
     }
     return title
 }
 
 function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(dom.childrenDom)dom.shadowRoot?dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom)
-    if((item.popup.list && item.popup.list.length > 0) || item.popup.dom){
+    if(item.popup){
         // 是否重写dom
         if(
-            typeof item.popup.dom === 'function'
+            typeof item.popup === 'function'
         ){
             // 重新childDom
 
-            let childDom = item.popup.dom(item,pen,dom);
+            let childDom = item.popup(item,pen,dom);
 
             /**
              * @description 若返回的是字符串，则在外部包裹一层div作为其container
@@ -427,7 +430,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 let div = document.createElement('div');
                 // 默认隐藏节点
                 if(typeof keepOpen === 'boolean'){
-                    keepOpen? (item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (div.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,div) || (div.style.visibility = 'hidden'));
+                    keepOpen? (item.popupAnimate?.(item,pen,item.dom.childrenDom) ||  (div.style.visibility = 'visible')):(item.collapseAnimate?.(item,pen,div) || (div.style.visibility = 'hidden'));
                 }
                 div.innerHTML = childDom;
                 dom.shadowRoot?dom.shadowRoot.appendChild(div):dom.appendChild(div);
@@ -435,7 +438,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
             }else{
                 containerDom = childDom;
                 if(typeof keepOpen == 'boolean'){
-                    keepOpen?(item.openChildDom?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
+                    keepOpen?(item.popupAnimate?.(item,pen,item.dom.childrenDom) ||  (childDom.style.visibility = 'visible')):(item.collapseAnimate?.(item,pen,childDom) || (childDom.style.visibility = 'hidden'));
                 }
             }
         }else{
@@ -461,42 +464,45 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
             },className:'toolbox_gap'})
             dom.shadowRoot?dom.shadowRoot.appendChild(gap):dom.appendChild(gap)
             if(typeof keepOpen === 'boolean'){
-                keepOpen?(item.openChildDom?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.closeChildDom?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
+                keepOpen?(item.popupAnimate?.(item,pen,containerDom) ||  (containerDom.style.visibility = 'visible')):(item.collapseAnimate?.(item,pen,containerDom) || (containerDom.style.visibility = 'hidden'));
             }
 
         }
-        let fragment = new DocumentFragment();
-        for(let i of item.popup.list || []){
-            let node = createDom('div',
-                {style:{
-                    margin: '5px 8px'
-                },event:i.event,func:function(e){
-                    i.stopPropagation?e.stopPropagation():'';
-                    i.func(i, this, dom, item,e);
-                }.bind(pen),className:'toolbox_item'});
+        if(Array.isArray(item.popup)){
+            let fragment = new DocumentFragment();
+            for(let i of item.popup || []){
+                let node = createDom('div',
+                    {style:{
+                            margin: '5px 8px'
+                        },event:i.event,func:function(e){
+                            i.stopPropagation?e.stopPropagation():'';
+                            i.func(i, this, dom, item,e);
+                        }.bind(pen),className:'toolbox_item'});
 
-            //TODO 执行时机是否正确？？？
-            i.init?.(i,pen,node)
-            if(i.menu?.dom){
-                let re = i.menu?.dom(i,pen,node);
-                switch (typeof re) {
-                    case "string":
-                        node.innerHTML = re;
-                        break;
-                    case "object":
-                        node.appendChild(re);
-                        break;
-                    default:
-                        throw new Error('function setDom must return string or node object');
+                //TODO 执行时机是否正确？？？
+                i.init?.(i,pen,node)
+                if(i.menu?.dom){
+                    let re = i.menu?.dom(i,pen,node);
+                    switch (typeof re) {
+                        case "string":
+                            node.innerHTML = re;
+                            break;
+                        case "object":
+                            node.appendChild(re);
+                            break;
+                        default:
+                            throw new Error('function setDom must return string or node object');
+                    }
+                }else {
+                    node.innerHTML = (i.menu?.icon && i.menu?.text) || (i.menu?.img && i.menu?.text)? '<span style="padding-right: 30px;width: max-content" >'+ (i.menu?.icon || `<img src="${i.menu?.img}"/>`)+'</span> <span>'+i.menu?.text+'</span>' :'<span>'+(i.menu?.text || i.menu?.icon)+'</span>';
                 }
-            }else {
-                node.innerHTML = (i.menu?.icon && i.menu?.text) || (i.menu?.img && i.menu?.text)? '<span style="padding-right: 30px;width: max-content" >'+ (i.menu?.icon || `<img src="${i.menu?.img}"/>`)+'</span> <span>'+i.menu?.text+'</span>' :'<span>'+(i.menu?.text || i.menu?.icon)+'</span>';
+                fragment.appendChild(node);
             }
-            fragment.appendChild(node);
+            containerDom?.appendChild(fragment);
         }
         dom.style.position = 'relative';
-        containerDom?.appendChild(fragment);
         containerDom.classList.add('toolbox_container')
+        // 下拉菜单默认为绝对定位
         containerDom.style.position = 'absolute';
         item.mounted?.(item,pen,containerDom)
         item.closeShadowDom?dom.appendChild(containerDom):dom.shadowRoot.appendChild(containerDom);
@@ -504,13 +510,12 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 // 添加样式到元素
     }
 
-    if(item.popup.list || item.popup.dom || item.closeOther){
+    if(item.popup || item.closeOther){
         // 关闭下拉菜单
         if(!item.closeOther){
-            item.closeChildDomEvent?((item.closeEventOnChild?dom.childrenDom: item.dom.titleDom)['on'+(item.closeChildDomEvent)] = (()=>{
+            item.collapseEvent?((item.collapseEventOnChild?dom.childrenDom: item.dom.titleDom)['on'+(item.collapseEvent || basicFuncConfig.collapseEvent)] = (()=>{
                 dom.offsetHeight
                 // 可手动派发隐藏函数
-                item.onCloseChildDom?.(item,pen,item.dom.childrenDom)
                 item.close()
                 toolbox.curItem = null
             })):''
@@ -529,16 +534,18 @@ function preprocess(item,pen) {
     if(!item.popup){
         item.popup = {}
     }
-    if(item.popup.list || item.popup.dom){
+    if(item.popup){
         item.isOpen = false
         item.closeOther = false
         item.close = ()=>{
-            item.closeChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden'))
+            item.collapseAnimate?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden'))
             item.isOpen = false
+            item.onCollapse?.(item,pen,item.dom.childrenDom)
         }
         item.open = ()=>{
-            item.openChildDom?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'))
+            item.popupAnimate?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'))
             item.isOpen = true
+            item.onPopup?.(item,pen.item.dom.childrenDom)
         }
     }
 

@@ -13,34 +13,37 @@ let LifeCycle = ['beforeMounted']
  * @return string dom字符串
  * */
 
-export function Component(config,{template,scripts,style},output = 'dom',root = null){
+export function Component(config,{template,script,style},output = 'dom',root = null){
     let res = createDom('div')
-    scripts.$update = ()=>{
+    script.$update = ()=>{
         if(!root)root = res
         // 直接进行dom替换 有问题  事件不生效
-        root.innerHTML = Component(config,{template,style,scripts:PluginManager._env[namespace]},output,root).innerHTML
+        root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root).innerHTML
     }
 
-    if(!scripts)scripts = {}
+    if(!script)script = {}
     if(!style)style = ''
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
     PluginManager._env[namespace]? '' : PluginManager._env[namespace] = {};
     let {dom, funcObjs,varObj} = parse(template)
-    let keys = Object.keys(scripts)
+    let keys = Object.keys(script)
 
     // 暂不考虑 传其他参数情况
     // keys.forEach(i=>{
     //     // 将script的函数传递到全局环境
-    //     PluginManager._env[namespace][i] = scripts[i]
+    //     PluginManager._env[namespace][i] = script[i]
     //
     //     // 执行生命周期函数 放入微队列依次执行
     //
     // })
-    PluginManager._env[namespace] = scripts
-    LifeCycle.forEach(i=>{
-        Object.keys(scripts).includes(i)?scripts[i]():''
-    })
+    PluginManager._env[namespace] = script
+    if(!root){
+        LifeCycle.forEach(i=>{
+            Object.keys(script).includes(i)?script[i]():''
+        })
+    }
+
     funcObjs.forEach(i=>{
         // 出现的函数在script中定义了 则转换
         if(keys.indexOf(i.name) !== -1){
@@ -75,7 +78,7 @@ export function Component(config,{template,scripts,style},output = 'dom',root = 
         return  dom + sty
     }else if(output === 'dom'){
         res.innerHTML = dom + sty
-        res.expose = scripts
+        res.expose = script
         return res
     }
 }

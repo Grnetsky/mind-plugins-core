@@ -37,7 +37,7 @@ let funcList =
     //   },
     popupEvent: 'mouseenter',
     closeShadowDom:true,
-    collapseEventOnChild:false, // 是否在childrenDom中触发事件
+    collapseEventOnMenu:false, // 是否在childrenDom中触发事件
     stopPropagation:true,
     collapseAnimate(self,pen,dom){
       // dom.style.height = 'max-height'
@@ -313,7 +313,7 @@ let funcList =
                 </div>
               </div>
           </div>`,
-          scripts:{
+          script:{
             // 能在这里面获取到dom
             mounted(){ // 生命周
               // 期函数
@@ -525,7 +525,7 @@ let funcList =
     colorList:['#f13097','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
     closeShadowDom: true,
-    collapseEventOnChild:false,
+    collapseEventOnMenu:false,
     openEventOnTitle:true,
     popupEvent: 'mouseenter',
     collapseEvent:'click',
@@ -612,7 +612,7 @@ let funcList =
                 </div>
               </div>
           </div>`,
-          scripts:{
+          script:{
             sliderChange: (value)=>{
               dom.shadowRoot.querySelector('#t').innerHTML = value
               self.width = value
@@ -798,7 +798,7 @@ let funcList =
       divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
     },
     popupEvent: 'mouseenter',
-    collapseEventOnChild:false, // 是否在childrenDom中触发事件
+    collapseEventOnMenu:false, // 是否在childrenDom中触发事件
     collapseEvent:'none',
     stopPropagation:true,
     animate:false,
@@ -1029,7 +1029,7 @@ let funcList =
                 </div>
               </div>
           </div>`,
-          scripts:{
+          script:{
             // 能在这里面获取到dom
             status:'已开启',
             setAnimate(){
@@ -1197,7 +1197,7 @@ let funcList =
   //   },
   popupEvent: 'mouseenter',
   closeShadowDom:true,
-  collapseEventOnChild:false, // 是否在childrenDom中触发事件
+  collapseEventOnMenu:false, // 是否在childrenDom中触发事件
   stopPropagation:true,
   collapseAnimate(self,pen,dom){
     dom.style.transformOrigin = 'top';
@@ -1355,8 +1355,9 @@ export let dividerStyle = {
 }
 
 export let basicFuncConfig = {
-  collapseEventOnChild:true,
+  collapseEventOnMenu:true,
   collapseEvent:'click',
+  popupEvent:'mouseenter'
 }
 export default {
   funcList,

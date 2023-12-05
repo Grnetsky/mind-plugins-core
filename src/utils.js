@@ -106,6 +106,7 @@ export function removeDuplicates(list){
     return uniqueResults
 }
 
+//沙盒
 export function scopedEval(scope, expr) {
     const scopeKeys = Object.keys(scope);
     const scopeValues = Object.values(scope);

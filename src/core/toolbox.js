@@ -121,7 +121,7 @@ export class ToolBox {
                             </div>
                             </div>
                            `,
-              scripts:{
+              script:{
                 rivetVisible: 'none',
                 toggleFreeze(v){
                     if(mouseMoved)return
@@ -245,7 +245,7 @@ export class ToolBox {
             // 清空列表  初始化列表
             renderInit(item,pen,dom)
             // 执行配置项初始化函数
-            item.init?.(item,pen,dom)
+            item.init?.(item,pen)
 
             // 初始化titleDOM
             let title = createDom('div',{className:'toolbox_title'})
@@ -274,7 +274,7 @@ export class ToolBox {
                     item.isOpen = true
                     toolbox.curItem = item
                 }
-                    title['on'+(item.popupEvent || 'click')] = openFunc
+                    title['on'+(item.popupEvent || basicFuncConfig.popupEvent)] = openFunc
             }
 
 
@@ -513,12 +513,12 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
     if(item.popup || item.closeOther){
         // 关闭下拉菜单
         if(!item.closeOther){
-            item.collapseEvent?((item.collapseEventOnChild?dom.childrenDom: item.dom.titleDom)['on'+(item.collapseEvent || basicFuncConfig.collapseEvent)] = (()=>{
+           ((item.collapseEventOnMenu ?? basicFuncConfig.collapseEventOnMenu? item.dom.titleDom : dom.childrenDom)['on'+(item.collapseEvent || basicFuncConfig.collapseEvent)] = (()=>{
                 dom.offsetHeight
                 // 可手动派发隐藏函数
                 item.close()
                 toolbox.curItem = null
-            })):''
+            }))
         }
     }
     return containerDom
@@ -538,11 +538,13 @@ function preprocess(item,pen) {
         item.isOpen = false
         item.closeOther = false
         item.close = ()=>{
+            if (!item.isOpen)return
             item.collapseAnimate?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden'))
             item.isOpen = false
             item.onCollapse?.(item,pen,item.dom.childrenDom)
         }
         item.open = ()=>{
+            if(item.isOpen)return
             item.popupAnimate?.(item,pen,item.dom.childrenDom) || (item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible'))
             item.isOpen = true
             item.onPopup?.(item,pen.item.dom.childrenDom)

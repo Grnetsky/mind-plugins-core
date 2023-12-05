@@ -2101,7 +2101,7 @@
       defer = _ctx(port.postMessage, port, 1);
     // Browsers with postMessage, skip WebWorkers
     // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-    } else if (_global.addEventListener && typeof postMessage == 'function' && !_global.importScripts) {
+    } else if (_global.addEventListener && typeof postMessage == 'function' && !_global.importscript) {
       defer = function (id) {
         _global.postMessage(id + '', '*');
       };

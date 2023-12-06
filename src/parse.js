@@ -5,7 +5,7 @@ const EVENTTAG = ['@','on']
 
 import {createDom, escapeRegExp, removeDuplicates, replaceAfterPosition, scopedEval} from "./utils";
 
-let LifeCycle = ['beforeMounted']
+let LifeCycle = ['init']
 /**
  * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
  * @param self 此配置项自身
@@ -39,9 +39,10 @@ export function Component(config,{template,script,style},output = 'dom',root = n
     // })
     PluginManager._env[namespace] = script
     if(!root){
-        LifeCycle.forEach(i=>{
-            Object.keys(script).includes(i)?script[i]():''
-        })
+        // LifeCycle.forEach(i=>{
+        //     Object.keys(script).includes(i)?script[i]():''
+        // })
+        script.init?.()
     }
 
     funcObjs.forEach(i=>{
@@ -60,13 +61,16 @@ export function Component(config,{template,script,style},output = 'dom',root = n
             dom = dom.replaceAll(i.name+"(",`PluginManager._env.${namespace}.${i.name}(`)
         }
     })
-
+    let offset = 0;
     varObj.forEach(i=>{
+        console.log(i.name,'xxxxxxxxxx')
         // 支持简单的表达式
         let res = scopedEval(window.PluginManager._env[namespace],i.name)
         let regex = new RegExp(`\\{\\{\\s*${escapeRegExp(i.name)}\\s*\\}\\}`)
         // 处理变量
-        dom = replaceAfterPosition(dom,i.index,regex,res)
+        let oldDom = dom
+        dom = replaceAfterPosition(dom,i.index - offset,regex,res)
+        offset = oldDom.length - dom.length // 更换后的文字偏移量
     })
 
 

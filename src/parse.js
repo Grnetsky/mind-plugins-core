@@ -44,6 +44,7 @@ export function Component(config,{template,script,style},output = 'dom',root = n
         // })
         script.init?.()
     }
+    let funcOffset = 0;
 
     funcObjs.forEach(i=>{
         // 出现的函数在script中定义了 则转换
@@ -54,7 +55,11 @@ export function Component(config,{template,script,style},output = 'dom',root = n
                 if(!j.param.startsWith('this') && j.param!=='event' && !isLiteral(j.param)){
                     // TODO 此处应当根据字符的具体位置来替换，而非全部替换
                     // dom = dom.replaceAll(j.param,`PluginManager._env.${namespace}.${j}`)
-                    dom = replaceAfterPosition(dom,j.index,j.param,`PluginManager._env.${namespace}.${j.param}`)
+                    let oldDom = dom
+
+                    dom = replaceAfterPosition(dom,j.index - funcOffset,j.param,`PluginManager._env.${namespace}.${j.param}`)
+                    funcOffset += oldDom.length - dom.length // 更换后的文字偏移量
+
                 }
             }));
             // 处理函数名
@@ -63,14 +68,13 @@ export function Component(config,{template,script,style},output = 'dom',root = n
     })
     let offset = 0;
     varObj.forEach(i=>{
-        console.log(i.name,'xxxxxxxxxx')
         // 支持简单的表达式
         let res = scopedEval(window.PluginManager._env[namespace],i.name)
         let regex = new RegExp(`\\{\\{\\s*${escapeRegExp(i.name)}\\s*\\}\\}`)
         // 处理变量
         let oldDom = dom
         dom = replaceAfterPosition(dom,i.index - offset,regex,res)
-        offset = oldDom.length - dom.length // 更换后的文字偏移量
+        offset += oldDom.length - dom.length // 更换后的文字偏移量
     })
 
 

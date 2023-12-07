@@ -184,6 +184,8 @@ export let mindBoxPlugin = {
             connectLine(from,fromAnchor,line,lineAnchor1)
             connectLine(to,toAnchor,line,lineAnchor2)
             meta2d.canvas.updateLines(child)
+            // 设置line的层级为最低
+            meta2d.bottom(line)
             if(recursion){
                 mindBoxPlugin.reconnectLines(child,true);
             }

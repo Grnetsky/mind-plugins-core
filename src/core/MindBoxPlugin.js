@@ -17,9 +17,17 @@ export let mindBoxPlugin = {
     colorFunc:new Map(), // 布局颜色函数map
     _history:[],
     animate: true,
+    _colorRule:'default',
     animateDuration:1000,
+    // 重新设置颜色规则
+    resetColorRule(pen,rule = 'default',recursion = true){
+        mindBoxPlugin._colorRule = rule
+        mindBoxPlugin.calcChildrenColor(pen,rule,recursion)
+        mindBoxPlugin.resetLinesColor(pen,true)
+        mindBoxPlugin.render(pen)
+    },
     // 计算子节点的颜色和位置
-    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = 'default',recursion = true){
+    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = mindBoxPlugin._colorRule,recursion = true){
         if(!pen)return;
         let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
         let colorFunc = mindBoxPlugin.colorFunc.get(color)
@@ -31,7 +39,7 @@ export let mindBoxPlugin = {
             throw new Error(`mindBoxPlugin error : ${e.message}`)
         }
     },
-    calcChildrenColor(pen,type = 'default',recursion = true){
+    calcChildrenColor(pen,type = mindBoxPlugin._colorRule,recursion = true){
         let colorFunc = mindBoxPlugin.colorFunc.get(type)
         if(!colorFunc)return
         try{
@@ -209,7 +217,7 @@ export let mindBoxPlugin = {
         mindBoxPlugin.reconnectLines(pen,recursion)
 
         // 计算子级节点颜色  按默认颜色规则进行配置
-        mindBoxPlugin.calcChildrenColor(pen,'default',recursion)
+        mindBoxPlugin.calcChildrenColor(pen,mindBoxPlugin._colorRule,recursion)
         // 重新设置连线样式
         mindBoxPlugin.resetLinesStyle(pen,recursion)
         mindBoxPlugin.resetLinesColor(pen,recursion)

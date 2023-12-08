@@ -3,25 +3,80 @@
 // TODO 此处只能处理返回字符串的信息
 const EVENTTAG = ['@','on']
 
-import {createDom, escapeRegExp, removeDuplicates, replaceAfterPosition, scopedEval} from "./utils";
+import {
+    compareObjects,
+    createDom,
+    deepCopy,
+    escapeRegExp,
+    removeDuplicates,
+    replaceAfterPosition,
+    scopedEval
+} from "./utils";
 
-let LifeCycle = ['init']
+let LifeCycle = ['init','mounted']
 /**
  * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
  * @param self 此配置项自身
- * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
  * @return string dom字符串
+ * @param config
+ * @param output
+ * @param root
+ * @param oldScript
  * */
 
-export function Component(config,{template,script,style},output = 'dom',root = null){
+export function Component(config,{template,script,style},output = 'dom',root = null,oldScript = null){
     let res = createDom('div')
+    if(!script)script = {}
+    let duty = {}
+    // dom的预处理
+    template = addUniqueIdsToHtmlString(template)
+
     script.$update = ()=>{
         if(!root)root = res
-        // 直接进行dom替换 有问题  事件不生效
-        root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root).innerHTML
-    }
+        // Object.keys(duty).forEach(key=>{
+            // 找到对应的dom
+            // let changes = PluginManager._env[namespace].__depMap.filter((v)=>{
+            //     // 返回表达式中包含此变量的表达式
+            //     return v.name.includes(key)
+            // })
+            // let globalRender = false
+            // changes.forEach(i=>{
+            //     if(i.prop === 'class'){
+            //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+            //         let res = scopedEval(window.PluginManager._env[namespace],i.name)
+            //         console.log(i['meta2d-id'])
+            //         // TODO 这没换成功
+            //         element.classList.remove(i.res)
+            //         element.classList.add(res)
+            //     }else if (i.prop === 'style'){
+            //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+            //         let res = scopedEval(window.PluginManager._env[namespace],i.name)
+            //         root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
+            //     }else {
+            //         globalRender = true
+            //     }
+            // })
+            // globalRender ? root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML: ''
 
-    if(!script)script = {}
+        // })
+        // 组件全部更新
+        root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
+        duty = {}
+    }
+    // 脏数据
+    let proxyScript = new Proxy(script,{
+        set(target, p, newValue, receiver) {
+            // 写入脏数据
+            if(!['$update','init','mounted','__depMap'].includes(p)){
+                duty[p] = Reflect.get(target,p,newValue,receiver)
+            }
+            return Reflect.set(target,p,newValue,receiver)
+        },
+        get(target, p, receiver) {
+            return Reflect.get(target,p,receiver)
+        }
+    })
+
     if(!style)style = ''
     let namespace = config.key
     if (!namespace)throw new Error('The name attribute is not configured')
@@ -29,20 +84,14 @@ export function Component(config,{template,script,style},output = 'dom',root = n
     let {dom, funcObjs,varObj} = parse(template)
     let keys = Object.keys(script)
 
-    // 暂不考虑 传其他参数情况
-    // keys.forEach(i=>{
-    //     // 将script的函数传递到全局环境
-    //     PluginManager._env[namespace][i] = script[i]
-    //
-    //     // 执行生命周期函数 放入微队列依次执行
-    //
-    // })
-    PluginManager._env[namespace] = script
+    PluginManager._env[namespace] = proxyScript
+    PluginManager._env[namespace].__depMap = null
+    // 生命周期
     if(!root){
-        // LifeCycle.forEach(i=>{
-        //     Object.keys(script).includes(i)?script[i]():''
-        // })
-        script.init?.()
+        proxyScript.init?.()
+        Promise.resolve().then(()=>{
+            proxyScript.mounted?.()
+        })
     }
     let funcOffset = 0;
 
@@ -59,24 +108,23 @@ export function Component(config,{template,script,style},output = 'dom',root = n
 
                     dom = replaceAfterPosition(dom,j.index - funcOffset,j.param,`PluginManager._env.${namespace}.${j.param}`)
                     funcOffset += oldDom.length - dom.length // 更换后的文字偏移量
-
                 }
             }));
             // 处理函数名
             dom = dom.replaceAll(i.name+"(",`PluginManager._env.${namespace}.${i.name}(`)
         }
     })
-    let offset = 0;
+    PluginManager._env[namespace].__depMap = varObj
     varObj.forEach(i=>{
         // 支持简单的表达式
         let res = scopedEval(window.PluginManager._env[namespace],i.name)
-        let regex = new RegExp(`\\{\\{\\s*${escapeRegExp(i.name)}\\s*\\}\\}`)
-        // 处理变量
-        let oldDom = dom
-        dom = replaceAfterPosition(dom,i.index - offset,regex,res)
-        offset += oldDom.length - dom.length // 更换后的文字偏移量
-    })
+        // 将生成的结果保存在数据中
+        i.res = res
 
+        // 进行运算后的值替换
+        let regex = new RegExp(`\\{\\{\\s*${escapeRegExp(i.name)}\\s*\\}\\}`)
+        dom = replaceAfterPosition(dom,0,regex,res)
+    })
 
     let sty = ''
     if(style){
@@ -86,7 +134,7 @@ export function Component(config,{template,script,style},output = 'dom',root = n
         return  dom + sty
     }else if(output === 'dom'){
         res.innerHTML = dom + sty
-        res.expose = script
+        res.expose = proxyScript
         return res
     }
 }
@@ -95,20 +143,14 @@ export function Component(config,{template,script,style},output = 'dom',root = n
 function parse(html){
     // 函数匹配式
     let funcReg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
-    let varReg = /\{\{\s*(?<variable>.+?)\s*\}\}/g
+    let varReg = /(?<prop>\w*)\s*=[^=]*\{\{\s*(?<variable>.+?)\s*\}\}/g
     // 变量匹配
 
     let reHtml = html.replaceAll('\n','').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');
 
 // 使用 matchAll 来匹配所有结果
     let funcMatchs = reHtml.matchAll(funcReg);
-    let varMaths = reHtml.matchAll(varReg);
-    let varResult = []
-    for(let match of varMaths){
-        let { variable } = match.groups;
-        let strIndex = match.index
-        varResult.push({name:variable,index:strIndex})
-    }
+    let varParseObj = variableParse(html);
 
 // 请注意，没有传递 'g' 标志给 matchAll，因为 reg 已经带有 'g' 标志
 
@@ -137,7 +179,7 @@ function parse(html){
 // 去重逻辑
     let funcObjs = removeDuplicates(result)
     // let varObj = removeDuplicates(varResult)
-    return {dom:reHtml,funcObjs,varObj:varResult}
+    return {dom:reHtml,funcObjs,varObj:varParseObj}
 }
 
 
@@ -154,3 +196,115 @@ function isLiteral(_) {
     // 还未考虑是否为对象
     return false
 }
+
+// 解析变量表达式
+function variableParse(html) {
+    // 正则表达式以匹配标签
+    const tagRegex = /<\s*\w.*?>/g;
+
+    // 正则表达式以匹配带有变量的属性和文本内容
+    const variableRegex = /{{(.*?)}}/g;
+
+    // 存储结果的数组
+    let results = [];
+
+    // 查找每个标签
+    let tagMatch;
+    while ((tagMatch = tagRegex.exec(html)) !== null) {
+        const tagContent = tagMatch[0];
+
+        // 获取该标签的data-meta2d-id
+        const meta2dIdMatch = tagContent.match(/data-meta2d-id=['"](.*?)['"]/);
+        const meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : null;
+
+        // 查找标签内的变量
+        let variableMatch;
+        while ((variableMatch = variableRegex.exec(tagContent)) !== null) {
+            const variableFullMatch = variableMatch[0];
+            const variableName = variableMatch[1].trim();
+
+            // 确定变量所在的属性
+            const beforeVariable = tagContent.substring(0, variableMatch.index);
+            const afterVariable = tagContent.substring(variableMatch.index + variableFullMatch.length);
+
+            const propMatchBefore = beforeVariable.match(/(\w+)=['"][^'"]*$/);
+            const propMatchAfter = afterVariable.match(/^['"][^'"]*['"]/);
+            const propName = propMatchBefore ? propMatchBefore[1] : 'content';
+
+            // 添加结果到数组中
+            results.push({
+                prop: propName,
+                name: variableName,
+                'meta2d-id': meta2dId
+            });
+        }
+    }
+
+    // 现在查找文本内容中的变量
+    const textVariableRegex = />([^<]*{{.*?}}[^<]*)</g;
+    let textMatch;
+    while ((textMatch = textVariableRegex.exec(html)) !== null) {
+        const textContent = textMatch[1];
+
+        // 重新定位以获取最接近的开头标签
+        const closestOpenTag = html.substring(0, textMatch.index).lastIndexOf('>');
+        const tagContent = html.substring(closestOpenTag, textMatch.index + 1);
+
+        const meta2dIdMatch = tagContent.match(/data-meta2d-id=['"](.*?)['"]/);
+        const meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : null;
+
+        let variableMatch;
+        while ((variableMatch = variableRegex.exec(textContent)) !== null) {
+            const variableName = variableMatch[1].trim();
+
+            // 添加结果到数组中
+            results.push({
+                prop: 'content',
+                name: variableName,
+                'meta2d-id': meta2dId
+            });
+        }
+    }
+
+    return results;
+}
+
+
+
+function addUniqueIdsToHtmlString(htmlString) {
+    // 解析HTML字符串为DOM对象
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+
+    // 生成UUID的辅助函数
+    function generateUUID() {
+        return 'xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/[x]/g, (c) => {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    // 递归函数用于遍历并为每个元素添加唯一ID
+    function addUniqueIdToElement(element) {
+        if (element.nodeType === 1) { // Element节点
+            element.setAttribute('data-meta2d-id', generateUUID());
+            Array.from(element.children).forEach(addUniqueIdToElement);
+        }
+    }
+
+    // 开始遍历并添加唯一ID
+    addUniqueIdToElement(doc.body);
+
+    // 将更新后的DOM对象转换回字符串
+    const serializer = new XMLSerializer();
+    let newHtmlString = serializer.serializeToString(doc);
+
+    // 清除可能的编码问题
+    newHtmlString = newHtmlString.replaceAll(/\?&quot;/g, '\"'); // 这里替换 '?&quot;' 为正常的双引号
+
+    // 由于serializeToString会包括整个HTML文档，我们需要提取body部分
+    const bodyContent = newHtmlString.match(/<body[^>]*>([\s\S]*)<\/body>/i)[1];
+    return bodyContent;
+}
+

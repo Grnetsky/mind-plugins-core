@@ -1,6 +1,6 @@
 import {mindBoxPlugin} from "../core/MindBoxPlugin";
-import { calcInView } from "@meta2d/core"
 
+// 是否应当用面向切面的方式来暴露给用户
 export function right(pen,recursion = true,) {
     pen.mind.direction = 'right'
     let childrenGap = mindBoxPlugin.childrenGap

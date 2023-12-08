@@ -105,7 +105,7 @@ export class ToolBox {
                                     </g>
                                 </g>
                             </svg></div>
-                           <div id="rivet" style="display: {{rivetVisible}};margin: 0 10px 0 0;justify-content: center;align-items: center" onclick="toggleFreeze(false)">
+                           <div id="rivet" style="display: {{ rivetVisible }};margin: 0 10px 0 0;justify-content: center;align-items: center" onclick="toggleFreeze(false)">
                                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="8px" height="16px" viewBox="0 0 8 16" version="1.1">
                                     <title>钉子</title>
                                     <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">

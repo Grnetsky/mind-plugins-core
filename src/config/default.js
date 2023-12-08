@@ -3,11 +3,15 @@ import {mindBoxPlugin} from "../core";
 import { Component } from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
-export function* generateColor() {
+export function* generateColor(colorList) {
+  if (colorList && !Array.isArray(colorList)){
+    console.warn('mindBoxPlugin warn: generateColor must take array param')
+  }
   let index = 0;
+  let list = colorList || mindBoxPlugin.colorList
   while(true) {
-    yield mindBoxPlugin.colorList[index];
-    index = (index + 1) % mindBoxPlugin.colorList.length;
+    yield list[index];
+    index = (index + 1) % list.length;
   }
 }
 
@@ -315,9 +319,9 @@ let funcList =
           </div>`,
           script:{
             // 能在这里面获取到dom
-            mounted(){ // 生命周
+            init(){ // 生命周
               // 期函数
-              self.dash = pen.dash.join(',')
+              self.dash = pen.dash?.join(',') || '0,0'
               if(self.dash === '0,0'){
                 this.lineactive = 'style_active'
                 this.dashActive = ''

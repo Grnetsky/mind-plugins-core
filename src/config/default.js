@@ -1,6 +1,6 @@
 import { createDom } from "../utils";
 import {mindBoxPlugin} from "../core";
-import { Component } from "../parse";
+import { Scope} from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 export function* generateColor(colorList) {
@@ -257,7 +257,7 @@ let funcList =
          * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
          * @return string dom字符串
          * */
-        let str = Component(self,{
+        let str = Scope(self,{
           template:`
           <div class="container">
               <div class="item">
@@ -360,7 +360,7 @@ let funcList =
                 id:pen.id,
                 lineWidth: value
               },{render:true})
-              self.update('title')
+              self.update('menu')
               self.update('popup',true)
 
             },
@@ -561,7 +561,7 @@ let funcList =
             boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
           }});
         dom.attachShadow({mode:'open'})
-        let str = Component(self,{
+        let str = Scope(self,{
           template:`
           <div class="container">
                 <div class="item">
@@ -633,7 +633,7 @@ let funcList =
               let root = meta2d.findOne(pen.mind.rootId)
               root.mind.lineWidth = value
               mindBoxPlugin.resetLinesStyle(root);
-              self.update('title')
+              self.update('menu')
             },
             setLineStyle(value){
               let res = value?'mind':'polyline'
@@ -850,7 +850,7 @@ let funcList =
             boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
           },event:'',func: undefined,className:'root'});
 
-        let str = Component(self,{
+        let str = Scope(self,{
           template:`
           <div class="container">
               <div class="item">

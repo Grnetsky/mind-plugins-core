@@ -200,10 +200,42 @@ export let mindBoxPlugin = {
         }
         meta2d.canvas.updateLines(pen)
     },
+
+    /**
+     * @description 根据连接关系来判断父子关系，目前在计算calcMAXWandH方法中会造成栈溢出
+     * */
+    collectChildNodes(pen,recursion = true){
+        let lines = pen.connectedLines || []
+        let collect = []
+        let children = pen.mind?.children || []
+        lines.forEach(i =>{
+            let line = meta2d.store.pens[i.lineId]
+            let index = line.anchors.findIndex(j=>j.connectTo === pen.id)
+            if(index){
+                // 被连接方，置为父级
+                let preNode = meta2d.store.pens[line.anchors[0].connectTo]
+                this.initPen(preNode,meta2d.store.pens[meta2d.store.pens[pen.mind.preNodeId].mind.preNodeId])
+                if(!preNode.children.includes(pen.id))preNode.children.push(pen.id)
+            }else {
+                // 连接方
+                let childNode = meta2d.store.pens[line.anchors[0].connectTo]
+                if(!pen.mind.children.includes(childNode.id)) {
+                    pen.mind.children.push(childNode.id)
+                }
+            }
+        })
+        if(recursion){
+            children.forEach(child=>{
+                this.collectChildNodes(child,true)
+            })
+        }
+
+    },
     // 重新设置连线的位置
     resetLayOut(pen,pos,recursion = true){
         if(!pen)return
         if(!pos)pos = pen.mind.direction
+        // mindBoxPlugin.collectChildNodes(pen,true)
         // 断开连线
         mindBoxPlugin.disconnectLines(pen,recursion)
         // 执行布局函数
@@ -304,6 +336,41 @@ export let mindBoxPlugin = {
         })
         return collect
     },
+    // 初始化pen
+    initPen(pen,prePen){
+        if(pen.mind)return;
+        let rootId = prePen?prePen.mind.rootId:pen.id;
+        let preNodeId = prePen? prePen.id:'';
+        let direction = prePen? prePen.mind.direction:''
+        let lineStyle = prePen? prePen.mind.lineStyle: 'mind'
+        let level = prePen? 0 : prePen.mind.level + 1
+        if(pen.mind)return
+        pen.disableRotate = true
+        pen.mind = {
+            type:'node',
+            isRoot: false,
+            rootId: rootId,
+            preNodeId:preNodeId,
+            children: [],
+            width: undefined,
+            height: undefined,
+            maxHeight:0, // 包含了自己和子节点的最大高度
+            maxWidth:0,// 包含了自己和子节点的最大宽度
+            direction:direction,
+            childrenVisible: true,
+            visible: true,
+            lineStyle: lineStyle,
+            lineColor:'',
+            level,
+        }
+        if(!prePen){
+            let root = meta2d.store.pens[prePen.mind.rootId]
+            pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
+        }
+        // 跟随移动
+        mindBoxPlugin.combineToolBox(pen);
+        mindBoxPlugin.combineLifeCircle(pen);
+    },
     install:(()=>{
         // 是否是第一次安装，第一次安装则进行初始化
         let isInit = false
@@ -341,17 +408,13 @@ export let mindBoxPlugin = {
                             mindBoxPlugin.combineToolBox(pen)
                             mindBoxPlugin.combineLifeCircle(pen)
                             i.mind.isRoot?window.PluginManager.rootIds.push(pen.id):''
-
                         }
-
                     })
                 })
                 meta2d.on('scale',()=>{
                     if(toolbox.open)toolbox.translateWithPen()
                 })
-                // meta2d.on('resize',(pen)=>{
-                //     if(pen.mind && pen.mind.rootId) mindBoxPlugin.record(meta2d.store.pens[pen.mind.rootId])
-                // })
+
                 meta2d.on('undo',(e)=>{
                     // TODO 删除顺序有问题
                     e.pens.reverse().forEach(i=>{
@@ -368,7 +431,16 @@ export let mindBoxPlugin = {
                         }
                     })
                 })
-
+                // meta2d.on('connectLine',(e)=>{
+                //     console.log('cccc')
+                //     if(e.line.calculative.worldAnchors.every(i=>i.connectTo)){
+                //         let start = meta2d.store.pens[e.line.calculative.worldAnchors[0].connectTo]
+                //         let end = meta2d.store.pens[e.line.calculative.worldAnchors[1].connectTo]
+                //         if(!(start.mind && end.mind)){
+                //          //
+                //         }
+                //     }
+                // })
                 meta2d.on('inactive',(targetPen)=>{
                     globalThis.toolbox?.hide();
                 });
@@ -432,8 +504,6 @@ export let mindBoxPlugin = {
                     }
                 })
             // 添加根节点
-
-
         }
     }})(),
     uninstall(){
@@ -538,8 +608,7 @@ export let mindBoxPlugin = {
      * @param func 方法函数
      * @param pos 插入的目标位置
      * */
-    appendFuncList(tag,func,pos
-    ){
+    appendFuncList(tag,func,pos){
         if(typeof tag !=="string" || typeof func !== "function"){
             throw new Error('appendFuncList error: appendFuncList parma error ')
         }
@@ -588,8 +657,6 @@ export let mindBoxPlugin = {
         setLifeCycleFunc(target,'onAdd',onAdd,del);
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target, 'onResize',onResize )
-
-
     },
     deleteNodeOnlyOnce: debounceFirstOnly(async(pen)=>{
         let children = mindBoxPlugin.getChildrenList(pen)

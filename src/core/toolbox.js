@@ -1,8 +1,7 @@
 import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
 import d, {basicFuncConfig, controlStyle, funcListStyle, toolboxDefault, toolboxStyle} from "../config/default"
-import { Component } from "../parse";
-const DIVIDER = 'divider'
-const CONTROL = 'control'
+import { Scope } from "../parse";
+const extra = 'extra'
 
 let mouseMoved = false;
 
@@ -83,7 +82,7 @@ export class ToolBox {
             let self = this
             let control = createDom('div',{style:controlStyle,className: "toolbox_control"})
 
-            let icon =  Component({key:'toolbox'},{
+            let icon =  Scope({key:'toolbox'},{
                 template:`
 <div style="display: flex;flex-direction: row"">
 <div style="display: flex;justify-content: center;align-items: center"><svg style="margin: 0 10px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="6px" height="14px" viewBox="0 0 6 14" version="1.1">
@@ -233,9 +232,9 @@ export class ToolBox {
     setChildDom(pen, item ){
         const dom = document.createElement('div');
         // 构建update方法 用于局部更新
-        item.update =(target,keepOpen = false)=> {
+        item.update =(target,keepOpen = true)=> {
             // update 局部更新
-            if(target === 'title'){
+            if(target === 'menu'){
                 renderTitle(item,pen,dom.titleDom)
                 return
             }else if(target === 'popup'){
@@ -287,7 +286,7 @@ export class ToolBox {
             // 事件处理
         }
         item.updateAll = (keepOpen = true)=>{
-            item.update('title');
+            item.update('menu');
             item.update('popup',keepOpen)
         }
         item.update()
@@ -527,13 +526,11 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 // 配置项预处理
 function preprocess(item,pen) {
     // 分隔符则返回
-    if(item.key === DIVIDER)return
+    if(item.key === extra)return
     if(item.openEventOnTitle == null){
         item.openEventOnTitle = true
     }
-    if(!item.popup){
-        item.popup = {}
-    }
+
     if(item.popup){
         item.isOpen = false
         item.closeOther = false
@@ -554,14 +551,16 @@ function preprocess(item,pen) {
 }
 
 function extraElement(config) {
-    if(config.key === DIVIDER){
+    if(config.key === extra){
         // 设置分隔符
-        let style = deepMerge(d.dividerStyle,config.style)
-        return createDom('span',{style:style})
-    }
-    if(config.key === CONTROL){
-        let style = deepMerge(d.controlStyle,config.style)
-        return createDom()
+        let node
+        let style = deepMerge(d.extraStyle,config.style)
+        if(typeof config.dom === 'function') {
+            node = config.dom()
+        }else {
+           node = createDom('div',{style:style})
+        }
+        return node
     }
 }
 

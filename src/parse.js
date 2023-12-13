@@ -6,7 +6,7 @@ const EVENTTAG = ['@','on']
 import {
     compareObjects,
     createDom,
-    deepCopy,
+    deepCopy, error,
     escapeRegExp,
     removeDuplicates,
     replaceAfterPosition,
@@ -24,9 +24,12 @@ let LifeCycle = ['init','mounted']
  * @param oldScript
  * */
 
-export function Component(config,{template,script,style},output = 'dom',root = null,oldScript = null){
+export function Scope(config,{template,script,style},output = 'dom',root = null,oldScript = null){
     let res = createDom('div')
     if(!script)script = {}
+    if(!style)style = ''
+    let namespace = config.key
+    if (!namespace)error('Scope','The config parameter is invalid')
     let duty = {}
     // dom的预处理
     template = addUniqueIdsToHtmlString(template)
@@ -34,36 +37,35 @@ export function Component(config,{template,script,style},output = 'dom',root = n
     script.$update = ()=>{
         if(!root)root = res
         // Object.keys(duty).forEach(key=>{
-            // 找到对应的dom
-            // let changes = PluginManager._env[namespace].__depMap.filter((v)=>{
-            //     // 返回表达式中包含此变量的表达式
-            //     return v.name.includes(key)
-            // })
-            // let globalRender = false
-            // changes.forEach(i=>{
-            //     if(i.prop === 'class'){
-            //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
-            //         let res = scopedEval(window.PluginManager._env[namespace],i.name)
-            //         console.log(i['meta2d-id'])
-            //         // TODO 这没换成功
-            //         element.classList.remove(i.res)
-            //         element.classList.add(res)
-            //     }else if (i.prop === 'style'){
-            //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
-            //         let res = scopedEval(window.PluginManager._env[namespace],i.name)
-            //         root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
-            //     }else {
-            //         globalRender = true
-            //     }
-            // })
-            // globalRender ? root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML: ''
-
+        //     // 找到对应的dom
+        //     let changes = PluginManager._env[namespace].__depMap.filter((v)=>{
+        //         // 返回表达式中包含此变量的表达式
+        //         return v.name.includes(key)
+        //     })
+        //     let globalRender = false
+        //     changes.forEach(i=>{
+        //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+        //         if(i.prop === 'class'){
+        //             let res = scopedEval(window.PluginManager._env[namespace],i.name)
+        //             console.log(i['meta2d-id'])
+        //             // TODO 这没换成功
+        //             element.classList.remove(i.res)
+        //             element.classList.add(res)
+        //         }else if (i.prop === 'style'){
+        //             // 将表达式放进沙盒执行得到返回结果
+        //             // let res = scopedEval(window.PluginManager._env[namespace],i.name)
+        //             // element.style[i.styleProp] = res
+        //             root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
+        //         }else {
+        //             globalRender = true
+        //         }
+        //     })
+        //     globalRender ? root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML: ''
         // })
         // 组件全部更新
-        root.innerHTML = Component(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
+        root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
         duty = {}
     }
-    // 脏数据
     let proxyScript = new Proxy(script,{
         set(target, p, newValue, receiver) {
             // 写入脏数据
@@ -77,9 +79,7 @@ export function Component(config,{template,script,style},output = 'dom',root = n
         }
     })
 
-    if(!style)style = ''
-    let namespace = config.key
-    if (!namespace)throw new Error('The name attribute is not configured')
+
     PluginManager._env[namespace]? '' : PluginManager._env[namespace] = {};
     let {dom, funcObjs,varObj} = parse(template)
     let keys = Object.keys(script)
@@ -199,76 +199,49 @@ function isLiteral(_) {
 
 // 解析变量表达式
 function variableParse(html) {
-    // 正则表达式以匹配标签
-    const tagRegex = /<\s*\w.*?>/g;
+    const results = [];
+    // 匹配标签以及标签中的属性
+    const tagRegex = /<\s*[\w-]+.*?>[\s\S]*?<\/[\w-]+>/g;
+    // 匹配单独的属性
+    const attributeRegex = /(\w+)\s*=\s*(['"])(.*?)\2/g;
+    // 匹配双花括号中的变量
+    const variableRegex = /{{\s*([\w.+\-? :()']*)\s*}}/g;
 
-    // 正则表达式以匹配带有变量的属性和文本内容
-    const variableRegex = /{{(.*?)}}/g;
-
-    // 存储结果的数组
-    let results = [];
-
-    // 查找每个标签
     let tagMatch;
     while ((tagMatch = tagRegex.exec(html)) !== null) {
-        const tagContent = tagMatch[0];
+        const tag = tagMatch[0];
+        let meta2dIdMatch = tag.match(/data-meta2d-id=['"](\d+)['"]/);
+        let meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : undefined;
 
-        // 获取该标签的data-meta2d-id
-        const meta2dIdMatch = tagContent.match(/data-meta2d-id=['"](.*?)['"]/);
-        const meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : null;
-
-        // 查找标签内的变量
-        let variableMatch;
-        while ((variableMatch = variableRegex.exec(tagContent)) !== null) {
-            const variableFullMatch = variableMatch[0];
-            const variableName = variableMatch[1].trim();
-
-            // 确定变量所在的属性
-            const beforeVariable = tagContent.substring(0, variableMatch.index);
-            const afterVariable = tagContent.substring(variableMatch.index + variableFullMatch.length);
-
-            const propMatchBefore = beforeVariable.match(/(\w+)=['"][^'"]*$/);
-            const propMatchAfter = afterVariable.match(/^['"][^'"]*['"]/);
-            const propName = propMatchBefore ? propMatchBefore[1] : 'content';
-
-            // 添加结果到数组中
-            results.push({
-                prop: propName,
-                name: variableName,
-                'meta2d-id': meta2dId
-            });
+        let attributeMatch;
+        while ((attributeMatch = attributeRegex.exec(tag)) !== null) {
+            const attributeName = attributeMatch[1];
+            const attributeValue = attributeMatch[3];
+            let variableMatch;
+            while ((variableMatch = variableRegex.exec(attributeValue)) !== null) {
+                const variableName = variableMatch[1];
+                results.push({
+                    prop: attributeName,
+                    name: variableName,
+                    'meta2d-id': meta2dId
+                });
+            }
         }
-    }
 
-    // 现在查找文本内容中的变量
-    const textVariableRegex = />([^<]*{{.*?}}[^<]*)</g;
-    let textMatch;
-    while ((textMatch = textVariableRegex.exec(html)) !== null) {
-        const textContent = textMatch[1];
-
-        // 重新定位以获取最接近的开头标签
-        const closestOpenTag = html.substring(0, textMatch.index).lastIndexOf('>');
-        const tagContent = html.substring(closestOpenTag, textMatch.index + 1);
-
-        const meta2dIdMatch = tagContent.match(/data-meta2d-id=['"](.*?)['"]/);
-        const meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : null;
-
+        // 检查标签内部的文本内容中的变量
+        let textContent = tag.replace(/<[\s\S]*?>/g, ''); // 移除标签，仅保留文本内容
         let variableMatch;
         while ((variableMatch = variableRegex.exec(textContent)) !== null) {
-            const variableName = variableMatch[1].trim();
-
-            // 添加结果到数组中
+            const variableName = variableMatch[1];
             results.push({
-                prop: 'content',
+                prop: 'textContent',
                 name: variableName,
                 'meta2d-id': meta2dId
             });
         }
     }
-
     return results;
 }
-
 
 
 function addUniqueIdsToHtmlString(htmlString) {

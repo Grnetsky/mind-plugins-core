@@ -417,19 +417,19 @@ export let mindBoxPlugin = {
 
                 meta2d.on('undo',(e)=>{
                     // TODO 删除顺序有问题
-                    e.pens.reverse().forEach(i=>{
-                        if(i.mind){
-                            // 撤回节点
-                            if(i.mind.type === 'node'){
-                                let preNode = meta2d.findOne(i.mind.preNodeId)
-                                preNode && (preNode.mind.children.push(i.id))
-                                mindBoxPlugin.update(preNode)
-                            }else{
-                                let preNode = meta2d.findOne(i.mind.from)
-                                mindBoxPlugin.update(preNode)
-                            }
-                        }
-                    })
+                    // e.pens.reverse().forEach(i=>{
+                    //     if(i.mind){
+                    //         // 撤回节点
+                    //         if(i.mind.type === 'node'){
+                    //             let preNode = meta2d.findOne(i.mind.preNodeId)
+                    //             preNode && (preNode.mind.children.push(i.id))
+                    //             mindBoxPlugin.update(preNode)
+                    //         }else{
+                    //             let preNode = meta2d.findOne(i.mind.from)
+                    //             mindBoxPlugin.update(preNode)
+                    //         }
+                    //     }
+                    // })
                 })
                 // meta2d.on('connectLine',(e)=>{
                 //     console.log('cccc')

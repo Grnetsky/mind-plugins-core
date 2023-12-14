@@ -321,9 +321,8 @@ let funcList =
           </div>`,
           script:{
             // 能在这里面获取到dom
-            init(){ // 生命周
-              // 期函数
-              self.dash = pen.dash?.join(',') || '0,0'
+            init(){ // 生命周期函数
+              self.dash = pen.lineDash?.join(',') || '0,0'
               if(self.dash === '0,0'){
                 this.lineactive = 'style_active'
                 this.dashActive = ''
@@ -341,15 +340,7 @@ let funcList =
                 id:pen.id,
                 lineDash: res
               },{render:true})
-              // toolbox.renderFuncList()
               self.dash = res.join(',')
-              // if(self.dash === '0,0'){
-              //   this.lineactive = 'style_active'
-              //   this.dashActive = ''
-              // }else {
-              //   this.lineactive = ''
-              //   this.dashActive = 'style_active'
-              // }
               self.updateAll()
               // self.close()
             },

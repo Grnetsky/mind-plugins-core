@@ -75,7 +75,7 @@ export let mindBoxPlugin = {
         // }
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
-        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,true)
+        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,false)
         line.mind = {
             type:'line',
             from:from.id,
@@ -741,6 +741,7 @@ export let mindBoxPlugin = {
         option.height && (option.height *= scale)
 
         opt = deepMerge(opt,option)
+        let initPens = deepClone(meta2d.store.data.pens,true)
         let newPen = await meta2d.addPen(opt,false);
 
         // 设置连接关系
@@ -748,7 +749,7 @@ export let mindBoxPlugin = {
             mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
 
-        window.PluginManager.messageChannel.publish('addNode', {plugin:'toolBox',pen,newPen});
+        window.PluginManager.messageChannel.publish('addNode', { plugin:'toolBox',pen,newPen });
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);
@@ -782,8 +783,10 @@ export let mindBoxPlugin = {
         }
 
         // mindBoxPlugin.update(rootNode)
-        let list = [newPen,line]
-        meta2d.canvas.pushHistory({ type: 0, pens: deepClone(list, true) });
+        // let list = [newPen,line]
+        // meta2d.canvas.pushHistory({ type: 1, pens: deepClone(list, true) });
+        let newPens = deepClone(meta2d.store.data.pens,true)
+        meta2d.pushHistory({ type: 3, pens:newPens, initPens  });
 
         return newPen
     },

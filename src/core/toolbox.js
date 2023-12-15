@@ -5,7 +5,7 @@ const extra = 'extra'
 
 let mouseMoved = false;
 
-
+// 此列表为，可供用户配置的属性列表
 let CONFIGS = ['showControl','offset','style']
 function configValid(config) {
     if(config.key)return true

@@ -24,68 +24,87 @@ let LifeCycle = ['init','mounted']
  * @param oldScript
  * */
 
+let env = Symbol('env')
+
 export function Scope(config,{template,script,style},output = 'dom',root = null,oldScript = null){
+
+    let symbols = Object.getOwnPropertySymbols(window);
+    let targetSymbol;
+    for (let i = 0;i<symbols.length;i++) {
+        let symbol = symbols[i]
+        if (window[symbol] === window[env]) {
+            targetSymbol = i;
+            break;
+        }
+    }
+
     let res = createDom('div')
     if(!script)script = {}
     if(!style)style = ''
     let namespace = config.key
     if (!namespace)error('Scope','The config parameter is invalid')
-    let duty = {}
+    let duty = []
     // dom的预处理
     template = addUniqueIdsToHtmlString(template)
 
     script.$update = ()=>{
         if(!root)root = res
-        // Object.keys(duty).forEach(key=>{
-        //     // 找到对应的dom
-        //     let changes = PluginManager._env[namespace].__depMap.filter((v)=>{
-        //         // 返回表达式中包含此变量的表达式
-        //         return v.name.includes(key)
-        //     })
-        //     let globalRender = false
-        //     changes.forEach(i=>{
-        //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
-        //         if(i.prop === 'class'){
-        //             let res = scopedEval(window.PluginManager._env[namespace],i.name)
-        //             console.log(i['meta2d-id'])
-        //             // TODO 这没换成功
-        //             element.classList.remove(i.res)
-        //             element.classList.add(res)
-        //         }else if (i.prop === 'style'){
-        //             // 将表达式放进沙盒执行得到返回结果
-        //             // let res = scopedEval(window.PluginManager._env[namespace],i.name)
-        //             // element.style[i.styleProp] = res
-        //             root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
-        //         }else {
-        //             globalRender = true
-        //         }
-        //     })
-        //     globalRender ? root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML: ''
-        // })
+        duty.forEach(key=>{
+            // 找到对应的dom
+            let changes = window[env][namespace].__depMap.filter((v)=>{
+                // 返回表达式中包含此变量的表达式
+                return v.name.includes(key)
+            })
+            let globalRender = false
+            let textIndex = 0
+            changes.forEach((i)=>{
+                let res = scopedEval(window[env][namespace],i.name)
+                const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+                if(i.prop === 'class' ){
+                    let res =
+                    // TODO 这没换成功
+                    element.classList.remove(i.res)
+                    element.classList.add(res)
+                }else if (i.prop === 'style'){
+                    // 将表达式放进沙盒执行得到返回结果
+                    element.style[i.styleProp] = res
+                    // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+                }else if(i.prop === 'textContent'){
+                    // 若为第1个textContent
+                    if(!textIndex){
+                        element.textContent = i.textContent
+                        textIndex ++
+                    }
+                    i.textContent = element.textContent
+                    element.textContent = i.textContent.replace(i.originTemp,res)
+                    // i.textContent = res
+                } else {
+                    globalRender = true
+                }
+            })
+            globalRender ? root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML: ''
+        })
         // 组件全部更新
-        root.innerHTML = Scope(config,{template,style,script:PluginManager._env[namespace]},output,root,oldScript).innerHTML
-        duty = {}
+        // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+        duty = []
     }
-    let proxyScript = new Proxy(script,{
-        set(target, p, newValue, receiver) {
-            // 写入脏数据
-            if(!['$update','init','mounted','__depMap'].includes(p)){
-                duty[p] = Reflect.get(target,p,newValue,receiver)
+    // 代理模式查找更改数据项
+    let proxyScript = createDeepProxy(script,(p,v)=>{
+        if(!['$update','init','mounted','__depMap'].includes(p)){
+            if(p.includes('.')){
+                p = p.split('.')[0]
             }
-            return Reflect.set(target,p,newValue,receiver)
-        },
-        get(target, p, receiver) {
-            return Reflect.get(target,p,receiver)
+            duty.push(p)
         }
     })
-
-
-    PluginManager._env[namespace]? '' : PluginManager._env[namespace] = {};
+    window[env]?'': window[env] = {}
+    window[env][namespace]? '' :window[env][namespace] = {};
     let {dom, funcObjs,varObj} = parse(template)
     let keys = Object.keys(script)
 
-    PluginManager._env[namespace] = proxyScript
-    PluginManager._env[namespace].__depMap = null
+    window[env][namespace] = proxyScript
+    window[env][namespace].__depMap = null
+
     // 生命周期
     if(!root){
         proxyScript.init?.()
@@ -106,18 +125,18 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
                     // dom = dom.replaceAll(j.param,`PluginManager._env.${namespace}.${j}`)
                     let oldDom = dom
 
-                    dom = replaceAfterPosition(dom,j.index - funcOffset,j.param,`PluginManager._env.${namespace}.${j.param}`)
+                    dom = replaceAfterPosition(dom,j.index - funcOffset,j.param,`window[Object.getOwnPropertySymbols(window)[${targetSymbol}]].${namespace}.${j.param}`)
                     funcOffset += oldDom.length - dom.length // 更换后的文字偏移量
                 }
             }));
             // 处理函数名
-            dom = dom.replaceAll(i.name+"(",`PluginManager._env.${namespace}.${i.name}(`)
+            dom = dom.replaceAll(i.name+"(",`window[Object.getOwnPropertySymbols(window)[${targetSymbol}]].${namespace}.${i.name}(`)
         }
     })
-    PluginManager._env[namespace].__depMap = varObj
+    window[env][namespace].__depMap = varObj
     varObj.forEach(i=>{
         // 支持简单的表达式
-        let res = scopedEval(window.PluginManager._env[namespace],i.name)
+        let res = scopedEval(window[env][namespace],i.name)
         // 将生成的结果保存在数据中
         i.res = res
 
@@ -210,7 +229,7 @@ function variableParse(html) {
     let tagMatch;
     while ((tagMatch = tagRegex.exec(html)) !== null) {
         const tag = tagMatch[0];
-        let meta2dIdMatch = tag.match(/data-meta2d-id=['"](\d+)['"]/);
+        let meta2dIdMatch = tag.match(/data-meta2d-id=['"]([\d|\w]+)['"]/);
         let meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : undefined;
 
         let attributeMatch;
@@ -220,11 +239,29 @@ function variableParse(html) {
             let variableMatch;
             while ((variableMatch = variableRegex.exec(attributeValue)) !== null) {
                 const variableName = variableMatch[1];
-                results.push({
-                    prop: attributeName,
-                    name: variableName,
-                    'meta2d-id': meta2dId
-                });
+                if (attributeName === 'style') {
+                    const styleAttributeRegex = /\s*(?<prop>[\w-]+)\s*:\s*{{\s*([^{}]+)\s*}};?/g;
+                    let stylePropMatch;
+                    while ((stylePropMatch = styleAttributeRegex.exec(attributeValue)) !== null) {
+                        const styleProp = stylePropMatch[1];
+                        const styleValue = stylePropMatch[2];
+                        if(results.findIndex(i=>{
+                            return (i.styleProp === styleProp && i['meta2d-id'] === meta2dId && i.name === styleValue)
+                        }) > -1)continue
+                        results.push({
+                            prop: "style",
+                            styleProp,
+                            'meta2d-id': meta2dId,
+                            name: styleValue
+                        });
+                    }
+                } else {
+                    results.push({
+                        prop: attributeName,
+                        name: variableName,
+                        'meta2d-id': meta2dId
+                    });
+                }
             }
         }
 
@@ -236,12 +273,15 @@ function variableParse(html) {
             results.push({
                 prop: 'textContent',
                 name: variableName,
+                textContent,
+                originTemp: variableMatch[0],
                 'meta2d-id': meta2dId
             });
         }
     }
     return results;
 }
+
 
 
 function addUniqueIdsToHtmlString(htmlString) {
@@ -251,7 +291,7 @@ function addUniqueIdsToHtmlString(htmlString) {
 
     // 生成UUID的辅助函数
     function generateUUID() {
-        return 'xxxx-xxxx-xxxx-xxxx-xxxx'.replace(/[x]/g, (c) => {
+        return 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, (c) => {
             const r = (Math.random() * 16) | 0;
             const v = c === 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16);
@@ -279,5 +319,22 @@ function addUniqueIdsToHtmlString(htmlString) {
     // 由于serializeToString会包括整个HTML文档，我们需要提取body部分
     const bodyContent = newHtmlString.match(/<body[^>]*>([\s\S]*)<\/body>/i)[1];
     return bodyContent;
+}
+
+function createDeepProxy(obj, onChange, path = []) {
+    return new Proxy(obj, {
+        get(target, key, receiver) {
+            const value = Reflect.get(target, key, receiver);
+            if (typeof value === 'object' && value !== null) {
+                return createDeepProxy(value, onChange, [...path, key]); // 递归代理子属性
+            }
+            return value;
+        },
+        set(target, key, value, receiver) {
+            const result = Reflect.set(target, key, value, receiver);
+            onChange([...path, key].join('.'), value); // 传递属性路径
+            return result;
+        }
+    });
 }
 

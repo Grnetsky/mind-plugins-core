@@ -111,14 +111,14 @@ export function scopedEval(scope, expr) {
     const scopeValues = Object.values(scope);
 
     // 函数的参数名称与作用域的键相匹配，函数体是表达式
-    const func = new Function(...scopeKeys, `return ${expr};`);
+    const func = new Function(...scopeKeys/*这是变量名列表*/, `return ${expr};`);
 
     // 将作用域的值作为参数传递
     try {
         let re = func(...scopeValues);
         return re
     }catch (e) {
-        error('Component',e.message)
+        error('[ScopedEval] Error: ',e.message)
     }
 }
 

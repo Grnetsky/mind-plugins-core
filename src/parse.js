@@ -49,43 +49,43 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
 
     script.$update = ()=>{
         if(!root)root = res
-        duty.forEach(key=>{
-            // 找到对应的dom
-            let changes = window[env][namespace].__depMap.filter((v)=>{
-                // 返回表达式中包含此变量的表达式
-                return v.name.includes(key)
-            })
-            let globalRender = false
-            let textIndex = 0
-            changes.forEach((i)=>{
-                let res = scopedEval(window[env][namespace],i.name)
-                const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
-                if(i.prop === 'class' ){
-                    let res =
-                    // TODO 这没换成功
-                    element.classList.remove(i.res)
-                    element.classList.add(res)
-                }else if (i.prop === 'style'){
-                    // 将表达式放进沙盒执行得到返回结果
-                    element.style[i.styleProp] = res
-                    // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
-                }else if(i.prop === 'textContent'){
-                    // 若为第1个textContent
-                    if(!textIndex){
-                        element.textContent = i.textContent
-                        textIndex ++
-                    }
-                    i.textContent = element.textContent
-                    element.textContent = i.textContent.replace(i.originTemp,res)
-                    // i.textContent = res
-                } else {
-                    globalRender = true
-                }
-            })
-            globalRender ? root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML: ''
-        })
+        // duty.forEach(key=>{
+        //     // 找到对应的dom
+        //     let changes = window[env][namespace].__depMap.filter((v)=>{
+        //         // 返回表达式中包含此变量的表达式
+        //         return v.name.includes(key)
+        //     })
+        //     let globalRender = false
+        //     let textIndex = 0
+        //     changes.forEach((i)=>{
+        //         let res = scopedEval(window[env][namespace],i.name)
+        //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+        //         if(i.prop === 'class' ){
+        //             let res =
+        //             // TODO 这没换成功
+        //             element.classList.remove(i.res)
+        //             element.classList.add(res)
+        //         }else if (i.prop === 'style'){
+        //             // 将表达式放进沙盒执行得到返回结果
+        //             element.style[i.styleProp] = res
+        //             // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+        //         }else if(i.prop === 'textContent'){
+        //             // 若为第1个textContent
+        //             if(!textIndex){
+        //                 element.textContent = i.textContent
+        //                 textIndex ++
+        //             }
+        //             i.textContent = element.textContent
+        //             element.textContent = i.textContent.replace(i.originTemp,res)
+        //             // i.textContent = res
+        //         } else {
+        //             globalRender = true
+        //         }
+        //     })
+        //     globalRender ? root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML: ''
+        // })
         // 组件全部更新
-        // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+        root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
         duty = []
     }
     // 代理模式查找更改数据项
@@ -122,7 +122,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
                 //TODO 应该还要过滤一遍字面量  此处仅仅处理了变量
                 if(!j.param.startsWith('this') && j.param!=='event' && !isLiteral(j.param)){
                     // TODO 此处应当根据字符的具体位置来替换，而非全部替换
-                    // dom = dom.replaceAll(j.param,`PluginManager._env.${namespace}.${j}`)
+                    // dom = dom.replaceAll(j.param,`meta2dPluginManager._env.${namespace}.${j}`)
                     let oldDom = dom
 
                     dom = replaceAfterPosition(dom,j.index - funcOffset,j.param,`window[Object.getOwnPropertySymbols(window)[${targetSymbol}]].${namespace}.${j.param}`)
@@ -202,6 +202,11 @@ function parse(html){
 }
 
 
+function parseHtmlString(html) {
+    let parser = new DOMParser()
+    let doc = parser.parseFromString(html)
+}
+
 // 该数据是否为字面量
 function isLiteral(_) {
     // 判断是否为字符串
@@ -217,6 +222,7 @@ function isLiteral(_) {
 }
 
 // 解析变量表达式
+// TODO  该解释器不支持嵌套使用，是否应当使用DomPaser进行解析替换传统正则替换？？
 function variableParse(html) {
     const results = [];
     // 匹配标签以及标签中的属性

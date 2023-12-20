@@ -6,6 +6,7 @@ import defaultColorRule from "../color/default";
 import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 
 let CONFIGS = ['animate','animateDuration','childrenGap','levelGap','colorList']
+let destroyRes = null
 export let mindBoxPlugin = {
     name:'mindBox',
     target:[],  // 已经绑定该插件的图元
@@ -637,7 +638,7 @@ export let mindBoxPlugin = {
      * @param pos 插入的目标位置
      * */
     appendFuncList(tag,func,pos){
-        if(typeof tag !=="string" || typeof func !== "function"){
+        if(typeof tag !=="string" || typeof func !== "object"){
             throw new Error('appendFuncList error: appendFuncList parma error ')
         }
         let funcList = this.funcList[tag]
@@ -651,12 +652,27 @@ export let mindBoxPlugin = {
             throw new Error('appendFuncList error: no such tag')
         }
     },
+    __debounceFirstOnly: (debounceFirstOnly(()=>{
+        destroyRes = new Promise(resolve => {
+            resolve(deepClone(meta2d.store.data.pens.filter(pen=>pen.mind),true))
+        })
+    },1000)),
+    __debouncePushHistory:(debounce(()=>{
+        destroyRes.then(res =>{
+            let newPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind),true)
+            // meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
+        })
 
+    },2000)),
     //
     combineLifeCircle(target,del = false){
         const onDestroy = (targetPen)=>{
             toolbox?.hide();
             mindBoxPlugin.deleteChildrenNode(targetPen);
+
+            this.__debounceFirstOnly()
+            this.__debouncePushHistory()
+
             // mindBoxPlugin.deleteNodeOnlyOnce(targetPen);
             // if(targetPen.mind.isRoot){
             //     let index = meta2dPluginManager.rootIds.indexOf(targetPen.id)
@@ -684,7 +700,7 @@ export let mindBoxPlugin = {
         // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target,'onAdd',onAdd,del);
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
-        setLifeCycleFunc(target, 'onResize',onResize )
+        setLifeCycleFunc(target, 'onResize',onResize );
     },
     deleteNodeOnlyOnce: debounceFirstOnly(async(pen)=>{
         let children = mindBoxPlugin.getChildrenList(pen)
@@ -762,7 +778,7 @@ export let mindBoxPlugin = {
             },
             calculative:{
                 x:pen.x,
-                y:pen.y
+                y:pen.y,
             },
             x:pen.x ,
             y:pen.y ,
@@ -787,8 +803,7 @@ export let mindBoxPlugin = {
         newPen.mind.connect =pen.mind.level === 0?
             mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
-
-        window.meta2d.emit('aplugin:ddNode', { plugin:'toolBox',pen,newPen });
+        meta2d.emit('plugin:ddNode', { plugin:'toolBox',pen,newPen });
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);

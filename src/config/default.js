@@ -1304,6 +1304,7 @@ export let pluginDefault = {
   animateDuration:200,
   childrenGap: 20,
   levelGap:200,
+  showControl: true,
   funcList,
   colorList:colorList,
   getFuncList(pen){
@@ -1357,7 +1358,7 @@ export let extraStyle = {
 export let basicFuncConfig = {
   collapseEventOnMenu:true,
   collapseEvent:'click',
-  popupEvent:'mouseenter'
+  popupEvent:'mouseenter',
 }
 export default {
   funcList,

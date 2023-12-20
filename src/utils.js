@@ -129,7 +129,7 @@ export function escapeRegExp(string) {
 
 
 export function error(scope,message) {
-    throw new Error(`mind-plugin-core ${scope} Error: ${message}`)
+    throw new Error(`plugin-mind-core ${scope} Error: ${message}`)
 }
 
 

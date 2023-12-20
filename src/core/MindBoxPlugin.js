@@ -402,10 +402,11 @@ export let mindBoxPlugin = {
                     }
                 })
                 meta2d.on('opened',()=>{
-                    let {pens} = meta2d.data()
-                    pens.forEach(i=>{
-                        if(i.mind && i.mind.type === 'node'){
-                            let pen = meta2d.findOne(i.id)
+                    console.log('opened')
+                    let pens= meta2d.store.data.pens
+                    pens.forEach(pen=>{
+                        let isAdd = mindBoxPlugin.target.includes(pen.tag) || mindBoxPlugin.target.includes(pen.name) || pen.mind
+                        if(isAdd){
                             window.meta2d.emit('plugin:open',pen)
                             mindBoxPlugin.combineToolBox(pen)
                             mindBoxPlugin.combineLifeCircle(pen)
@@ -482,7 +483,7 @@ export let mindBoxPlugin = {
                 addCallback = (pens)=>{
 
                     // TODO 此处还未考虑name与tag相等的情况
-                    let isAdd = mindBoxPlugin.target.includes(pens[0].tag || pens[0].name)
+                    let isAdd = mindBoxPlugin.target.includes(pens[0].tag) || mindBoxPlugin.target.includes(pens[0].name)
                     if(isAdd && pens && pens.length === 1 && !pens[0].mind){
                         let pen = pens[0]
                         pen.disableAnchor =  true
@@ -530,7 +531,7 @@ export let mindBoxPlugin = {
         }else if(pen.pen){
             target = pen
         }
-        if(mindBoxPlugin.target.includes(pen.tag || pen.name || pen)){
+        if(mindBoxPlugin.target.includes(pen.tag) || mindBoxPlugin.target.includes(pen.name) || mindBoxPlugin.target.includes(pen)){
             if(typeof target === "string"){
                 // 不能只清理当前pen上的内容，还应当清理所有的内容
                 let pens = meta2d.store.data.pens.filter(pen=>pen.tag === target)
@@ -803,7 +804,7 @@ export let mindBoxPlugin = {
         newPen.mind.connect =pen.mind.level === 0?
             mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
-        meta2d.emit('plugin:ddNode', { plugin:'toolBox',pen,newPen });
+        meta2d.emit('plugin:addNode', { plugin:'toolBox',pen,newPen });
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);

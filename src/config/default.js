@@ -3,6 +3,26 @@ import {mindBoxPlugin} from "../core";
 import { Scope} from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
+
+
+// export const colorList = [
+//   '#ea8554',
+//   '#d2c648',
+//   '#4ad38e',
+//   '#4ba7d5',
+//   '#e16b68',
+//   '#e18b63',
+//   '#e0a95d',
+//   '#e0bc5b',
+//   '#ded559',
+//   '#bad556',
+//   '#97e067',
+//   '#58d0c8',
+//   '#5ba5da',
+//   '#7794e5',
+//   '#a878dc',
+//   '#ec7bb2',
+// ];
 export function* generateColor(colorList) {
   if (colorList && !Array.isArray(colorList)){
     console.warn('mindBoxPlugin warn: generateColor must take array param')

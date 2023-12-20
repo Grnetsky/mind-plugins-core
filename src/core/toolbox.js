@@ -82,7 +82,6 @@ export class ToolBox {
         }`)
     }
     _setControl(){
-        console.log('setControl',this.showControl,controlDom)
         if(this.showControl){
             if (controlDom.show && controlDom.control)return;
             if (!controlDom.show && controlDom.control){

@@ -4,7 +4,10 @@ import { Scope } from "../parse";
 const extra = 'extra'
 
 let mouseMoved = false;
-
+let controlDom = {
+    control:null,
+    show:true,
+};
 // 此列表为，可供用户配置的属性列表
 let CONFIGS = ['showControl','offset','style']
 function configValid(config) {
@@ -46,8 +49,9 @@ export class ToolBox {
             }
         }
         this.setStyle(config.style)
+        this._setControl()
     }
-    _init(style){
+    _init(){
         this.box = createDom('div',{style:{...toolboxStyle,left:'-9999px'},className: 'toolBox'})
         this.box.id = 'toolbox'
         this._setControl()
@@ -78,7 +82,14 @@ export class ToolBox {
         }`)
     }
     _setControl(){
+        console.log('setControl',this.showControl,controlDom)
         if(this.showControl){
+            if (controlDom.show && controlDom.control)return;
+            if (!controlDom.show && controlDom.control){
+                controlDom.show = true
+                controlDom.control.style.display = 'flex'
+                return
+            }
             let self = this
             let control = createDom('div',{style:controlStyle,className: "toolbox_control"})
 
@@ -147,6 +158,14 @@ export class ToolBox {
             control.id = 'toolbox_control'
             this.box.appendChild(control)
             this._dragElement(control,icon)
+            controlDom.control = control
+            controlDom.show = true
+        }
+        else {
+            if(controlDom.control){
+                controlDom.control.style.display = 'none'
+            }
+            controlDom.show = false
         }
     }
     setStyle(style){

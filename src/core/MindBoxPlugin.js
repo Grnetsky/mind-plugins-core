@@ -405,8 +405,9 @@ export let mindBoxPlugin = {
                     console.log('opened')
                     let pens= meta2d.store.data.pens
                     pens.forEach(pen=>{
-                        let isAdd = mindBoxPlugin.target.includes(pen.tag) || mindBoxPlugin.target.includes(pen.name) || pen.mind
-                        if(isAdd){
+                        let t = meta2d.findOne(pen.mind?.rootId) || {}
+                        let isAdd = mindBoxPlugin.target.includes(t.tag) || mindBoxPlugin.target.includes(t.name) || pen.mind
+                        if(isAdd && (pen.mind.type === 'node')){
                             window.meta2d.emit('plugin:open',pen)
                             mindBoxPlugin.combineToolBox(pen)
                             mindBoxPlugin.combineLifeCircle(pen)

@@ -19,16 +19,16 @@ import { mindPens } from "@meta2d/mind-diagram"
 meta2d.register(mindPens())
 这样你就可以在meta2d中自由的使用脑图组件了。
 API
-PluginManager
-在mindPens被注册后会向全局（window）创建PluginManager对象，用于管理整个图纸的脑图系统，该对象上有以下属性：
+meta2dPluginManager
+在mindPens被注册后会向全局（window）创建meta2dPluginManager对象，用于管理整个图纸的脑图系统，该对象上有以下属性：
 属性	类型	描述	使用方法
 rootIds	array 	用于存放脑图根节点id的数组
 plugins	array	已安装的脑图插件对象
-installPlugin	function	安装插件，同下文的installPlugin	PluginManager.installPlugin( plugin, ...arg)
-uninstallPlugin	function	卸载插件，同下文的uninstallPlugin	PluginManager.uninstallPlugin( name, ...arg)
-pluginMessageChannel	object	脑图插件通讯管道，用于插件间数据通信，本质是发布订阅模式	发布：PluginManager.pluginMessageChannel.publish('event', data)
+installPlugin	function	安装插件，同下文的installPlugin	meta2dPluginManager.installPlugin( plugin, ...arg)
+uninstallPlugin	function	卸载插件，同下文的uninstallPlugin	meta2dPluginManager.uninstallPlugin( name, ...arg)
+pluginMessageChannel	object	脑图插件通讯管道，用于插件间数据通信，本质是发布订阅模式	发布：meta2dPluginManager.pluginMessageChannel.publish('event', data)
 订阅：
-PluginManager.pluginMessageChannel.subscribe('event', callback)
+meta2dPluginManager.pluginMessageChannel.subscribe('event', callback)
 
 installPlugin
 用于安装插件

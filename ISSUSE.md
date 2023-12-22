@@ -23,7 +23,7 @@ transition 能控制visibility属性
 ### 重新打开文件 删除节点有问题 [已解决]
 原因：meta2d保存的文件为深拷贝，重新打开后无引用关系，目前已将children中的列表数据换为id
 
-### 是否应在重新打开图之后，重新初始化PluginManager中的内容[待思考]
+### 是否应在重新打开图之后，重新初始化meta2dPluginManager中的内容[待思考]
 
 ### 自定义布局功能（待实现） [已解决]
 可以编写自定义布局函数，注册到全局mindBoxPlugin的layoutfunc 的map中即可
@@ -38,4 +38,4 @@ transition 能控制visibility属性
 
 ### toolbox聚焦时，折叠父级，toolbox不消失  [已解决]
 
-### 是否应当以面向切面的方式来暴露给用户自定义布局函数？
+### 某些特定情况下，撤销重做导致布局问题[严重]

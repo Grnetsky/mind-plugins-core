@@ -59,21 +59,6 @@ export let mindBoxPlugin = {
         }
     },
     connectLine(pen,newPen,style = 'mind'){
-        // let line = null;
-        // switch (option.position){
-        //     case 'right':
-        //         line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
-        //         break;
-        //     case 'left':
-        //         line = meta2d.connectLine(newPen, pen, newPen.anchors[1],pen.anchors[3] , false);
-        //         break;
-        //     case 'bottom':
-        //         line = meta2d.connectLine(pen, newPen, pen.anchors[2],newPen.anchors[0] , false);
-        //         break;
-        //     case 'top':
-        //         line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
-        //         break;
-        // }
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
         let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,false)
@@ -207,7 +192,6 @@ export let mindBoxPlugin = {
      * */
     collectChildNodes(pen,recursion = true){
         let lines = pen.connectedLines || []
-        let collect = []
         let children = pen.mind?.children || []
         lines.forEach(i =>{
             let line = meta2d.store.pens[i.lineId]
@@ -258,19 +242,6 @@ export let mindBoxPlugin = {
 
         // 更新连线
     },
-    // 递归修改子节点的direction属性
-    // resetDirection(pen,direction,recursion = true){
-    //     let children = pen.mind.children;
-    //     if(!children || children.length === 0 )return;
-    //     for(let i = 0 ;i<children.length;i++){
-    //         const child = children[i];
-    //         child.mind.direction = direction;
-    //         this.connectLine()
-    //         if(recursion){
-    //             mindBoxPlugin.resetDirection(child,direction,true);
-    //         }
-    //     }
-    // },
     /**
      * @description 删除连线
      * @param pen {Object} 图元对象
@@ -310,18 +281,11 @@ export let mindBoxPlugin = {
     async deleteChildrenNode(pen){
         // 删除与之相关的线
         let lines = mindBoxPlugin.getLines(pen);
-
         // 查找到对应的父级，删除其在父级中的子级列表数据
         let parent = meta2d.findOne(pen.mind.preNodeId);
         parent && (pen.mind.preNodeChildren = deepClone(parent.mind.children))
         parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
-
-        // 刷新界面
-
-        // 删除meta2d数据
-        // 删除数据单不追加到历史记录
         await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,false);
-
     },
     getChildrenList(pen,recursion = true){
         if (pen || !pen.mind)return [];
@@ -379,7 +343,39 @@ export let mindBoxPlugin = {
         let optionMap = new Map()
         return (pen,options)=>{
             if(!isInit){
-
+                // TODO 进行撤销重做的重写操作
+                document.addEventListener('keydown',async (e)=>{
+                    if(e.key === 'Backspace'){
+                        let stopPropagation = false
+                        //判断是否有脑图组件
+                        let collection = meta2d.store.active
+                        meta2d.store.active.forEach(pen=>{
+                            if(pen.mind){
+                                stopPropagation = true
+                                let lines = pen.connectedLines?.map(i=>meta2d.findOne(i.LineId))
+                                collection.concat(lines)
+                            }
+                        })
+                        if(!stopPropagation)return
+                        let initPens = deepClone(meta2d.store.data.pens.map(pen=>{
+                            pen.calculative.active = undefined;
+                            return pen
+                        }
+                        ),true)
+                        await meta2d.delete(collection,false,false)
+                        let newPens = deepClone(meta2d.store.data.pens.map(pen=>{
+                            pen.calculative.active = undefined;
+                            return pen
+                        }
+                        ),true)
+                        meta2d.pushHistory({ type: 3, pens:newPens, initPens  });
+                        // 阻止触发meta2d的删除行为
+                        stopPropagation?
+                            e.stopPropagation()
+                            :
+                            ''
+                    }
+                },true)
                 // 初始化布局函数
                 mindBoxPlugin.layoutFunc.set('right',right)
                 mindBoxPlugin.layoutFunc.set('left',left)
@@ -391,24 +387,13 @@ export let mindBoxPlugin = {
 
                 // 设置颜色生成函数
                 mindBoxPlugin.colorFunc.set('default',defaultColorRule)
-                // 打开时进行初始化
-                document.addEventListener('keydown',(e)=>{
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                        // 阻止默认的撤销行为
-                        e.preventDefault();
-                        console.log('Ctrl + Z 被按下');
-
-                        // 在这里执行你想要的操作
-                    }
-                })
                 meta2d.on('opened',()=>{
-                    console.log('opened')
                     let pens= meta2d.store.data.pens
                     pens.forEach(pen=>{
                         let t = meta2d.findOne(pen.mind?.rootId) || {}
                         let isAdd = mindBoxPlugin.target.includes(t.tag) || mindBoxPlugin.target.includes(t.name) || pen.mind
                         if(isAdd && (pen.mind.type === 'node')){
-                            window.meta2d.emit('plugin:open',pen)
+                            window.meta2d.emit('plugin:mindBox:open',pen)
                             mindBoxPlugin.combineToolBox(pen)
                             mindBoxPlugin.combineLifeCircle(pen)
                         }
@@ -419,6 +404,11 @@ export let mindBoxPlugin = {
                 })
 
                 meta2d.on('undo',(e)=>{
+                    let { initPens } = e
+                    initPens?.forEach( pen =>{
+                        pen.calculative.active = false
+                        // pen.calculative.canvas = meta2d.canvas
+                    })
                     // TODO 删除顺序有问题
                     // e.pens.reverse().forEach(i=>{
                     //     if(i.mind){
@@ -472,7 +462,7 @@ export let mindBoxPlugin = {
                 let pen = target
                 mindBoxPlugin.combineToolBox(pen);
                 mindBoxPlugin.combineLifeCircle(pen)
-                meta2d.emit('plugin:open',pen)
+                meta2d.emit('plugin:mindBox:open',pen)
                 mindBoxPlugin.record(pen.id)
                 meta2d.render()
                 return
@@ -482,9 +472,9 @@ export let mindBoxPlugin = {
                     meta2d.off('add',addCallback)
                 }
                 addCallback = (pens)=>{
-
                     // TODO 此处还未考虑name与tag相等的情况
                     let isAdd = mindBoxPlugin.target.includes(pens[0].tag) || mindBoxPlugin.target.includes(pens[0].name)
+                    // 是否为根节点
                     if(isAdd && pens && pens.length === 1 && !pens[0].mind){
                         let pen = pens[0]
                         pen.disableAnchor =  true
@@ -507,11 +497,11 @@ export let mindBoxPlugin = {
                             lineWidth: 2,
                             level:0,
                         };
-                        // 跟随移动
-                        pen.mind.mindboxOption = optionMap.get(pens[0].tag || pens[0].name);
+                        // 在根节点上新增
+                        pen.mind.mindboxOption = optionMap.get(pens[0].tag) || optionMap.get(pens[0].name);
                         mindBoxPlugin.combineToolBox(pen);
                         mindBoxPlugin.combineLifeCircle(pen);
-                        meta2d.emit('plugin:open',pen)
+                        meta2d.emit('plugin:mindBox:addRoot',pen)
                         mindBoxPlugin.record(pen.id)
                         meta2d.render()
                     }
@@ -662,7 +652,7 @@ export let mindBoxPlugin = {
     __debouncePushHistory:(debounce(()=>{
         destroyRes.then(res =>{
             let newPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind),true)
-            // meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
+            meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
         })
 
     },2000)),
@@ -718,6 +708,7 @@ export let mindBoxPlugin = {
         let onMouseUp = (targetPen)=>{
             if(!meta2d.store.data.locked){
                 mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
+                meta2d.emit('plugin:mindBox:loadOption',{pen:targetPen,options:meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption})
                 if(toolbox){
                     toolbox._loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
                 }
@@ -798,14 +789,14 @@ export let mindBoxPlugin = {
         option.height && (option.height *= scale)
 
         opt = deepMerge(opt,option)
-        let initPens = deepClone(meta2d.store.data.pens,true)
+        let initPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind).map(i=>{i.calculative.active = false;return i}),true)
         let newPen = await meta2d.addPen(opt,false);
 
         // 设置连接关系
         newPen.mind.connect =pen.mind.level === 0?
             mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen,newPen)
             : pen.mind.connect
-        meta2d.emit('plugin:addNode', { plugin:'toolBox',pen,newPen });
+        meta2d.emit('plugin:mindBox:addNode', { plugin:'toolBox',pen,newPen });
         // 添加节点
         if(position){
             pen.mind.children.splice(position,0,newPen.id);
@@ -837,11 +828,8 @@ export let mindBoxPlugin = {
             globalThis.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
             globalThis.toolbox.translateWithPen(newPen);
         }
-
-        // mindBoxPlugin.update(rootNode)
-        // let list = [newPen,line]
-        // meta2d.canvas.pushHistory({ type: 1, pens: deepClone(list, true) });
-        let newPens = deepClone(meta2d.store.data.pens,true)
+        // TODO 此处是否应当局部替换
+        let newPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind).map(i=>{i.calculative.active = false;return i}),true)
         meta2d.pushHistory({ type: 3, pens:newPens, initPens  });
 
         return newPen
@@ -850,7 +838,7 @@ export let mindBoxPlugin = {
         if(!pen)return;
         mindBoxPlugin.record(pen)
         mindBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
-        meta2d.emit('plugin:update',{form:'toolBox'})
+        meta2d.emit('plugin:mindBox:update',{form:'toolBox'})
     },50),
 
     // root 为根节点id
@@ -894,7 +882,7 @@ export let mindBoxPlugin = {
         }else{
             meta2d.render();
         }
-        meta2d.emit('plugin:render')
+        meta2d.emit('plugin:mindBox:render')
     },
 
     /**

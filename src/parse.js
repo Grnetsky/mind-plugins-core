@@ -27,7 +27,12 @@ let LifeCycle = ['init','mounted']
 let env = Symbol('env')
 
 export function Scope(config,{template,script,style},output = 'dom',root = null,oldScript = null){
-
+    let res = createDom('div')
+    if(!script)script = {}
+    if(!style)style = ''
+    let namespace = config.key
+    window[env]?'': window[env] = {}
+    window[env][namespace]? '' :window[env][namespace] = {};
     let symbols = Object.getOwnPropertySymbols(window);
     let targetSymbol;
     for (let i = 0;i<symbols.length;i++) {
@@ -38,11 +43,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
         }
     }
 
-    let res = createDom('div')
-    if(!script)script = {}
-    if(!style)style = ''
-    let namespace = config.key
-    if (!namespace)error('Scope','The config parameter is invalid')
+    if (!namespace)error('Scope','The config parameter is invalid [have no key]')
     let duty = []
     // dom的预处理
     template = addUniqueIdsToHtmlString(template)

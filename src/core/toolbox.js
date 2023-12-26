@@ -1,5 +1,12 @@
 import {createDom, debounce, deepMerge, isObjectLiteral} from "../utils";
-import d, {basicFuncConfig, controlStyle, funcListStyle, toolboxDefault, toolboxStyle} from "../config/default"
+import d, {
+    basicFuncConfig,
+    controlStyle,
+    DefaultCssVar,
+    funcListStyle,
+    toolboxDefault,
+    toolboxStyle
+} from "../config/default"
 import { Scope } from "../parse";
 const extra = 'extra'
 
@@ -60,7 +67,7 @@ export class ToolBox {
         this._funcDom = funcContainer
         let stylesheet = document.styleSheets[0]; // 选择第一个样式表
         // toolbox_item是否交给用户设置
-        stylesheet.insertRule(".toolbox_item {" +
+        stylesheet.insertRule(".toolbox_item,.toolbox_slider_item {" +
             "display: flex;" +
             "justify-content: center;" +
             "align-items: center;" +
@@ -72,14 +79,25 @@ export class ToolBox {
             "padding: 0 3px;" +
             "}", 0);
         stylesheet.insertRule(".toolbox_item:hover {" +
-            "background-color: #eee;" +
+            "background-color: var(--toolboxItem-hover-backgroundColor);" +
             "}", 0);
         stylesheet.insertRule(".toolbox_slider_item:hover {" +
-            "background-color: #eee;" +
+            "background-color: var(--toolboxSliderItem-hover-backgroundColor)" +
             "}", 0);
         stylesheet.insertRule(`.toolbox_control_move {
             outline: solid 2px #8585ff !important;
         }`)
+        this.setCssVar()
+    }
+    setCssVar(cssVar){
+        let cssVarObj;
+        cssVar?
+            cssVarObj = cssVar
+            :
+            cssVarObj = DefaultCssVar
+        for (const key in cssVarObj) {
+            document.documentElement.style.setProperty(key,cssVarObj[key])
+        }
     }
     _setControl(){
         if(this.showControl){
@@ -168,12 +186,25 @@ export class ToolBox {
         }
     }
     setStyle(style){
-        if (!style){
-            style = toolboxStyle
-        }
+        this._setDefaultStyle()
+        if(!style)return
+        // 用戶未定義hover樣式
         Object.keys(style).forEach(i=>{
+            if(i === 'itemHoverBackgroundColor') {
+                this.setCssVar({
+                    '--toolboxItem-hover-backgroundColor':style[i]
+                })
+                return;
+            }
             this.box.style[i] = style[i];
         });
+    }
+
+    _setDefaultStyle(){
+        Object.keys(toolboxStyle).forEach(i=>{
+            this.box.style[i] = toolboxStyle[i];
+        });
+        this.setCssVar()
     }
     // 重写dom函数
     _rewriteDom(dom){
@@ -296,7 +327,7 @@ export class ToolBox {
 
 
             // titleDom添加到dom中
-            item.closeShadowDom?dom.appendChild(title):dom.shadowRoot.appendChild(title);
+            item.shadowRoot?dom.shadowRoot.appendChild(title):dom.appendChild(title)
 
             // 渲染下拉列表
             let containerDom = null;
@@ -384,11 +415,11 @@ function renderInit(item,pen,dom){
         // 清空
         dom.shadowRoot.innerHTML = ''
     }else{
-        item.closeShadowDom?dom.innerHTML = '':dom.attachShadow({mode: "open"});
+        item.shadowRoot?dom.attachShadow({mode: "open"}):dom.innerHTML = '';
     }
 
     //设置样式与事件
-    typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
+    // typeof item.style === 'object' && toolbox.setStyle(item.style);
 
     // 绑定事件，绑定在dom上
     if(item.event){
@@ -494,7 +525,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                         },event:i.event,func:function(e){
                             i.stopPropagation?e.stopPropagation():'';
                             i.func(i, this, dom, item,e);
-                        }.bind(pen),className:'toolbox_item'});
+                        }.bind(pen),className:'toolbox_slider_item'});
 
                 //TODO 执行时机是否正确？？？
                 i.init?.(i,pen,node)
@@ -522,7 +553,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
         // 下拉菜单默认为绝对定位
         containerDom.style.position = 'absolute';
         item.mounted?.(item,pen,containerDom)
-        item.closeShadowDom?dom.appendChild(containerDom):dom.shadowRoot.appendChild(containerDom);
+        item.shadowRoot?dom.shadowRoot.appendChild(containerDom):dom.appendChild(containerDom)
         dom.childrenDom = containerDom;
 // 添加样式到元素
     }
@@ -545,10 +576,10 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 function preprocess(item,pen) {
     // 分隔符则返回
     if(item.key === extra)return
-    if(item.openEventOnTitle == null){
-        item.openEventOnTitle = true
+    // 默认为false
+    if(item.shadowRoot == null){
+        item.shadowRoot = basicFuncConfig.shadowRoot
     }
-
     if(item.popup){
         item.isOpen = false
         item.closeOther = false

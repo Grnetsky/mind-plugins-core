@@ -61,7 +61,7 @@ let funcList =
     //   mindBoxPlugin.bottomChildren(pen,0);
     //   },
     popupEvent: 'mouseenter',
-    closeShadowDom:true,
+    shadowRoot:false,
     collapseEventOnMenu:false, // 是否在childrenDom中触发事件
     stopPropagation:true,
     collapseAnimate(self,pen,dom){
@@ -542,7 +542,7 @@ let funcList =
      * */
     colorList:['#f13097','#5757F3','#fa7878','#8C8CFF','#19f1cc',
       '#6ffd97','#efe864','#ff931a'],
-    closeShadowDom: true,
+    shadowRoot: false,
     collapseEventOnMenu:false,
     openEventOnTitle:true,
     popupEvent: 'mouseenter',
@@ -1216,7 +1216,7 @@ let funcList =
   //   mindBoxPlugin.bottomChildren(pen,0);
   //   },
   popupEvent: 'mouseenter',
-  closeShadowDom:true,
+  shadowRoot:false,
   collapseEventOnMenu:false, // 是否在childrenDom中触发事件
   stopPropagation:true,
   collapseAnimate(self,pen,dom){
@@ -1320,7 +1320,7 @@ export const toolboxDefault = {
   showControl:true
 }
 export let pluginDefault = {
-  animate: true,
+  animate: false,
   animateDuration:200,
   childrenGap: 20,
   levelGap:200,
@@ -1335,7 +1335,7 @@ export let pluginDefault = {
 
 export let toolboxStyle = {
   backgroundColor: '#fff',
-  borderRadius: '5px',
+  borderRadius: '8px',
   boxShadow:'0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
   transform: 'translateX(-50%)',
   position:'absolute',
@@ -1379,6 +1379,7 @@ export let basicFuncConfig = {
   collapseEventOnMenu:true,
   collapseEvent:'click',
   popupEvent:'mouseenter',
+  shadowRoot:true
 }
 export default {
   funcList,
@@ -1389,3 +1390,7 @@ export default {
   basicFuncConfig
 }
 
+export let DefaultCssVar = {
+  '--toolboxItem-hover-backgroundColor':'#eee',
+  '--toolboxSliderItem-hover-backgroundColor':'#eee'
+}

@@ -1,2 +1,2 @@
-export * from "./ToolBoxPlugin"
+export * from "./MindBoxPlugin"
 export * from "./toolbox"

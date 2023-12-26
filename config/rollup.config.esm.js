@@ -2,13 +2,22 @@
 var common = require("./rollup")
 
 const nodeResolve = require("rollup-plugin-node-resolve");
+const commonjs = require("rollup-plugin-commonjs");
 module.exports = {
-    input:"./index",
+    input:"index.js",
     output:{
         file:"dist/index.esm.js",
         format:"es",
         banner:common.banner
     },
-    plugins:[common.getCompiler()]
+    external: ['mind-diagram','@meta2d/core'],
+    plugins:[
+        nodeResolve({
+        main: true,
+        extensions: ['.js']
+    }),
+        commonjs({
+            include: 'node_modules/**',
+        }),common.getCompiler()]
 
 }

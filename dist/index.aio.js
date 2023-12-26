@@ -3,10 +3,10 @@
 * Licensed under MIT
 */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('mind-diagram'), require('@meta2d/core')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'mind-diagram', '@meta2d/core'], factory) :
-  (factory((global.clone = {}),global.mindDiagram,global.core));
-}(this, (function (exports,mindDiagram,core) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@meta2d/core')) :
+  typeof define === 'function' && define.amd ? define(['exports', '@meta2d/core'], factory) :
+  (factory((global.clone = {}),global.core));
+}(this, (function (exports,core) { 'use strict';
 
   function _regeneratorRuntime() {
     _regeneratorRuntime = function () {
@@ -386,6 +386,20 @@
       });
     };
   }
+  function _extends() {
+    _extends = Object.assign ? Object.assign.bind() : function (target) {
+      for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
+        for (var key in source) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
+      }
+      return target;
+    };
+    return _extends.apply(this, arguments);
+  }
   function _inherits(subClass, superClass) {
     if (typeof superClass !== "function" && superClass !== null) {
       throw new TypeError("Super expression must either be null or a function");
@@ -408,6 +422,32 @@
       return o;
     };
     return _setPrototypeOf(o, p);
+  }
+  function _isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+    try {
+      Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function _construct(Parent, args, Class) {
+    if (_isNativeReflectConstruct()) {
+      _construct = Reflect.construct.bind();
+    } else {
+      _construct = function _construct(Parent, args, Class) {
+        var a = [null];
+        a.push.apply(a, args);
+        var Constructor = Function.bind.apply(Parent, a);
+        var instance = new Constructor();
+        if (Class) _setPrototypeOf(instance, Class.prototype);
+        return instance;
+      };
+    }
+    return _construct.apply(null, arguments);
   }
   function _unsupportedIterableToArray(o, minLen) {
     if (!o) return;
@@ -1525,402 +1565,6 @@
 
   var map$1 = map;
 
-  var f$1 = Object.getOwnPropertySymbols;
-
-  var _objectGops = {
-  	f: f$1
-  };
-
-  var f$2 = {}.propertyIsEnumerable;
-
-  var _objectPie = {
-  	f: f$2
-  };
-
-  // 19.1.2.1 Object.assign(target, source, ...)
-
-
-
-
-
-
-  var $assign = Object.assign;
-
-  // should work with symbols and should have deterministic property order (V8 bug)
-  var _objectAssign = !$assign || _fails(function () {
-    var A = {};
-    var B = {};
-    // eslint-disable-next-line no-undef
-    var S = Symbol();
-    var K = 'abcdefghijklmnopqrst';
-    A[S] = 7;
-    K.split('').forEach(function (k) { B[k] = k; });
-    return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
-  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
-    var T = _toObject(target);
-    var aLen = arguments.length;
-    var index = 1;
-    var getSymbols = _objectGops.f;
-    var isEnum = _objectPie.f;
-    while (aLen > index) {
-      var S = _iobject(arguments[index++]);
-      var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
-      var length = keys.length;
-      var j = 0;
-      var key;
-      while (length > j) {
-        key = keys[j++];
-        if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
-      }
-    } return T;
-  } : $assign;
-
-  // 19.1.3.1 Object.assign(target, source)
-
-
-  _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
-
-  var assign = _core.Object.assign;
-
-  var assign$1 = assign;
-
-  // most Object methods by ES6 should accept primitives
-
-
-
-  var _objectSap = function (KEY, exec) {
-    var fn = (_core.Object || {})[KEY] || Object[KEY];
-    var exp = {};
-    exp[KEY] = exec(fn);
-    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
-  };
-
-  // 19.1.2.14 Object.keys(O)
-
-
-
-  _objectSap('keys', function () {
-    return function keys(it) {
-      return _objectKeys(_toObject(it));
-    };
-  });
-
-  var keys = _core.Object.keys;
-
-  var keys$1 = keys;
-
-  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
-
-
-  _export(_export.S, 'Array', { isArray: _isArray });
-
-  var isArray = _core.Array.isArray;
-
-  var isArray$1 = isArray;
-
-  function createDom(name, style, even, func, className) {
-    if (even === void 0) {
-      even = undefined;
-    }
-    if (func === void 0) {
-      func = undefined;
-    }
-    if (className === void 0) {
-      className = undefined;
-    }
-    // 创建dom
-    var dom = document.createElement(name);
-    // 设置dom样式
-    if (style && typeof style === 'object') {
-      assign$1(dom.style, style);
-      className && dom.classList.add(className);
-    } else {
-      throw new Error('createDom error: parma "style" must be a Object');
-    }
-    // 绑定dom事件；
-    if (typeof even === 'string' && typeof func === 'function') {
-      dom.addEventListener(even, function (e) {
-        func();
-      });
-    }
-    return dom;
-  }
-
-  var ToolBox = /*#__PURE__*/function () {
-    function ToolBox(parentHtml, style) {
-      if (style === void 0) {
-        style = {};
-      }
-      this.curItem = null;
-      this.box = document.createElement('div');
-      this.box.style.backgroundColor = '#fff';
-      this.box.style.borderRadius = '5px';
-      this.box.style.boxShadow = '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)';
-      this.box.style.width = 'max-content';
-      this.box.style.height = '40px';
-      this.box.style.padding = '6px';
-      this.box.className = 'toolBox';
-      this.box.style.display = 'none';
-      this.box.style.zIndex = '999';
-      this.box.style.display = 'flex';
-      this.box.style.justifyContent = 'center';
-      this.box.style.alignItems = 'center';
-      // this.box.style.overflow = 'hidden';
-      this.box.style.position = 'relative';
-      this.box.style.transform = 'translateX(-50%)';
-      this.setStyle(style);
-      var stylesheet = document.styleSheets[0]; // 选择第一个样式表
-      stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "padding: 0 5px;" + "}", 0);
-      stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
-      parentHtml.appendChild(this.box);
-    }
-    var _proto = ToolBox.prototype;
-    _proto.setStyle = function setStyle(style) {
-      var _this = this;
-      keys$1(style).forEach(function (i) {
-        _this.box.style[i] = style[i];
-      });
-    };
-    _proto.hide = function hide() {
-      this.box.style.display = 'none';
-    };
-    _proto.bindPen = function bindPen(pen) {
-      this.pen = pen;
-    };
-    _proto.show = function show() {
-      this.box.style.display = 'flex';
-      this.box.style.flexDirection = 'row';
-    };
-    _proto.destroy = function destroy() {
-      this.box.parentNode.removeChild(this.box);
-    };
-    _proto.translatePosition = function translatePosition(pen) {
-      this.hide();
-      var store = pen.calculative.canvas.store;
-      var worldRect = pen.calculative.worldRect;
-      this.box.style.position = 'absolute';
-      this.box.style.outline = 'none';
-      this.box.style.left = worldRect.x + store.data.x + worldRect.width / 2 + 'px';
-      this.box.style.top = worldRect.y + store.data.y + -80 + 'px';
-      this.box.style.userSelect = 'none';
-      this.show();
-    };
-    _proto.renderChildren = function renderChildren() {
-      var _this2 = this;
-      var fragmentChild = new DocumentFragment();
-      this.box.innerHTML = '';
-      this.funcList.forEach(function (i) {
-        if (i.name) {
-          var itemsSpan = _this2.setChildDom(_this2.pen, i);
-          itemsSpan.className = 'toolbox_item';
-          fragmentChild.appendChild(itemsSpan);
-        }
-      });
-      this.box.appendChild(fragmentChild);
-    }
-    /**
-     * @description 创造子节点  设置样式 配置事件函数等；
-     * @param pen 操作的图元
-     * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
-     * */;
-    _proto.setChildDom = function setChildDom(pen, item) {
-      var dom = document.createElement('div');
-      // 构建update方法 用于局部更新
-      item.update = function (target, keepOpen) {
-        if (target === 'title') {
-          renderTitle(item, pen, dom.titleDom);
-          return;
-        } else if (target === 'child') {
-          renderChildDom(item, pen, dom, dom.childrenDom, keepOpen);
-          return;
-        }
-        // 清空列表  初始化列表
-        renderInit(item, pen, dom);
-        item.init == null || item.init(item, pen, dom);
-
-        // 初始化titleDOM
-        var title = createDom('div', {}, undefined, undefined, 'toolbox_title');
-        // 执行titleDom
-        title = renderTitle(item, pen, title);
-        // titleDom添加到dom中
-        item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
-
-        // 渲染下拉列表
-        var containerDom = null;
-        renderChildDom(item, pen, dom, containerDom);
-        item.dom = dom;
-        item.dom.titleDom = title;
-        // 事件处理
-      };
-
-      item.updateAll = function (keepOpen) {
-        if (keepOpen === void 0) {
-          keepOpen = true;
-        }
-        item.update('title');
-        item.update('child', keepOpen);
-      };
-      item.update();
-      return dom;
-    };
-    _proto.setFuncList = function setFuncList(funcList) {
-      this.funcList = funcList;
-      this.renderChildren();
-    };
-    _proto.clearFuncList = function clearFuncList() {
-      this.setFuncList([]);
-    };
-    return ToolBox;
-  }();
-  function renderInit(item, pen, dom) {
-    if (dom.shadowRoot) {
-      // 清空
-      dom.shadowRoot.innerHTML = '';
-    } else {
-      item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
-        mode: "open"
-      });
-    }
-
-    //设置样式与事件
-    typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
-    if (item.event) {
-      var eventFunc = function eventFunc(e) {
-        // 绑定事件
-        item.func(item, this, dom);
-      };
-      dom.addEventListener(item.event, eventFunc.bind(pen));
-    }
-    return dom;
-  }
-  function renderTitle(item, pen, title) {
-    title.innerHTML = '';
-    if (typeof item.setDom === 'function') {
-      var re = item.setDom(item, title);
-      switch (typeof re) {
-        case "string":
-          title.innerHTML = re;
-          break;
-        case "object":
-          title.appendChild(re);
-          break;
-        default:
-          throw new Error('function setDom must return string or node object');
-      }
-    } else {
-      title.innerHTML = item.icon ? item.icon : item.img ? "<img src=\"" + item.img + "\" title=\"" + item.name + "\" />" : item.name;
-    }
-    title.addEventListener(item.openChildDomEvent || 'click', function () {
-      // 关闭其他选项
-      if (toolbox.curItem !== item && toolbox.curItem) {
-        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, item.dom.childrenDom)) || toolbox.curItem.dom.childrenDom && (toolbox.curItem.dom.childrenDom.style.visibility = 'hidden');
-      }
-      // 将打开逻辑交给用户 或者
-      (item.openChildDom == null ? void 0 : item.openChildDom(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
-
-      // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
-      item.onOpenChildDom == null || item.onOpenChildDom(item, pen, item.dom.childrenDom);
-      toolbox.curItem = item;
-    });
-    return title;
-  }
-  function renderChildDom(item, pen, dom, containerDom, keepOpen) {
-    if (keepOpen === void 0) {
-      keepOpen = false;
-    }
-    if (dom.childrenDom) dom.shadowRoot ? dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom);
-    if (item.children && item.children.length > 0 || item.setChildrenDom) {
-      var _containerDom;
-      // 是否重写dom
-      if (typeof item.setChildrenDom === 'function') {
-        // 重新childDom
-
-        var childDom = item.setChildrenDom(item, pen, dom);
-
-        /**
-         * @description 若返回的是字符串，则在外部包裹一层div作为其container
-         * */
-        if (typeof childDom === 'string') {
-          var div = document.createElement('div');
-          // 默认隐藏节点
-          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (div.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (div.style.visibility = 'hidden');
-          div.innerHTML = childDom;
-          dom.shadowRoot ? dom.shadowRoot.appendChild(div) : dom.appendChild(div);
-          containerDom = div;
-        } else {
-          containerDom = childDom;
-          keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (childDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (childDom.style.visibility = 'hidden');
-        }
-      } else {
-        containerDom = createDom('div', {
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          position: 'absolute',
-          top: '50px',
-          backgroundColor: '#fff',
-          borderRadius: '5px',
-          padding: '3px',
-          width: 'max-content',
-          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
-        });
-        keepOpen ? (item.openChildDom == null ? void 0 : item.openChildDom()) || (containerDom.style.visibility = 'visible') : (item.closeChildDom == null ? void 0 : item.closeChildDom()) || (containerDom.style.visibility = 'hidden');
-      }
-      var fragment = new DocumentFragment();
-      var _loop = function _loop() {
-        var i = _step.value;
-        var node = createDom('div', {
-          margin: '5px 8px'
-        }, i.event, function (e) {
-          i.stopPropagation ? e.stopPropagation() : '';
-          i.func(i, this, dom, item);
-        }.bind(pen), 'toolbox_item');
-
-        //TODO 执行时机是否正确？？？
-        i.init == null || i.init(i, pen, node);
-        if (i.setDom) {
-          var re = i.setDom(i, node);
-          switch (typeof re) {
-            case "string":
-              node.innerHTML = re;
-              break;
-            case "object":
-              node.appendChild(re);
-              break;
-            default:
-              throw new Error('function setDom must return string or node object');
-          }
-        } else {
-          node.innerHTML = i.icon && i.name ? '<span style="padding-right: 30px;width: max-content" >' + i.icon + '</span> <span>' + i.name + '</span>' : '<span>' + (i.name || i.icon) + '</span>';
-        }
-        fragment.appendChild(node);
-      };
-      for (var _iterator = _createForOfIteratorHelperLoose(item.children || []), _step; !(_step = _iterator()).done;) {
-        _loop();
-      }
-      dom.style.position = 'relative';
-      (_containerDom = containerDom) == null || _containerDom.appendChild(fragment);
-      containerDom.classList.add('toolbox_container');
-      containerDom.style.position = 'absolute';
-      item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
-      dom.childrenDom = containerDom;
-      // 添加样式到元素
-    }
-
-    if (item.children || item.setChildrenDom || item.closeOther) {
-      // 关闭下拉菜单
-      !item.closeOther && dom.childrenDom.addEventListener(item.closeChildDomEvent || 'click', function () {
-        var _toolbox$curItem;
-        console.log('mouselevae');
-        // 可手动派发隐藏函数
-        (_toolbox$curItem = toolbox.curItem) == null || _toolbox$curItem.onHideChildDom == null || _toolbox$curItem.onHideChildDom();
-        (item.closeChildDom == null ? void 0 : item.closeChildDom(item, pen, containerDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
-        toolbox.curItem = null;
-      });
-    }
-    return containerDom;
-  }
-
   // 7.3.20 SpeciesConstructor(O, defaultConstructor)
 
 
@@ -2111,12 +1755,12 @@
     this.reject = _aFunction(reject);
   }
 
-  var f$3 = function (C) {
+  var f$1 = function (C) {
     return new PromiseCapability(C);
   };
 
   var _newPromiseCapability = {
-  	f: f$3
+  	f: f$1
   };
 
   var _perform = function (exec) {
@@ -2466,80 +2110,1249 @@
 
   var promise$1 = promise;
 
+  // most Object methods by ES6 should accept primitives
+
+
+
+  var _objectSap = function (KEY, exec) {
+    var fn = (_core.Object || {})[KEY] || Object[KEY];
+    var exp = {};
+    exp[KEY] = exec(fn);
+    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+  };
+
+  // 19.1.2.14 Object.keys(O)
+
+
+
+  _objectSap('keys', function () {
+    return function keys(it) {
+      return _objectKeys(_toObject(it));
+    };
+  });
+
+  var keys = _core.Object.keys;
+
+  var keys$1 = keys;
+
+  // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
+
+
+  _export(_export.S, 'Array', { isArray: _isArray });
+
+  var isArray = _core.Array.isArray;
+
+  var isArray$1 = isArray;
+
+  var f$2 = Object.getOwnPropertySymbols;
+
+  var _objectGops = {
+  	f: f$2
+  };
+
+  var f$3 = {}.propertyIsEnumerable;
+
+  var _objectPie = {
+  	f: f$3
+  };
+
+  // 19.1.2.1 Object.assign(target, source, ...)
+
+
+
+
+
+
+  var $assign = Object.assign;
+
+  // should work with symbols and should have deterministic property order (V8 bug)
+  var _objectAssign = !$assign || _fails(function () {
+    var A = {};
+    var B = {};
+    // eslint-disable-next-line no-undef
+    var S = Symbol();
+    var K = 'abcdefghijklmnopqrst';
+    A[S] = 7;
+    K.split('').forEach(function (k) { B[k] = k; });
+    return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+  }) ? function assign(target, source) { // eslint-disable-line no-unused-vars
+    var T = _toObject(target);
+    var aLen = arguments.length;
+    var index = 1;
+    var getSymbols = _objectGops.f;
+    var isEnum = _objectPie.f;
+    while (aLen > index) {
+      var S = _iobject(arguments[index++]);
+      var keys = getSymbols ? _objectKeys(S).concat(getSymbols(S)) : _objectKeys(S);
+      var length = keys.length;
+      var j = 0;
+      var key;
+      while (length > j) {
+        key = keys[j++];
+        if (!_descriptors || isEnum.call(S, key)) T[key] = S[key];
+      }
+    } return T;
+  } : $assign;
+
+  // 19.1.3.1 Object.assign(target, source)
+
+
+  _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
+
+  var assign = _core.Object.assign;
+
+  var assign$1 = assign;
+
+  var SET = 'Set';
+
+  // 23.2 Set Objects
+  var es6_set = _collection(SET, function (get) {
+    return function Set() { return get(this, arguments.length > 0 ? arguments[0] : undefined); };
+  }, {
+    // 23.2.3.1 Set.prototype.add(value)
+    add: function add(value) {
+      return _collectionStrong.def(_validateCollection(this, SET), value = value === 0 ? 0 : value, value);
+    }
+  }, _collectionStrong);
+
+  // https://github.com/DavidBruant/Map-Set.prototype.toJSON
+
+
+  _export(_export.P + _export.R, 'Set', { toJSON: _collectionToJson('Set') });
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-set.of
+  _setCollectionOf('Set');
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-set.from
+  _setCollectionFrom('Set');
+
+  var set$1 = _core.Set;
+
+  var set$2 = set$1;
+
+  var isEnum = _objectPie.f;
+  var _objectToArray = function (isEntries) {
+    return function (it) {
+      var O = _toIobject(it);
+      var keys = _objectKeys(O);
+      var length = keys.length;
+      var i = 0;
+      var result = [];
+      var key;
+      while (length > i) {
+        key = keys[i++];
+        if (!_descriptors || isEnum.call(O, key)) {
+          result.push(isEntries ? [key, O[key]] : O[key]);
+        }
+      }
+      return result;
+    };
+  };
+
+  // https://github.com/tc39/proposal-object-values-entries
+
+  var $values = _objectToArray(false);
+
+  _export(_export.S, 'Object', {
+    values: function values(it) {
+      return $values(it);
+    }
+  });
+
+  var values = _core.Object.values;
+
+  var values$1 = values;
+
+  var getWeak = _meta.getWeak;
+
+
+
+
+
+
+
+  var arrayFind = _arrayMethods(5);
+  var arrayFindIndex = _arrayMethods(6);
+  var id$2 = 0;
+
+  // fallback for uncaught frozen keys
+  var uncaughtFrozenStore = function (that) {
+    return that._l || (that._l = new UncaughtFrozenStore());
+  };
+  var UncaughtFrozenStore = function () {
+    this.a = [];
+  };
+  var findUncaughtFrozen = function (store, key) {
+    return arrayFind(store.a, function (it) {
+      return it[0] === key;
+    });
+  };
+  UncaughtFrozenStore.prototype = {
+    get: function (key) {
+      var entry = findUncaughtFrozen(this, key);
+      if (entry) return entry[1];
+    },
+    has: function (key) {
+      return !!findUncaughtFrozen(this, key);
+    },
+    set: function (key, value) {
+      var entry = findUncaughtFrozen(this, key);
+      if (entry) entry[1] = value;
+      else this.a.push([key, value]);
+    },
+    'delete': function (key) {
+      var index = arrayFindIndex(this.a, function (it) {
+        return it[0] === key;
+      });
+      if (~index) this.a.splice(index, 1);
+      return !!~index;
+    }
+  };
+
+  var _collectionWeak = {
+    getConstructor: function (wrapper, NAME, IS_MAP, ADDER) {
+      var C = wrapper(function (that, iterable) {
+        _anInstance(that, C, NAME, '_i');
+        that._t = NAME;      // collection type
+        that._i = id$2++;      // collection id
+        that._l = undefined; // leak store for uncaught frozen objects
+        if (iterable != undefined) _forOf(iterable, IS_MAP, that[ADDER], that);
+      });
+      _redefineAll(C.prototype, {
+        // 23.3.3.2 WeakMap.prototype.delete(key)
+        // 23.4.3.3 WeakSet.prototype.delete(value)
+        'delete': function (key) {
+          if (!_isObject(key)) return false;
+          var data = getWeak(key);
+          if (data === true) return uncaughtFrozenStore(_validateCollection(this, NAME))['delete'](key);
+          return data && _has(data, this._i) && delete data[this._i];
+        },
+        // 23.3.3.4 WeakMap.prototype.has(key)
+        // 23.4.3.4 WeakSet.prototype.has(value)
+        has: function has(key) {
+          if (!_isObject(key)) return false;
+          var data = getWeak(key);
+          if (data === true) return uncaughtFrozenStore(_validateCollection(this, NAME)).has(key);
+          return data && _has(data, this._i);
+        }
+      });
+      return C;
+    },
+    def: function (that, key, value) {
+      var data = getWeak(_anObject(key), true);
+      if (data === true) uncaughtFrozenStore(that).set(key, value);
+      else data[that._i] = value;
+      return that;
+    },
+    ufstore: uncaughtFrozenStore
+  };
+
+  var es6_weakMap = createCommonjsModule(function (module) {
+
+  var each = _arrayMethods(0);
+
+
+
+
+
+
+  var NATIVE_WEAK_MAP = _validateCollection;
+  var IS_IE11 = !_global.ActiveXObject && 'ActiveXObject' in _global;
+  var WEAK_MAP = 'WeakMap';
+  var getWeak = _meta.getWeak;
+  var isExtensible = Object.isExtensible;
+  var uncaughtFrozenStore = _collectionWeak.ufstore;
+  var InternalMap;
+
+  var wrapper = function (get) {
+    return function WeakMap() {
+      return get(this, arguments.length > 0 ? arguments[0] : undefined);
+    };
+  };
+
+  var methods = {
+    // 23.3.3.3 WeakMap.prototype.get(key)
+    get: function get(key) {
+      if (_isObject(key)) {
+        var data = getWeak(key);
+        if (data === true) return uncaughtFrozenStore(_validateCollection(this, WEAK_MAP)).get(key);
+        return data ? data[this._i] : undefined;
+      }
+    },
+    // 23.3.3.5 WeakMap.prototype.set(key, value)
+    set: function set(key, value) {
+      return _collectionWeak.def(_validateCollection(this, WEAK_MAP), key, value);
+    }
+  };
+
+  // 23.3 WeakMap Objects
+  var $WeakMap = module.exports = _collection(WEAK_MAP, wrapper, methods, _collectionWeak, true, true);
+
+  // IE11 WeakMap frozen keys fix
+  if (NATIVE_WEAK_MAP && IS_IE11) {
+    InternalMap = _collectionWeak.getConstructor(wrapper, WEAK_MAP);
+    _objectAssign(InternalMap.prototype, methods);
+    _meta.NEED = true;
+    each(['delete', 'has', 'get', 'set'], function (key) {
+      var proto = $WeakMap.prototype;
+      var method = proto[key];
+      _redefine(proto, key, function (a, b) {
+        // store frozen objects on internal weakmap shim
+        if (_isObject(a) && !isExtensible(a)) {
+          if (!this._f) this._f = new InternalMap();
+          var result = this._f[key](a, b);
+          return key == 'set' ? this : result;
+        // store all the rest on native weakmap
+        } return method.call(this, a, b);
+      });
+    });
+  }
+  });
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-weakmap.of
+  _setCollectionOf('WeakMap');
+
+  // https://tc39.github.io/proposal-setmap-offrom/#sec-weakmap.from
+  _setCollectionFrom('WeakMap');
+
+  var weakMap = _core.WeakMap;
+
+  var weakMap$1 = weakMap;
+
+  // 19.1.2.9 Object.getPrototypeOf(O)
+
+
+
+  _objectSap('getPrototypeOf', function () {
+    return function getPrototypeOf(it) {
+      return _objectGpo(_toObject(it));
+    };
+  });
+
+  var getPrototypeOf = _core.Object.getPrototypeOf;
+
+  var getPrototypeOf$1 = getPrototypeOf;
+
+  var gOPD = Object.getOwnPropertyDescriptor;
+
+  var f$4 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
+    O = _toIobject(O);
+    P = _toPrimitive$1(P, true);
+    if (_ie8DomDefine) try {
+      return gOPD(O, P);
+    } catch (e) { /* empty */ }
+    if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
+  };
+
+  var _objectGopd = {
+  	f: f$4
+  };
+
+  // Works with __proto__ only. Old v8 can't work with null proto objects.
+  /* eslint-disable no-proto */
+
+
+  var check = function (O, proto) {
+    _anObject(O);
+    if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+  };
+  var _setProto = {
+    set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
+      function (test, buggy, set) {
+        try {
+          set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
+          set(test, []);
+          buggy = !(test instanceof Array);
+        } catch (e) { buggy = true; }
+        return function setPrototypeOf(O, proto) {
+          check(O, proto);
+          if (buggy) O.__proto__ = proto;
+          else set(O, proto);
+          return O;
+        };
+      }({}, false) : undefined),
+    check: check
+  };
+
+  // 19.1.3.19 Object.setPrototypeOf(O, proto)
+
+  _export(_export.S, 'Object', { setPrototypeOf: _setProto.set });
+
+  var setPrototypeOf = _core.Object.setPrototypeOf;
+
+  var setPrototypeOf$1 = setPrototypeOf;
+
+  function createDom(tag, config) {
+    if (config === void 0) {
+      config = {
+        style: {},
+        event: undefined,
+        func: undefined,
+        className: undefined
+      };
+    }
+    // 创建dom
+    var dom = document.createElement(tag);
+    // 设置dom样式
+    if (config.style) {
+      if (typeof config.style === 'object') {
+        assign$1(dom.style, config.style);
+        config.className && dom.classList.add(config.className);
+      } else {
+        throw new Error('createDom error: parma "style" must be a Object');
+      }
+    }
+    // 绑定dom事件；
+    if (typeof config.event === 'string' && typeof config.func === 'function') {
+      dom.addEventListener(config.event, function (e) {
+        config.func(e);
+      });
+    }
+    return dom;
+  }
+  function debounce(fn, delay) {
+    var timer = null;
+    return function (pen, recursion) {
+      var _this = this;
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fn.call(_this, pen, recursion);
+      }, delay);
+    };
+  }
+  function deepMerge(obj1, obj2) {
+    var newObj = assign$1({}, obj1);
+    for (var key in obj2) {
+      if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+        newObj[key] = deepMerge(obj1[key], obj2[key]);
+      } else {
+        newObj[key] = obj2[key];
+      }
+    }
+    return newObj;
+  }
+  function replaceAfterPosition(str, position, regex, replacement) {
+    // 判断位置是否超出字符串长度
+    if (position >= str.length) return str;
+
+    // 截取从指定位置开始到字符串末尾的子字符串
+    var substringToReplace = str.slice(position);
+
+    // 在子字符串中执行替换操作
+    var replacedSubstring = substringToReplace.replace(regex, replacement);
+
+    // 将替换后的子字符串与前面的部分结合
+    var resultString = str.slice(0, position) + replacedSubstring;
+    return resultString;
+  }
+  function debounceFirstOnly(func, wait) {
+    var timeout;
+    var executed = false; // 标志是否已经执行过一次
+
+    return function () {
+      var context = this;
+      if (!executed) {
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+        func.apply(context, args);
+        executed = true;
+      }
+      clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        executed = false; // 重置执行标志，使得函数可以在下一次防抖周期首次被触发时执行
+      }, wait);
+    };
+  }
+  function isObjectLiteral(value) {
+    return Object.prototype.toString.call(value) === '[object Object]';
+  }
+  function removeDuplicates(list) {
+    var uniqueResults = [];
+    var uniqueNames = new set$2();
+    for (var _iterator = _createForOfIteratorHelperLoose(list), _step; !(_step = _iterator()).done;) {
+      var res = _step.value;
+      if (!uniqueNames.has(res.name)) {
+        uniqueNames.add(res.name);
+        uniqueResults.push(res);
+      }
+    }
+    return uniqueResults;
+  }
+
+  //沙盒
+  function scopedEval(scope, expr) {
+    var scopeKeys = keys$1(scope);
+    var scopeValues = values$1(scope);
+
+    // 函数的参数名称与作用域的键相匹配，函数体是表达式
+    var func = _construct(Function, scopeKeys.concat(["return " + expr + ";"]));
+
+    // 将作用域的值作为参数传递
+    try {
+      var re = func.apply(void 0, scopeValues);
+      return re;
+    } catch (e) {
+      error('[ScopedEval] Error: ', e.message);
+    }
+  }
+  function escapeRegExp(string) {
+    // RegExp.escape的提案用法，替换所有可能的特殊字符
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  function error(scope, message) {
+    throw new Error("plugin-mind-core " + scope + " Error: " + message);
+  }
+  function warn(scope, message) {
+    console.warn("mind-plugin-core " + scope + " Warn: " + message);
+  }
+  function deepCopy(obj, cache) {
+    if (cache === void 0) {
+      cache = new weakMap$1();
+    }
+    // 基本数据类型直接返回
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    // 处理日期
+    if (obj instanceof Date) {
+      return new Date(obj);
+    }
+
+    // 处理正则表达式
+    if (obj instanceof RegExp) {
+      return new RegExp(obj.source, obj.flags);
+    }
+
+    // 处理函数
+    if (typeof obj === 'function') {
+      return obj.bind(null);
+    }
+
+    // 避免循环引用
+    if (cache.has(obj)) {
+      return cache.get(obj);
+    }
+
+    // 处理数组和对象
+    var copy = isArray$1(obj) ? [] : {};
+
+    // 将拷贝的结果存入缓存
+    cache.set(obj, copy);
+
+    // 递归拷贝所有属性
+    keys$1(obj).forEach(function (key) {
+      copy[key] = deepCopy(obj[key], cache);
+    });
+
+    // 拷贝原型链上的属性
+    var proto = getPrototypeOf$1(obj);
+    if (proto) {
+      setPrototypeOf$1(copy, proto);
+    }
+    return copy;
+  }
+  function isObject(object) {
+    return object != null && typeof object === 'object';
+  }
+  function compareObjects(object1, object2) {
+    var diffs = {};
+    var compare = function compare(item1, item2, key) {
+      var type1 = Object.prototype.toString.call(item1);
+      var type2 = Object.prototype.toString.call(item2);
+      if (type1 !== type2) {
+        diffs[key] = {
+          oldVal: item1,
+          newVal: item2
+        };
+        return;
+      }
+      if (isObject(item1) && isObject(item2)) {
+        var objDiffs = compareObjects(item1, item2);
+        if (keys$1(objDiffs).length > 0) {
+          diffs[key] = objDiffs;
+        }
+      } else if (item1 !== item2) {
+        diffs[key] = {
+          oldVal: item1,
+          newVal: item2
+        };
+      }
+    };
+    for (var key in object1) {
+      if (object1.hasOwnProperty(key)) {
+        compare(object1[key], object2[key], key);
+      }
+    }
+    for (var _key2 in object2) {
+      if (object2.hasOwnProperty(_key2)) {
+        if (!object1.hasOwnProperty(_key2)) {
+          diffs[_key2] = {
+            oldVal: undefined,
+            newVal: object2[_key2]
+          };
+        }
+      }
+    }
+    return diffs;
+  }
+
+  var f$5 = _wks;
+
+  var _wksExt = {
+  	f: f$5
+  };
+
+  var defineProperty = _objectDp.f;
+  var _wksDefine = function (name) {
+    var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
+    if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
+  };
+
+  // all enumerable object keys, includes symbols
+
+
+
+  var _enumKeys = function (it) {
+    var result = _objectKeys(it);
+    var getSymbols = _objectGops.f;
+    if (getSymbols) {
+      var symbols = getSymbols(it);
+      var isEnum = _objectPie.f;
+      var i = 0;
+      var key;
+      while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
+    } return result;
+  };
+
+  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+
+  var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
+
+  var f$6 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+    return _objectKeysInternal(O, hiddenKeys);
+  };
+
+  var _objectGopn = {
+  	f: f$6
+  };
+
+  // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+
+  var gOPN = _objectGopn.f;
+  var toString$1 = {}.toString;
+
+  var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+    ? Object.getOwnPropertyNames(window) : [];
+
+  var getWindowNames = function (it) {
+    try {
+      return gOPN(it);
+    } catch (e) {
+      return windowNames.slice();
+    }
+  };
+
+  var f$7 = function getOwnPropertyNames(it) {
+    return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
+  };
+
+  var _objectGopnExt = {
+  	f: f$7
+  };
+
+  // ECMAScript 6 symbols shim
+
+
+
+
+
+  var META = _meta.KEY;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var gOPD$1 = _objectGopd.f;
+  var dP$3 = _objectDp.f;
+  var gOPN$1 = _objectGopnExt.f;
+  var $Symbol = _global.Symbol;
+  var $JSON = _global.JSON;
+  var _stringify = $JSON && $JSON.stringify;
+  var PROTOTYPE$2 = 'prototype';
+  var HIDDEN = _wks('_hidden');
+  var TO_PRIMITIVE = _wks('toPrimitive');
+  var isEnum$1 = {}.propertyIsEnumerable;
+  var SymbolRegistry = _shared('symbol-registry');
+  var AllSymbols = _shared('symbols');
+  var OPSymbols = _shared('op-symbols');
+  var ObjectProto$1 = Object[PROTOTYPE$2];
+  var USE_NATIVE$1 = typeof $Symbol == 'function' && !!_objectGops.f;
+  var QObject = _global.QObject;
+  // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+  var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
+
+  // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+  var setSymbolDesc = _descriptors && _fails(function () {
+    return _objectCreate(dP$3({}, 'a', {
+      get: function () { return dP$3(this, 'a', { value: 7 }).a; }
+    })).a != 7;
+  }) ? function (it, key, D) {
+    var protoDesc = gOPD$1(ObjectProto$1, key);
+    if (protoDesc) delete ObjectProto$1[key];
+    dP$3(it, key, D);
+    if (protoDesc && it !== ObjectProto$1) dP$3(ObjectProto$1, key, protoDesc);
+  } : dP$3;
+
+  var wrap = function (tag) {
+    var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
+    sym._k = tag;
+    return sym;
+  };
+
+  var isSymbol = USE_NATIVE$1 && typeof $Symbol.iterator == 'symbol' ? function (it) {
+    return typeof it == 'symbol';
+  } : function (it) {
+    return it instanceof $Symbol;
+  };
+
+  var $defineProperty = function defineProperty(it, key, D) {
+    if (it === ObjectProto$1) $defineProperty(OPSymbols, key, D);
+    _anObject(it);
+    key = _toPrimitive$1(key, true);
+    _anObject(D);
+    if (_has(AllSymbols, key)) {
+      if (!D.enumerable) {
+        if (!_has(it, HIDDEN)) dP$3(it, HIDDEN, _propertyDesc(1, {}));
+        it[HIDDEN][key] = true;
+      } else {
+        if (_has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
+        D = _objectCreate(D, { enumerable: _propertyDesc(0, false) });
+      } return setSymbolDesc(it, key, D);
+    } return dP$3(it, key, D);
+  };
+  var $defineProperties = function defineProperties(it, P) {
+    _anObject(it);
+    var keys = _enumKeys(P = _toIobject(P));
+    var i = 0;
+    var l = keys.length;
+    var key;
+    while (l > i) $defineProperty(it, key = keys[i++], P[key]);
+    return it;
+  };
+  var $create = function create(it, P) {
+    return P === undefined ? _objectCreate(it) : $defineProperties(_objectCreate(it), P);
+  };
+  var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+    var E = isEnum$1.call(this, key = _toPrimitive$1(key, true));
+    if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
+    return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
+  };
+  var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+    it = _toIobject(it);
+    key = _toPrimitive$1(key, true);
+    if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
+    var D = gOPD$1(it, key);
+    if (D && _has(AllSymbols, key) && !(_has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
+    return D;
+  };
+  var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+    var names = gOPN$1(_toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (!_has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
+    } return result;
+  };
+  var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+    var IS_OP = it === ObjectProto$1;
+    var names = gOPN$1(IS_OP ? OPSymbols : _toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (_has(AllSymbols, key = names[i++]) && (IS_OP ? _has(ObjectProto$1, key) : true)) result.push(AllSymbols[key]);
+    } return result;
+  };
+
+  // 19.4.1.1 Symbol([description])
+  if (!USE_NATIVE$1) {
+    $Symbol = function Symbol() {
+      if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
+      var tag = _uid(arguments.length > 0 ? arguments[0] : undefined);
+      var $set = function (value) {
+        if (this === ObjectProto$1) $set.call(OPSymbols, value);
+        if (_has(this, HIDDEN) && _has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+        setSymbolDesc(this, tag, _propertyDesc(1, value));
+      };
+      if (_descriptors && setter) setSymbolDesc(ObjectProto$1, tag, { configurable: true, set: $set });
+      return wrap(tag);
+    };
+    _redefine($Symbol[PROTOTYPE$2], 'toString', function toString() {
+      return this._k;
+    });
+
+    _objectGopd.f = $getOwnPropertyDescriptor;
+    _objectDp.f = $defineProperty;
+    _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
+    _objectPie.f = $propertyIsEnumerable;
+    _objectGops.f = $getOwnPropertySymbols;
+
+    if (_descriptors && !_library) {
+      _redefine(ObjectProto$1, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+    }
+
+    _wksExt.f = function (name) {
+      return wrap(_wks(name));
+    };
+  }
+
+  _export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Symbol: $Symbol });
+
+  for (var es6Symbols = (
+    // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+    'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+  ).split(','), j = 0; es6Symbols.length > j;)_wks(es6Symbols[j++]);
+
+  for (var wellKnownSymbols = _objectKeys(_wks.store), k = 0; wellKnownSymbols.length > k;) _wksDefine(wellKnownSymbols[k++]);
+
+  _export(_export.S + _export.F * !USE_NATIVE$1, 'Symbol', {
+    // 19.4.2.1 Symbol.for(key)
+    'for': function (key) {
+      return _has(SymbolRegistry, key += '')
+        ? SymbolRegistry[key]
+        : SymbolRegistry[key] = $Symbol(key);
+    },
+    // 19.4.2.5 Symbol.keyFor(sym)
+    keyFor: function keyFor(sym) {
+      if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+      for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
+    },
+    useSetter: function () { setter = true; },
+    useSimple: function () { setter = false; }
+  });
+
+  _export(_export.S + _export.F * !USE_NATIVE$1, 'Object', {
+    // 19.1.2.2 Object.create(O [, Properties])
+    create: $create,
+    // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+    defineProperty: $defineProperty,
+    // 19.1.2.3 Object.defineProperties(O, Properties)
+    defineProperties: $defineProperties,
+    // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+    getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+    // 19.1.2.7 Object.getOwnPropertyNames(O)
+    getOwnPropertyNames: $getOwnPropertyNames,
+    // 19.1.2.8 Object.getOwnPropertySymbols(O)
+    getOwnPropertySymbols: $getOwnPropertySymbols
+  });
+
+  // Chrome 38 and 39 `Object.getOwnPropertySymbols` fails on primitives
+  // https://bugs.chromium.org/p/v8/issues/detail?id=3443
+  var FAILS_ON_PRIMITIVES = _fails(function () { _objectGops.f(1); });
+
+  _export(_export.S + _export.F * FAILS_ON_PRIMITIVES, 'Object', {
+    getOwnPropertySymbols: function getOwnPropertySymbols(it) {
+      return _objectGops.f(_toObject(it));
+    }
+  });
+
+  // 24.3.2 JSON.stringify(value [, replacer [, space]])
+  $JSON && _export(_export.S + _export.F * (!USE_NATIVE$1 || _fails(function () {
+    var S = $Symbol();
+    // MS Edge converts symbol values to JSON as {}
+    // WebKit converts symbol values to JSON as null
+    // V8 throws on boxed symbols
+    return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+  })), 'JSON', {
+    stringify: function stringify(it) {
+      var args = [it];
+      var i = 1;
+      var replacer, $replacer;
+      while (arguments.length > i) args.push(arguments[i++]);
+      $replacer = replacer = args[1];
+      if (!_isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+      if (!_isArray(replacer)) replacer = function (key, value) {
+        if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+        if (!isSymbol(value)) return value;
+      };
+      args[1] = replacer;
+      return _stringify.apply($JSON, args);
+    }
+  });
+
+  // 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+  $Symbol[PROTOTYPE$2][TO_PRIMITIVE] || _hide($Symbol[PROTOTYPE$2], TO_PRIMITIVE, $Symbol[PROTOTYPE$2].valueOf);
+  // 19.4.3.5 Symbol.prototype[@@toStringTag]
+  _setToStringTag($Symbol, 'Symbol');
+  // 20.2.1.9 Math[@@toStringTag]
+  _setToStringTag(Math, 'Math', true);
+  // 24.3.3 JSON[@@toStringTag]
+  _setToStringTag(_global.JSON, 'JSON', true);
+
+  _wksDefine('asyncIterator');
+
+  _wksDefine('observable');
+
+  var symbol = _core.Symbol;
+
+  var symbol$1 = symbol;
+
+  var getOwnPropertySymbols = _core.Object.getOwnPropertySymbols;
+
+  var getOwnPropertySymbols$1 = getOwnPropertySymbols;
+
+  // 20.1.2.4 Number.isNaN(number)
+
+
+  _export(_export.S, 'Number', {
+    isNaN: function isNaN(number) {
+      // eslint-disable-next-line no-self-compare
+      return number != number;
+    }
+  });
+
+  var isNan = _core.Number.isNaN;
+
+  var isNan$1 = isNan;
+
+  var _createProperty = function (object, index, value) {
+    if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
+    else object[index] = value;
+  };
+
+  _export(_export.S + _export.F * !_iterDetect(function (iter) { }), 'Array', {
+    // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+    from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
+      var O = _toObject(arrayLike);
+      var C = typeof this == 'function' ? this : Array;
+      var aLen = arguments.length;
+      var mapfn = aLen > 1 ? arguments[1] : undefined;
+      var mapping = mapfn !== undefined;
+      var index = 0;
+      var iterFn = core_getIteratorMethod(O);
+      var length, result, step, iterator;
+      if (mapping) mapfn = _ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
+      // if object isn't iterable or it's array with default iterator - use simple case
+      if (iterFn != undefined && !(C == Array && _isArrayIter(iterFn))) {
+        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+          _createProperty(result, index, mapping ? _iterCall(iterator, mapfn, [step.value, index], true) : step.value);
+        }
+      } else {
+        length = _toLength(O.length);
+        for (result = new C(length); length > index; index++) {
+          _createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
+        }
+      }
+      result.length = index;
+      return result;
+    }
+  });
+
+  var from = _core.Array.from;
+
+  var from$1 = from;
+
+  // 26.1.6 Reflect.get(target, propertyKey [, receiver])
+
+
+
+
+
+
+
+  function get(target, propertyKey /* , receiver */) {
+    var receiver = arguments.length < 3 ? target : arguments[2];
+    var desc, proto;
+    if (_anObject(target) === receiver) return target[propertyKey];
+    if (desc = _objectGopd.f(target, propertyKey)) return _has(desc, 'value')
+      ? desc.value
+      : desc.get !== undefined
+        ? desc.get.call(receiver)
+        : undefined;
+    if (_isObject(proto = _objectGpo(target))) return get(proto, propertyKey, receiver);
+  }
+
+  _export(_export.S, 'Reflect', { get: get });
+
+  var get$1 = _core.Reflect.get;
+
+  var get$2 = get$1;
+
+  // 26.1.13 Reflect.set(target, propertyKey, V [, receiver])
+
+
+
+
+
+
+
+
+
+  function set$3(target, propertyKey, V /* , receiver */) {
+    var receiver = arguments.length < 4 ? target : arguments[3];
+    var ownDesc = _objectGopd.f(_anObject(target), propertyKey);
+    var existingDescriptor, proto;
+    if (!ownDesc) {
+      if (_isObject(proto = _objectGpo(target))) {
+        return set$3(proto, propertyKey, V, receiver);
+      }
+      ownDesc = _propertyDesc(0);
+    }
+    if (_has(ownDesc, 'value')) {
+      if (ownDesc.writable === false || !_isObject(receiver)) return false;
+      if (existingDescriptor = _objectGopd.f(receiver, propertyKey)) {
+        if (existingDescriptor.get || existingDescriptor.set || existingDescriptor.writable === false) return false;
+        existingDescriptor.value = V;
+        _objectDp.f(receiver, propertyKey, existingDescriptor);
+      } else _objectDp.f(receiver, propertyKey, _propertyDesc(0, V));
+      return true;
+    }
+    return ownDesc.set === undefined ? false : (ownDesc.set.call(receiver, V), true);
+  }
+
+  _export(_export.S, 'Reflect', { set: set$3 });
+
+  var set$4 = _core.Reflect.set;
+
+  var set$5 = set$4;
+
   // 模板解析，注册函数并返回返回dom对象
   // TODO 此处只能处理返回字符串的信息
+  var EVENTTAG = ['@', 'on'];
+  /**
+   * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
+   * @param self 此配置项自身
+   * @return string dom字符串
+   * @param config
+   * @param output
+   * @param root
+   * @param oldScript
+   * */
 
-  var LifeCycle = ['mounted'];
-  function template(config, _ref) {
+  var env = symbol$1('env');
+  function Scope(config, _ref, output, root, oldScript) {
     var template = _ref.template,
-      scripts = _ref.scripts,
+      script = _ref.script,
       style = _ref.style;
+    if (output === void 0) {
+      output = 'dom';
+    }
+    if (root === void 0) {
+      root = null;
+    }
+    if (oldScript === void 0) {
+      oldScript = null;
+    }
+    var symbols = getOwnPropertySymbols$1(window);
+    var targetSymbol;
+    for (var i = 0; i < symbols.length; i++) {
+      var symbol = symbols[i];
+      if (window[symbol] === window[env]) {
+        targetSymbol = i;
+        break;
+      }
+    }
+    var res = createDom('div');
+    if (!script) script = {};
+    if (!style) style = '';
     var namespace = config.key;
-    if (!namespace) throw new Error('The name attribute is not configured');
-    MindManager._env[namespace] ? '' : MindManager._env[namespace] = {};
+    if (!namespace) error('Scope', 'The config parameter is invalid');
+    var duty = [];
+    // dom的预处理
+    template = addUniqueIdsToHtmlString(template);
+    script.$update = function () {
+      if (!root) root = res;
+      // duty.forEach(key=>{
+      //     // 找到对应的dom
+      //     let changes = window[env][namespace].__depMap.filter((v)=>{
+      //         // 返回表达式中包含此变量的表达式
+      //         return v.name.includes(key)
+      //     })
+      //     let globalRender = false
+      //     let textIndex = 0
+      //     changes.forEach((i)=>{
+      //         let res = scopedEval(window[env][namespace],i.name)
+      //         const element = document.querySelector(`[data-meta2d-id="${i['meta2d-id']}"]`);
+      //         if(i.prop === 'class' ){
+      //             let res =
+      //             // TODO 这没换成功
+      //             element.classList.remove(i.res)
+      //             element.classList.add(res)
+      //         }else if (i.prop === 'style'){
+      //             // 将表达式放进沙盒执行得到返回结果
+      //             element.style[i.styleProp] = res
+      //             // root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+      //         }else if(i.prop === 'textContent'){
+      //             // 若为第1个textContent
+      //             if(!textIndex){
+      //                 element.textContent = i.textContent
+      //                 textIndex ++
+      //             }
+      //             i.textContent = element.textContent
+      //             element.textContent = i.textContent.replace(i.originTemp,res)
+      //             // i.textContent = res
+      //         } else {
+      //             globalRender = true
+      //         }
+      //     })
+      //     globalRender ? root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML: ''
+      // })
+      // 组件全部更新
+      root.innerHTML = Scope(config, {
+        template: template,
+        style: style,
+        script: window[env][namespace]
+      }, output, root, oldScript).innerHTML;
+      duty = [];
+    };
+    // 代理模式查找更改数据项
+    var proxyScript = createDeepProxy(script, function (p, v) {
+      if (!['$update', 'init', 'mounted', '__depMap'].includes(p)) {
+        if (p.includes('.')) {
+          p = p.split('.')[0];
+        }
+        duty.push(p);
+      }
+    });
+    window[env] ? '' : window[env] = {};
+    window[env][namespace] ? '' : window[env][namespace] = {};
     var _parse = parse(template),
       dom = _parse.dom,
-      funcObjs = _parse.funcObjs;
-    var keys = keys$1(scripts);
+      funcObjs = _parse.funcObjs,
+      varObj = _parse.varObj;
+    var keys = keys$1(script);
+    window[env][namespace] = proxyScript;
+    window[env][namespace].__depMap = null;
 
-    // 暂不考虑 传其他参数情况
-    keys.forEach(function (i) {
-      // 将script的函数传递到全局环境
-      MindManager._env[namespace][i] = scripts[i];
-
-      // 执行生命周期函数 放入微队列依次执行
-      LifeCycle.includes(i) ? promise$1.resolve().then(function () {
-        scripts[i]();
-      }) : '';
-    });
+    // 生命周期
+    if (!root) {
+      proxyScript.init == null || proxyScript.init();
+      promise$1.resolve().then(function () {
+        proxyScript.mounted == null || proxyScript.mounted();
+      });
+    }
+    var funcOffset = 0;
     funcObjs.forEach(function (i) {
       // 出现的函数在script中定义了 则转换
       if (keys.indexOf(i.name) !== -1) {
-        dom = dom.replaceAll(i.name + "(", "MindManager._env." + namespace + "." + i.name + "(");
+        // 处理函数传参的变量
         i.params.forEach(function (j) {
           //TODO 应该还要过滤一遍字面量  此处仅仅处理了变量
-          if (!j.startsWith('this') && j !== 'event' && !isLiteral(j)) {
-            dom = dom.replaceAll(j, "MindManager._env." + namespace + "." + j);
+          if (!j.param.startsWith('this') && j.param !== 'event' && !isLiteral(j.param)) {
+            // TODO 此处应当根据字符的具体位置来替换，而非全部替换
+            // dom = dom.replaceAll(j.param,`meta2dPluginManager._env.${namespace}.${j}`)
+            var oldDom = dom;
+            dom = replaceAfterPosition(dom, j.index - funcOffset, j.param, "window[Object.getOwnPropertySymbols(window)[" + targetSymbol + "]]." + namespace + "." + j.param);
+            funcOffset += oldDom.length - dom.length; // 更换后的文字偏移量
           }
         });
+        // 处理函数名
+        dom = dom.replaceAll(i.name + "(", "window[Object.getOwnPropertySymbols(window)[" + targetSymbol + "]]." + namespace + "." + i.name + "(");
       }
+    });
+    window[env][namespace].__depMap = varObj;
+    varObj.forEach(function (i) {
+      // 支持简单的表达式
+      var res = scopedEval(window[env][namespace], i.name);
+      // 将生成的结果保存在数据中
+      i.res = res;
+
+      // 进行运算后的值替换
+      var regex = new RegExp("\\{\\{\\s*" + escapeRegExp(i.name) + "\\s*\\}\\}");
+      dom = replaceAfterPosition(dom, 0, regex, res);
     });
     var sty = '';
     if (style) {
       style.startsWith('<style>') ? sty = style : sty = "<style>" + style + "</style>";
     }
-    return dom + sty;
+    if (output === 'string') {
+      return dom + sty;
+    } else if (output === 'dom') {
+      res.innerHTML = dom + sty;
+      res.expose = proxyScript;
+      return res;
+    }
   }
   function parse(html) {
     // 函数匹配式
-    var reg = /*#__PURE__*/_wrapRegExp(/([a-zA-Z][a-zA-z0-9]+)\((.*?)\)/g, {
-      name: 1,
-      param: 2
+    var funcReg = new RegExp("(" + EVENTTAG.join('|') + ")(?<event>\\w+)\\s*=\\s*[\"'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)[\"']", 'g');
+    var varReg = /*#__PURE__*/_wrapRegExp(/(\w*)\s*=[^=]*\{\{\s*(.+?)\s*\}\}/g, {
+      prop: 1,
+      variable: 2
     });
-    var reHtml = html.replaceAll('\n', '');
-    var groups = reHtml.matchAll(reg, 'g');
+    // 变量匹配
+
+    var reHtml = html.replaceAll('\n', '').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');
+
+    // 使用 matchAll 来匹配所有结果
+    var funcMatchs = reHtml.matchAll(funcReg);
+    var varParseObj = variableParse(html);
+
+    // 请注意，没有传递 'g' 标志给 matchAll，因为 reg 已经带有 'g' 标志
+
     var result = [];
-    for (var _iterator = _createForOfIteratorHelperLoose(groups), _step; !(_step = _iterator()).done;) {
-      var i = _step.value;
-      var m = i.groups;
-      var param = m.param;
-      var params = param.replace(' ', '').split(',');
+    var _loop = function _loop() {
+      var match = _step.value;
+      var _match$groups = match.groups,
+        event = _match$groups.event,
+        name = _match$groups.name,
+        param = _match$groups.param;
+
+      // 获取参数的具体位置
+
+      var params = param.replaceAll(/\s/g, '').split(',');
+      var lastIndex = 0;
+      params = params.map(function (i) {
+        var strIndex = match[0].indexOf(i, lastIndex);
+        var index = match.index + strIndex;
+        lastIndex = strIndex + i.length;
+        return {
+          param: i,
+          index: index
+        };
+      });
+      // 去除 param 中的空格并按逗号分割参数
       var re = {
-        name: m.name,
-        params: params
+        event: event,
+        name: name,
+        params: params,
+        index: match.index
       };
       result.push(re);
+    };
+    for (var _iterator = _createForOfIteratorHelperLoose(funcMatchs), _step; !(_step = _iterator()).done;) {
+      _loop();
     }
 
-    // 去重
-    var obj = {};
-    result = result.reduce(function (total, next) {
-      obj[next.name] ? '' : obj[next.name] = true && total.push(next);
-      return total;
-    }, []);
+    // 去重逻辑
+    var funcObjs = removeDuplicates(result);
+    // let varObj = removeDuplicates(varResult)
     return {
       dom: reHtml,
-      funcObjs: result
+      funcObjs: funcObjs,
+      varObj: varParseObj
     };
   }
 
@@ -2548,38 +3361,204 @@
     // 判断是否为字符串
     if (_.startsWith('"') || _.startsWith("'")) return true;
     // 判断是否为数字
-    if (typeof +_ === "number") return true;
+    // if(typeof (+ _) === "number")return true
+    if (!isNan$1(+_)) return true;
     if (_ === "true" || _ === "false") return true;
 
     // 还未考虑是否为对象
     return false;
   }
 
+  // 解析变量表达式
+  // TODO  该解释器不支持嵌套使用，是否应当使用DomPaser进行解析替换传统正则替换？？
+  function variableParse(html) {
+    var results = [];
+    // 匹配标签以及标签中的属性
+    var tagRegex = /<\s*[\w-]+.*?>[\s\S]*?<\/[\w-]+>/g;
+    // 匹配单独的属性
+    var attributeRegex = /(\w+)\s*=\s*(['"])(.*?)\2/g;
+    // 匹配双花括号中的变量
+    var variableRegex = /{{\s*([\w.+\-? :()']*)\s*}}/g;
+    var tagMatch;
+    var _loop2 = function _loop2() {
+      var tag = tagMatch[0];
+      var meta2dIdMatch = tag.match(/data-meta2d-id=['"]([\d|\w]+)['"]/);
+      var meta2dId = meta2dIdMatch ? meta2dIdMatch[1] : undefined;
+      var attributeMatch;
+      while ((attributeMatch = attributeRegex.exec(tag)) !== null) {
+        var attributeName = attributeMatch[1];
+        var attributeValue = attributeMatch[3];
+        var _variableMatch = void 0;
+        while ((_variableMatch = variableRegex.exec(attributeValue)) !== null) {
+          var variableName = _variableMatch[1];
+          if (attributeName === 'style') {
+            var styleAttributeRegex = /*#__PURE__*/_wrapRegExp(/\s*([\w-]+)\s*:\s*\{\{\s*([^{}]+)\s*\}\};?/g, {
+              prop: 1
+            });
+            var stylePropMatch = void 0;
+            var _loop3 = function _loop3() {
+              var styleProp = stylePropMatch[1];
+              var styleValue = stylePropMatch[2];
+              if (results.findIndex(function (i) {
+                return i.styleProp === styleProp && i['meta2d-id'] === meta2dId && i.name === styleValue;
+              }) > -1) return 1; // continue
+              results.push({
+                prop: "style",
+                styleProp: styleProp,
+                'meta2d-id': meta2dId,
+                name: styleValue
+              });
+            };
+            while ((stylePropMatch = styleAttributeRegex.exec(attributeValue)) !== null) {
+              if (_loop3()) continue;
+            }
+          } else {
+            results.push({
+              prop: attributeName,
+              name: variableName,
+              'meta2d-id': meta2dId
+            });
+          }
+        }
+      }
+
+      // 检查标签内部的文本内容中的变量
+      var textContent = tag.replace(/<[\s\S]*?>/g, ''); // 移除标签，仅保留文本内容
+      var variableMatch;
+      while ((variableMatch = variableRegex.exec(textContent)) !== null) {
+        var _variableName = variableMatch[1];
+        results.push({
+          prop: 'textContent',
+          name: _variableName,
+          textContent: textContent,
+          originTemp: variableMatch[0],
+          'meta2d-id': meta2dId
+        });
+      }
+    };
+    while ((tagMatch = tagRegex.exec(html)) !== null) {
+      _loop2();
+    }
+    return results;
+  }
+  function addUniqueIdsToHtmlString(htmlString) {
+    // 解析HTML字符串为DOM对象
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(htmlString, 'text/html');
+
+    // 生成UUID的辅助函数
+    function generateUUID() {
+      return 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function (c) {
+        var r = Math.random() * 16 | 0;
+        var v = c === 'x' ? r : r & 0x3 | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    // 递归函数用于遍历并为每个元素添加唯一ID
+    function addUniqueIdToElement(element) {
+      if (element.nodeType === 1) {
+        // Element节点
+        element.setAttribute('data-meta2d-id', generateUUID());
+        from$1(element.children).forEach(addUniqueIdToElement);
+      }
+    }
+
+    // 开始遍历并添加唯一ID
+    addUniqueIdToElement(doc.body);
+
+    // 将更新后的DOM对象转换回字符串
+    var serializer = new XMLSerializer();
+    var newHtmlString = serializer.serializeToString(doc);
+
+    // 清除可能的编码问题
+    newHtmlString = newHtmlString.replaceAll(/\?&quot;/g, '\"'); // 这里替换 '?&quot;' 为正常的双引号
+
+    // 由于serializeToString会包括整个HTML文档，我们需要提取body部分
+    var bodyContent = newHtmlString.match(/<body[^>]*>([\s\S]*)<\/body>/i)[1];
+    return bodyContent;
+  }
+  function createDeepProxy(obj, onChange, path) {
+    if (path === void 0) {
+      path = [];
+    }
+    return new Proxy(obj, {
+      get: function get(target, key, receiver) {
+        var value = get$2(target, key, receiver);
+        if (typeof value === 'object' && value !== null) {
+          return createDeepProxy(value, onChange, [].concat(path, [key])); // 递归代理子属性
+        }
+
+        return value;
+      },
+      set: function set(target, key, value, receiver) {
+        var result = set$5(target, key, value, receiver);
+        onChange([].concat(path, [key]).join('.'), value); // 传递属性路径
+        return result;
+      }
+    });
+  }
+
   var _marked = /*#__PURE__*/_regeneratorRuntime().mark(generateColor);
   var colorList = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
-  function generateColor() {
-    var index;
+
+  // export const colorList = [
+  //   '#ea8554',
+  //   '#d2c648',
+  //   '#4ad38e',
+  //   '#4ba7d5',
+  //   '#e16b68',
+  //   '#e18b63',
+  //   '#e0a95d',
+  //   '#e0bc5b',
+  //   '#ded559',
+  //   '#bad556',
+  //   '#97e067',
+  //   '#58d0c8',
+  //   '#5ba5da',
+  //   '#7794e5',
+  //   '#a878dc',
+  //   '#ec7bb2',
+  // ];
+  function generateColor(colorList) {
+    var index, list;
     return _regeneratorRuntime().wrap(function generateColor$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
+          if (colorList && !isArray$1(colorList)) {
+            console.warn('mindBoxPlugin warn: generateColor must take array param');
+          }
           index = 0;
-        case 1:
-          _context.next = 4;
-          return toolBoxPlugin.colorList[index];
-        case 4:
-          index = (index + 1) % toolBoxPlugin.colorList.length;
-          _context.next = 1;
+          list = colorList || mindBoxPlugin.colorList;
+        case 3:
+          _context.next = 6;
+          return list[index];
+        case 6:
+          index = (index + 1) % list.length;
+          _context.next = 3;
           break;
-        case 7:
+        case 9:
         case "end":
           return _context.stop();
       }
     }, _marked);
   }
-  var funcList = [{
+  var funcList = [
+  //   {
+  // key: "id",
+  //     name:'id',
+  // setDom(self,pen) {
+  //   return pen.id
+  // }
+  //   },
+  {
     key: 'addChildNode',
-    name: '新增子级节点',
-    // 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
+    description: '用于新增子节点',
+    menu: {
+      text: '新增子级节点',
+      // 该选项的选项名，当无icon或者img或者setDom时，会以此为准  优先级：setDom>icon>img>name
+      img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
+    },
     // 监听事件名
     // event: 'click',
     /**
@@ -2588,120 +3567,127 @@
      * @param pen 返回当前操作的pen对象
      * */
     // func: async (self,pen)=>{
-    //   toolBoxPlugin.addNode(pen,0);
+    //   mindBoxPlugin.bottomChildren(pen,0);
     //   },
-    openChildDomEvent: 'mouseenter',
-    closeChildDomEvent: 'mouseleave',
+    popupEvent: 'mouseenter',
     closeShadowDom: true,
-    children: [{
-      name: '',
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+    collapseEventOnMenu: false,
+    // 是否在childrenDom中触发事件
+    stopPropagation: true,
+    collapseAnimate: function collapseAnimate(self, pen, dom) {
+      // dom.style.height = 'max-height'
+      // dom.style.visibility = 'hidden'
+      // dom.style.overflow = 'hidden'
+      // dom.style.transition = '.3s'
+      // dom.style.height = 0'
+      dom.style.transformOrigin = 'top';
+      dom.offsetHeight;
+      dom.style.transition = 'all .3s';
+      dom.style.transform = 'scaleY(0)';
+      return true;
+    },
+    popupAnimate: function popupAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(1)';
+      return true;
+    },
+    popup: [{
+      menu: {
+        text: '矩形',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>'
+      },
       event: 'click',
-      func: function func(self, pen, dom) {
-        toolBoxPlugin.addNode(pen, 0, 'mindNode2');
-      }
-    }, {
-      name: '',
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
-      event: 'click',
-      func: function func(self, pen, dom) {
-        toolBoxPlugin.addNode(pen, 0, 'diamond', {
-          width: 150,
-          height: 100
+      func: function func(self, pen, dom, father) {
+        mindBoxPlugin.addNode(pen, 0, 'mindNode2', {
+          width: 200,
+          height: 50
         });
+        father.close();
       }
     }, {
-      name: '',
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>',
+      menu: {
+        text: '菱形',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>'
+      },
       event: 'click',
-      func: function func(self, pen, dom) {
-        toolBoxPlugin.addNode(pen, 0, 'mindLine2');
+      func: function func(self, pen, dom, father) {
+        mindBoxPlugin.addNode(pen, 0, 'diamond', {
+          width: 200,
+          height: 120
+        });
+        father.close();
       }
-    }],
-    //     setChildrenDom(self, pen) {
-    //       let dom = createDom('div',{
-    //         display: 'flex',
-    //         flexDirection: 'row',
-    //         flexWrap: 'wrap',
-    //         justifyContent: 'flex-start',
-    //         position:'absolute',
-    //         visibility:'hidden',
-    //         top:'50px',
-    //         backgroundColor:'#fff',
-    //         borderRadius:'5px',
-    //         padding:'16px',
-    //         width: '140px',
-    //         boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
-    //       });
-    //
-    //       let str = template(self,{
-    //         template:`
-    //           <div class="container">
-    //             <ul>
-    //               <li data-target="rectangle"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-flow-start"></use></svg></li>
-    //               <li data-target="mindLine"><svg data-v-94053adc="" class="l-icon" aria-hidden="true"><use data-v-94053adc="" xlink:href="#l-zizhuti"></use></svg></li>
-    //               <li></li>
-    //               <li></li>
-    //               <li></li>
-    //             </ul>
-    //           </div>
-    //         `,
-    //         scripts:``,
-    //         style:`<style>
-    //             li{
-    //                 list-style: none;
-    //             }
-    // </style>`
-    //       })
-    //       dom.innerHTML = str
-    //       return dom
-    //       },
-    // 显示的图标
-    img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5LiL57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjE0IiB5PSIxOCIgd2lkdGg9IjE2IiBoZWlnaHQ9IjciIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzM2LjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuS4i+e6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTU0LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaLlpIfku70tNiIgc3Ryb2tlPSIjODE4MTg3IiB4PSI0LjUiIHk9IjguNSIgd2lkdGg9IjE1IiBoZWlnaHQ9IjYiIHJ4PSIxIj48L3JlY3Q+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMjIiIHgyPSIxNCIgeTI9IjIyIiBpZD0i55u057q/LTciIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPGxpbmUgeDE9IjEyIiB5MT0iMTUiIHgyPSIxMiIgeTI9IjIyIiBpZD0i55u057q/LTYiIHN0cm9rZT0iIzgxODE4NyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48L2xpbmU+CiAgICAgICAgICAgICAgICAgICAgPHVzZSBpZD0i55+p5b2i5aSH5Lu9LTUiIHN0cm9rZT0iIzlDOUNBNSIgbWFzaz0idXJsKCNtYXNrLTIpIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjIiIHhsaW5rOmhyZWY9IiNwYXRoLTEiPjwvdXNlPgogICAgICAgICAgICAgICAgPC9nPgogICAgICAgICAgICA8L2c+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4='
-    /**
-     * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
-     * @param self 此配置项自身
-     * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
-     * @return string dom字符串
-     * */
+    }, {
+      menu: {
+        text: '椭圆',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+      },
+      event: 'click',
+      func: function func(self, pen, dom, father) {
+        mindBoxPlugin.addNode(pen, 0, 'circle', {
+          width: 200,
+          height: 75
+        });
+        father.close();
+      }
+    }]
+  }, {
+    key: 'extra'
   }, {
     key: 'relayout',
-    name: '重新布局',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' + '    <title>重新布局下一级</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' + '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' + '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' + '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' + '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' + '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' + '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' + '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' + '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' + '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' + '                </g>\n' + '            </g>\n' + '        </g>\n' + '    </g>\n' + '</svg>',
+    description: '用于重新布局某节点下的所有子节点',
+    menu: {
+      text: '重新布局',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' + '    <title>重新布局</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-577.000000, -138.000000)" stroke="#818187">\n' + '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' + '                <g id="仅重布局子集" transform="translate(324.000000, 3.000000)">\n' + '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' + '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' + '                    <line x1="14.325" y1="18.5" x2="26.325" y2="18.5" id="直线-11备份-4" stroke-linecap="square"/>\n' + '                    <line x1="14.325" y1="23.5" x2="26.325" y2="23.5" id="直线-11备份-5" stroke-linecap="square"/>\n' + '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' + '                    <line x1="17.5" y1="13.5" x2="17.5" y2="25.5" id="直线-11备份-2" stroke-linecap="square"/>\n' + '                    <line x1="22.5" y1="13.5" x2="22.5" y2="25.5" id="直线-11备份-3" stroke-linecap="square"/>\n' + '                </g>\n' + '            </g>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+    },
     event: 'click',
-    func: function func(self, pen, dom, father) {
+    func: function func(self, pen, dom, e) {
       var _pen$mind;
       var children = ((_pen$mind = pen.mind) == null ? void 0 : _pen$mind.children) || [];
       if (children.length > 0) {
-        toolBoxPlugin.update(pen, true);
+        mindBoxPlugin.update(pen, true);
       }
-    } // setDom(self,dom){
+    },
+    // setDom(self,dom){
     //   // draw your dom freeDom！！！
     //   let result =  `<span>${self.name}</span>`;
     //   return result;
     // }
+    closeOther: true
   }, {
     key: 'relayoutNext',
-    description: '',
-    name: '重新布局下一级',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' + '    <title>重新布局</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' + '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' + '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' + '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' + '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' + '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' + '                </g>\n' + '            </g>\n' + '        </g>\n' + '    </g>\n' + '</svg>',
+    description: '用于重新布局某节点下的第一级子节点',
+    closeOther: true,
+    menu: {
+      text: '重新布局下一级',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' + '    <title>重新布局下一级</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-531.000000, -138.000000)" stroke="#818187">\n' + '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' + '                <g id="重新布局" transform="translate(278.000000, 3.000000)">\n' + '                    <rect id="矩形备份-6" x="7.5" y="7.5" width="19" height="19" rx="1"/>\n' + '                    <line x1="7.5" y1="13.5" x2="26.5" y2="13.5" id="直线-11" stroke-linecap="square"/>\n' + '                    <line x1="13.5" y1="13.5" x2="13.5" y2="25.5" id="直线-11备份" stroke-linecap="square"/>\n' + '                </g>\n' + '            </g>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+    },
     event: 'click',
     func: function func(self, pen) {
       var _pen$mind2;
       var children = ((_pen$mind2 = pen.mind) == null ? void 0 : _pen$mind2.children) || [];
       if (children.length > 0) {
-        toolBoxPlugin.update(pen, false);
+        mindBoxPlugin.update(pen, false);
       }
     }
   }, {
+    key: 'extra'
+  }, {
     key: 'nodeStyle',
-    name: '边框样式',
+    menu: {
+      text: '边框样式',
+      dom: function dom(self) {
+        var color = self.color;
+        var dash = self.dash;
+        var width = self.width;
+        var HTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"34px\" height=\"34px\" viewBox=\"0 0 34 34\" version=\"1.1\">\n                    <title>\u8FB9\u6846\u6837\u5F0F</title>\n                    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-628.000000, -138.000000)\">\n                            <g id=\"\u7F16\u7EC4-2\" transform=\"translate(253.000000, 135.000000)\">\n                                <g id=\"\u8FB9\u6846\u989C\u8272\" transform=\"translate(375.000000, 3.000000)\">\n                                    <rect id=\"\u900F\u660E\u5E95\u56FE\" fill-opacity=\"0\" fill=\"#FFFFFF\" x=\"0\" y=\"0\" width=\"34\" height=\"34\"/>\n                                    <circle id=\"\u692D\u5706\u5F62\" stroke=\"" + color + "\" stroke-width=\"" + width + "\" cx=\"17\" cy=\"17\" r=\"8\" stroke-dasharray=\"" + dash + "\"/>\n                                </g>\n                            </g>\n                        </g>\n                    </g>\n                </svg>";
+        return HTML;
+      }
+    },
     color: '#4D4DFF',
     dash: '5,5',
     width: 4,
     colorList: ['#5757F3', '#FD42DD', '#8C8CFF', '#19f1cc', '#6ffd97', '#efe864', '#ff931a', '#fa7878'],
-    openChildDomEvent: 'mouseenter',
-    closeChildDomEvent: 'mouseleave',
+    popupEvent: 'mouseover',
     /**
      * @description 初始化函数
      * @param self 配置项本身
@@ -2709,62 +3695,101 @@
      */
     init: function init(self, pen) {
       self.dash = pen.lineDash ? pen.lineDash[0] + "," + pen.lineDash[1] : '0,0';
-      self.width = pen.lineWidth;
-      self.color = pen.color || '#000';
+      self.width = (+pen.lineWidth).toFixed(0);
+      self.color = pen.mind.color || pen.calculative.color || '#000000';
     },
-    setDom: function setDom(self) {
-      var color = self.color;
-      var dash = self.dash;
-      var width = self.width;
-      var HTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"34px\" height=\"34px\" viewBox=\"0 0 34 34\" version=\"1.1\">\n                    <title>\u8FB9\u6846\u6837\u5F0F</title>\n                    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-628.000000, -138.000000)\">\n                            <g id=\"\u7F16\u7EC4-2\" transform=\"translate(253.000000, 135.000000)\">\n                                <g id=\"\u8FB9\u6846\u989C\u8272\" transform=\"translate(375.000000, 3.000000)\">\n                                    <rect id=\"\u900F\u660E\u5E95\u56FE\" fill-opacity=\"0\" fill=\"#FFFFFF\" x=\"0\" y=\"0\" width=\"34\" height=\"34\"/>\n                                    <circle id=\"\u692D\u5706\u5F62\" stroke=\"" + color + "\" stroke-width=\"" + width + "\" cx=\"17\" cy=\"17\" r=\"8\" stroke-dasharray=\"" + dash + "\"/>\n                                </g>\n                            </g>\n                        </g>\n                    </g>\n                </svg>";
-      return HTML;
+    stopPropagation: true,
+    collapseAnimate: function collapseAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(0)';
+      return true;
     },
-    setChildrenDom: function setChildrenDom(self, pen) {
+    popupAnimate: function popupAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(1)';
+      return true;
+    },
+    popup: function popup(self, pen) {
       var dom = createDom('div', {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position: 'absolute',
-        visibility: 'hidden',
-        top: '50px',
-        backgroundColor: '#fff',
-        borderRadius: '5px',
-        padding: '16px',
-        width: '140px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          transformOrigin: 'top',
+          transition: 'all .3s',
+          position: 'absolute',
+          top: '40px',
+          backgroundColor: '#fff',
+          borderRadius: '5px',
+          padding: '16px',
+          width: '140px',
+          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        }
       });
       dom.attachShadow({
         mode: 'open'
       });
-      var str = template(self, {
-        template: "\n          <div class=\"container\">\n              <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" max=\"10\" style=\"width: 81px\" onchange=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n                  <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.dash === '0,0' ? 'style_active' : '') + "\" data-style=\"\u76F4\u7EBF\" onclick=\"setOutLineStyle(true)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"50px\" height=\"2px\" viewBox=\"0 0 78 2\" version=\"1.1\">\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" stroke-linecap=\"round\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-402.000000, -306.000000)\" stroke=\"#000000\" stroke-width=\"2\">\n                                <line x1=\"403\" y1=\"307\" x2=\"479\" y2=\"307\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-9\"/>\n                            </g>\n                        </g>\n                    </svg>\n                  </div>\n                  <div class=\"style_item " + (self.dash !== '0,0' ? 'style_active' : '') + "\" data-style=\"\u865A\u7EBF\" onclick=\"setOutLineStyle(false)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"50px\" height=\"2px\" viewBox=\"0 0 78 2\" version=\"1.1\">\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" stroke-dasharray=\"4\" stroke-linecap=\"round\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-402.000000, -306.000000)\" stroke=\"#000000\" stroke-width=\"2\">\n                                <line x1=\"403\" y1=\"307\" x2=\"479\" y2=\"307\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-9\"/>\n                            </g>\n                        </g>\n                    </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\" onchange=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
+      var gap = createDom('div', {
+        style: {
+          width: '100%',
+          height: '20px',
+          backgroundColor: 'red',
+          position: 'absolute',
+          top: '-10px',
+          opacity: 0
+        }
+      });
+      dom.shadowRoot.appendChild(gap);
+      /**
+       * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
+       * @param self 此配置项自身
+       * @param dom 插件提供的包含容器 即你创建的dom的外部div对象
+       * @return string dom字符串
+       * */
+      var str = Scope(self, {
+        template: "\n          <div class=\"container\">\n              <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" min=\"1\" max=\"10\" style=\"width: 81px\" @change=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n                  <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.dash === '0,0' ? 'style_active' : '') + "\" data-style=\"\u76F4\u7EBF\" @click=\"setOutLineStyle(true)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"50px\" height=\"2px\" viewBox=\"0 0 78 2\" version=\"1.1\">\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" stroke-linecap=\"round\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-402.000000, -306.000000)\" stroke=\"#000000\" stroke-width=\"2\">\n                                <line x1=\"403\" y1=\"307\" x2=\"479\" y2=\"307\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-9\"/>\n                            </g>\n                        </g>\n                    </svg>\n                  </div>\n                  <div class=\"style_item  " + (self.dash === '5,5' ? 'style_active' : '') + "\" data-style=\"\u865A\u7EBF\" @click=\"setOutLineStyle(false)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"50px\" height=\"2px\" viewBox=\"0 0 78 2\" version=\"1.1\">\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\" stroke-dasharray=\"4\" stroke-linecap=\"round\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-402.000000, -306.000000)\" stroke=\"#000000\" stroke-width=\"2\">\n                                <line x1=\"403\" y1=\"307\" x2=\"479\" y2=\"307\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-9\"/>\n                            </g>\n                        </g>\n                    </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FB9\u6846\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\"  @change=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
           return "<span class=\"color_item " + (self.color === i ? 'active' : '') + "\" style=\"background-color: " + i + ";border: 3px solid " + i + "\" data-color=\"" + i + "\"></span>";
         }).join('') + "\n                     </div>\n                </div>\n              </div>\n          </div>",
-        scripts: {
+        script: {
           // 能在这里面获取到dom
-          mounted: function mounted() {// 生命周期函数
+          init: function init() {
+            var _pen$lineDash;
+            // 生命周期函数
+            self.dash = ((_pen$lineDash = pen.lineDash) == null ? void 0 : _pen$lineDash.join(',')) || '0,0';
+            if (self.dash === '0,0') {
+              this.lineactive = 'style_active';
+              this.dashActive = '';
+            } else {
+              this.lineactive = '';
+              this.dashActive = 'style_active';
+            }
           },
+          value: 10,
+          lineactive: 'style_active',
+          dashActive: '',
           setOutLineStyle: function setOutLineStyle(style) {
             var res = style ? [0, 0] : [5, 5];
             meta2d.setValue({
               id: pen.id,
               lineDash: res
+            }, {
+              render: true
             });
-            // toolbox.renderChildren()
             self.dash = res.join(',');
-            self.update('title');
-            self.update('child', true);
+            self.updateAll();
+            // self.close()
           },
+
           sliderChange: function sliderChange(value) {
             self.width = value;
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             meta2d.setValue({
               id: pen.id,
               lineWidth: value
+            }, {
+              render: true
             });
-            self.update('title');
-            self.update('child', true);
+            self.update('menu');
+            self.update('popup', true);
           },
           setColor: function setColor(e, value) {
             var color = '';
@@ -2776,20 +3801,27 @@
             } else {
               color = value;
             }
-            meta2d.setValue({
-              id: pen.id,
-              color: color
-            });
+            if (color === self.color) {
+              color = undefined;
+            } else {
+              meta2d.setValue({
+                id: pen.id,
+                color: color
+              }, {
+                render: false
+              });
+            }
             pen.mind.color = color;
-            self.color = color;
+            mindBoxPlugin.calcChildrenColor(meta2d.store.pens[pen.mind.preNodeId] || pen);
+            mindBoxPlugin.resetLinesColor(pen);
+            mindBoxPlugin.render();
+            self.color = color || pen.calculative.color;
             self.updateAll();
-            toolBoxPlugin.resetLinesColor(pen);
-            toolBoxPlugin.calcChildrenColor(pen);
           }
         },
         style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            justify-content: space-around;\n            align-items: center;\n        }\n        .style_active{\n            width: 30%;\n            background-color:#fff;\n            height: 20px;\n            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);\n            border-radius: 3px;\n        }\n        .active{\n            border: 3px solid deepskyblue !important;\n        }\n        .colorList {\n            display: flex;\n            justify-content: space-between;\n            align-content: space-between;\n            flex-wrap: wrap;\n        }       \n        .main_style {\n            display: flex;\n            width: 100%;\n            height: 30px;\n            justify-content: space-around;\n            align-items: center;\n            border-radius: 3px;\n            background-color:#f7f7f9;\n        }\n        .style_item {\n            width:47%;\n            height: 22px;\n            display: flex;\n            align-items: center;\n            overflow: hidden;\n            justify-content: center;\n        }\n        .color_item {\n            width: 20px;\n            height: 20px;\n            border: 3px solid;\n            margin: 5px 5px 5px 0;\n            border-radius: 2px;\n        }\n        .color_item:hover {\n            border: 3px solid rgba(128,128,128,0.5) !important;\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
-      });
-      dom.shadowRoot.innerHTML = str;
+      }, 'dom');
+      dom.shadowRoot.appendChild(str);
       return dom;
     } // children: [
     //   {
@@ -2798,7 +3830,7 @@
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[0,0]})
     //       father.dash = '0,0';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   },
     //   {
@@ -2807,24 +3839,27 @@
     //     func(self, pen, dom, father) {
     //       meta2d.setValue({id:pen.id,lineDash:[5,5]})
     //       father.dash = '5,5';
-    //       toolbox.renderChildren()
+    //       toolbox.renderFuncList()
     //     }
     //   }
     // ]
   }, {
     key: 'lineStyle',
-    name: '线条样式',
+    description: '用于重新设置线条样式',
+    menu: {
+      text: '线条样式',
+      dom: function dom(self, pen) {
+        var html = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"34px\" height=\"34px\" viewBox=\"0 0 34 34\" version=\"1.1\">\n        <title>\u8FDE\u7EBF\u6837\u5F0F</title>\n        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n          <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-674.000000, -138.000000)\">\n            <g id=\"\u7F16\u7EC4-2\" transform=\"translate(253.000000, 135.000000)\">\n              <g id=\"\u8FDE\u7EBF\u989C\u8272\" transform=\"translate(421.000000, 3.000000)\">\n                <rect id=\"\u900F\u660E\u5E95\u56FE\" fill-opacity=\"0\" fill=\"#FFFFFF\" x=\"0\" y=\"0\" width=\"34\" height=\"34\"/>\n                <line x1=\"7.5\" y1=\"17.5\" x2=\"27.5\" y2=\"17.5\" id=\"\u76F4\u7EBF-9\" stroke=\"" + (self.color || pen.color) + "\" stroke-dasharray=\"" + self.dash + "\" stroke-width=\"" + self.width + "\" stroke-linecap=\"round\"/>\n              </g>\n            </g>\n          </g>\n        </g>\n      </svg>";
+        return html;
+      }
+    },
     color: '#4D4DFF',
     lineStyle: 'mind',
     width: 3,
     init: function init(self, pen) {
-      self.color = pen.mind.lineColor || pen.calculative.color || '#000';
+      self.color = pen.mind.lineColor || pen.calculative.color || '#000000';
       self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
       self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth;
-    },
-    setDom: function setDom(self) {
-      var html = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"34px\" height=\"34px\" viewBox=\"0 0 34 34\" version=\"1.1\">\n        <title>\u8FDE\u7EBF\u6837\u5F0F</title>\n        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n          <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-674.000000, -138.000000)\">\n            <g id=\"\u7F16\u7EC4-2\" transform=\"translate(253.000000, 135.000000)\">\n              <g id=\"\u8FDE\u7EBF\u989C\u8272\" transform=\"translate(421.000000, 3.000000)\">\n                <rect id=\"\u900F\u660E\u5E95\u56FE\" fill-opacity=\"0\" fill=\"#FFFFFF\" x=\"0\" y=\"0\" width=\"34\" height=\"34\"/>\n                <line x1=\"7.5\" y1=\"17.5\" x2=\"27.5\" y2=\"17.5\" id=\"\u76F4\u7EBF-9\" stroke=\"" + self.color + "\" stroke-dasharray=\"" + self.dash + "\" stroke-width=\"" + self.width + "\" stroke-linecap=\"round\"/>\n              </g>\n            </g>\n          </g>\n        </g>\n      </svg>";
-      return html;
     },
     /**
      * @description 设置下拉框的样式，你也可以使用webComponent，或者将vue组件转换为webComponent
@@ -2832,35 +3867,50 @@
      * @param pen 返回当前pen对象
      * @param dom 返回此容器dom
      * */
-    colorList: ['#00000000', '#5757F3', '#fa7878', '#8C8CFF', '#19f1cc', '#6ffd97', '#efe864', '#ff931a'],
+    colorList: ['#f13097', '#5757F3', '#fa7878', '#8C8CFF', '#19f1cc', '#6ffd97', '#efe864', '#ff931a'],
     closeShadowDom: true,
-    setChildrenDom: function setChildrenDom(self, pen) {
+    collapseEventOnMenu: false,
+    openEventOnTitle: true,
+    popupEvent: 'mouseenter',
+    collapseEvent: 'click',
+    collapseAnimate: function collapseAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(0)';
+      return true;
+    },
+    popupAnimate: function popupAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(1)';
+      return true;
+    },
+    popup: function popup(self, pen) {
       var dom = createDom('div', {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position: 'absolute',
-        visibility: 'hidden',
-        top: '50px',
-        backgroundColor: '#fff',
-        borderRadius: '5px',
-        padding: '16px',
-        width: '140px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          transformOrigin: 'top',
+          transition: 'all .3s',
+          justifyContent: 'flex-start',
+          position: 'absolute',
+          top: '40px',
+          backgroundColor: '#fff',
+          borderRadius: '5px',
+          padding: '16px',
+          width: '140px',
+          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        }
       });
       dom.attachShadow({
         mode: 'open'
       });
-      var str = template(self, {
-        template: "\n          <div class=\"container\">\n                <div class=\"item\">\n                <div class=\"title\">\u7EBF\u6761\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" max=\"10\" style=\"width: 81px\" onchange=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n            <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.lineStyle === 'mind' ? 'style_active' : '') + "\" data-style=\"\u66F2\u7EBF\" onclick=\"setLineStyle(true)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                  <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                    <path d=\"M0 9 a100,50 0 0,1 85,0\"></path>\n                  </g>\n                </svg>\n                  </div>\n                  <div class=\"style_item " + (self.lineStyle === 'polyline' ? 'style_active' : '') + "\" data-style=\"\u6298\u7EBF\" onclick=\"setLineStyle(false)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                    <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                      <path d=\"M0 4 l25 0 l0 12 l40 0\"></path>\n                    </g>\n                  </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\" onchange=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
+      var str = Scope(self, {
+        template: "\n          <div class=\"container\">\n                <div class=\"item\">\n                <div class=\"title\">\u7EBF\u6761\u7C97\u7EC6</div>\n                <div class=\"main\">\n                  <input type=\"range\" min=\"1\" max=\"10\" style=\"width: 81px\" onchange=\"sliderChange(this.value)\" id=\"width\" value=\"" + self.width + "\">  <span id=\"t\" style=\"display:block;vertical-align: top;margin-left: 10px;width: 41px;height: 20px;background-color:#f7f7f9;text-align: center;line-height: 20px\">" + self.width + "</span>\n                </div>\n              </div>\n            <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u6837\u5F0F</div>\n                <div class=\"main_style \">\n                  <div class=\"style_item " + (self.lineStyle === 'mind' ? 'style_active' : '') + "\" data-style=\"\u66F2\u7EBF\" onclick=\"setLineStyle(true)\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                  <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                    <path d=\"M0 9 a100,50 0 0,1 85,0\"></path>\n                  </g>\n                </svg>\n                  </div>\n                  <div class=\"style_item " + (self.lineStyle === 'polyline' ? 'style_active' : '') + "\" data-style=\"\u6298\u7EBF\" onclick=\"setLineStyle(false)\">\n                     <svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"50px\" height=\"20px\">\n                    <g fill=\"none\" stroke=\"black\" stroke-width=\"1\">\n                      <path d=\"M0 4 l25 0 l0 12 l40 0\"></path>\n                    </g>\n                  </svg>\n                  </div>\n                </div>\n              </div>\n              <div class=\"item\">\n                <div class=\"title\">\u8FDE\u7EBF\u989C\u8272                     \n                <label for=\"color\">\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"18px\" height=\"17px\" viewBox=\"0 0 18 17\" version=\"1.1\">\n    <title>\u5438\u7BA1</title>\n    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-279.000000, -349.000000)\" stroke=\"#818187\">\n            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD-2\" transform=\"translate(208.000000, 188.000000)\">\n                <g id=\"\u5438\u7BA1\" transform=\"translate(72.062370, 161.000000)\">\n                    <g id=\"\u7F16\u7EC4-8\" transform=\"translate(7.937630, 8.095196) rotate(-315.000000) translate(-7.937630, -8.095196) translate(4.036351, 0.770971)\">\n                        <path d=\"M4.96179031,5.89679753 L4.96179031,10.0040546 C4.96179031,10.4930202 4.63081262,10.9045357 4.18105852,11.0275164 L4.18153455,13.8681947 L3.62149907,11.0275164 C3.17174496,10.9045357 2.84076728,10.4930202 2.84076728,10.0040546 L2.84076728,5.89679753 L4.96179031,5.89679753 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <path d=\"M3.90127879,0.5 C4.40959264,0.5 4.86978446,0.706034895 5.20289782,1.03914825 C5.53601117,1.37226161 5.74204607,1.83245343 5.74204607,2.34076728 L5.74204607,5.66776861 L2.06051152,5.66776861 L2.06051152,2.34076728 C2.06051152,1.83245343 2.26654641,1.37226161 2.59965977,1.03914825 C2.93277313,0.706034895 3.39296495,0.5 3.90127879,0.5 Z\" id=\"\u5F62\u72B6\u7ED3\u5408\"/>\n                        <line x1=\"0.390127879\" y1=\"5.78228307\" x2=\"7.41242971\" y2=\"5.78228307\" id=\"\u76F4\u7EBF-13\" stroke-linecap=\"round\"/>\n                    </g>\n                </g>\n            </g>\n        </g>\n    </g>\n</svg>                  \n                  </div>\n                  <input id=\"color\" style=\"display: none\" type=\"color\" onchange=\"setColor(event,this.value)\" value=\"" + self.color + "\">\n                </label>                \n                     <div class=\"main\">\n\n                     <div class=\"colorList\" onclick=\"setColor(event)\">\n                     " + self.colorList.map(function (i, index) {
           return "<span class=\"color_item " + (self.color === i ? 'active' : '') + "\" style=\"background-color: " + i + ";border: 3px solid " + i + "\" data-color=\"" + i + "\"></span>";
         }).join('') + "\n                     </div>\n                </div>\n              </div>\n          </div>",
-        scripts: {
+        script: {
           sliderChange: function sliderChange(value) {
             dom.shadowRoot.querySelector('#t').innerHTML = value;
             self.width = value;
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
             // pen.connectedLines?.forEach(i=>{
             //   meta2d.setValue({
             //     id:i.lineId,
@@ -2869,18 +3919,18 @@
             // })
             var root = meta2d.findOne(pen.mind.rootId);
             root.mind.lineWidth = value;
-            toolBoxPlugin.resetLinesStyle(root);
-            self.update('title');
+            mindBoxPlugin.resetLinesStyle(root);
+            self.update('menu');
           },
           setLineStyle: function setLineStyle(value) {
             var res = value ? 'mind' : 'polyline';
-            // toolbox.renderChildren()
+            // toolbox.renderFuncList()
 
             var root = window.meta2d.findOne(pen.mind.rootId);
             root.mind.lineStyle = res;
-            toolBoxPlugin.resetLinesStyle(root);
+            mindBoxPlugin.resetLinesStyle(root);
             self.lineStyle = res;
-            // toolBoxPlugin.update(root);
+            // mindBoxPlugin.update(root);
             self.updateAll();
           },
           setColor: function setColor(e, value) {
@@ -2894,49 +3944,66 @@
             } else {
               color = value;
             }
+            if (color === self.color) {
+              color = undefined;
+            }
             (_pen$connectedLines = pen.connectedLines) == null || _pen$connectedLines.forEach(function (i) {
               meta2d.setValue({
                 id: pen.id,
                 'mind.lineColor': color
+              }, {
+                render: true
               });
             });
             self.color = color;
-            toolBoxPlugin.update(pen);
+            mindBoxPlugin.resetLinesColor(pen, true);
             self.updateAll();
           }
         },
         style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            justify-content: space-around;\n            align-items: center;\n        }\n        .style_active{\n            width: 30%;\n            background-color:#fff;\n            height: 20px;\n            box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.2);\n            border-radius: 3px;\n        }\n        .active{\n            border: 3px solid deepskyblue !important;\n        }\n        .colorList {\n            display: flex;\n            justify-content: space-between;\n            align-content: space-between;\n            flex-wrap: wrap;\n        }       \n        .main_style {\n            display: flex;\n            width: 100%;\n            height: 30px;\n            justify-content: space-around;\n            align-items: center;\n            border-radius: 3px;\n            background-color:#f7f7f9;\n        }\n        .style_item {\n            width:47%;\n            height: 22px;\n            display: flex;\n            align-items: center;\n            overflow: hidden;\n            justify-content: center;\n        }\n        .color_item {\n            width: 20px;\n            height: 20px;\n            border: 3px solid;\n            margin: 5px 5px 5px 0;\n            border-radius: 2px;\n        }\n        .color_item:hover {\n            border: 3px solid rgba(128,128,128,0.5) !important;\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
+      }, 'string');
+      var gap = createDom('div', {
+        style: {
+          width: '100%',
+          height: '20px',
+          backgroundColor: 'red',
+          position: 'absolute',
+          top: '-10px',
+          opacity: 0
+        }
       });
       dom.shadowRoot.innerHTML = str;
+      dom.shadowRoot.appendChild(gap);
       return dom;
     },
-    closeChildDomEvent: 'none',
     event: 'mouseenter',
     func: function func(self, pen, dom) {
       self.open = true;
     }
   }, {
+    key: 'extra'
+  }, {
     key: 'layoutDirection',
-    name: '布局方式',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>',
-    closeChildDom: function closeChildDom(dom) {
-      // dom.style.top = 0
-      // dom.style.opacity = 0
-      return false;
+    description: '用于重新设置脑图基本设置',
+    menu: {
+      text: '基本设置',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698740367149" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13181" width="34" height="20"><path d="M914.752 292.608c26.112 0 47.232 21.12 47.232 47.296v577.088c0 26.112-21.12 47.232-47.232 47.232H110.4a47.232 47.232 0 0 1-47.296-47.232V339.904c0-26.112 21.12-47.296 47.296-47.296h804.352z m-6.72 54.016H117.12v563.648h790.848V346.624z" p-id="13182"/><path d="M957.44 484.992v64H62.08v-64z" p-id="13183"/><path d="M957.44 484.992v64H62.08v-64zM409.536 735.36l63.104-0.128 0.896 198.528-63.104 0.192zM561.472 600.32l63.168-0.064 0.832 333.568-63.232 0.128zM578.368 62.016c8.704 0 15.744 7.04 15.744 15.744v268.864H430.976V77.76c0-8.704 7.04-15.744 15.744-15.744h131.648z m-38.272 54.016h-55.04v176.64h55.04v-176.64z" p-id="13184"/></svg>'
     },
-    onHideChildDom: function onHideChildDom() {},
     direction: 'right',
     childrenGap: 20,
     levelGap: 0,
     init: function init(self, pen) {
       self.direction = pen.mind.direction;
-      self.childrenGap = toolBoxPlugin.childrenGap;
-      self.levelGap = toolBoxPlugin.levelGap;
+      self.childrenGap = mindBoxPlugin.childrenGap;
+      self.levelGap = mindBoxPlugin.levelGap;
+      self.animate = mindBoxPlugin.animate;
+      pen.locked = 0;
+      self.status = self.animate ? '已开启' : '已关闭';
     },
     activeDirection: function activeDirection(self, pen, dom) {
       var rootDom = dom.querySelector('.main');
       var divs = rootDom.querySelectorAll('div');
-      var index = ['right', 'left', 'top', 'bottom'].findIndex(function (i) {
+      var index = ['right', 'left', 'top', 'bottom', 'butterfly', 'sandglass'].findIndex(function (i) {
         return i === self.direction;
       });
       divs.forEach(function (i) {
@@ -2956,55 +4023,93 @@
         return i.setAttribute('fill', '#7878FF');
       });
     },
-    onOpenChildDom: function onOpenChildDom(self, pen, dom) {
-      self.activeDirection(self, pen, dom);
-      self.childrenGap = toolBoxPlugin.childrenGap;
-      self.levelGap = toolBoxPlugin.levelGap;
+    popupEvent: 'mouseenter',
+    collapseEventOnMenu: false,
+    // 是否在childrenDom中触发事件
+    collapseEvent: 'none',
+    stopPropagation: true,
+    animate: false,
+    collapseAnimate: function collapseAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(0)';
+      return true;
     },
+    mounted: function mounted(self, pen, dom) {
+      self.activeDirection(self, pen, dom);
+    },
+    popupAnimate: function popupAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(1)';
+      return true;
+    },
+    onPopup: function onPopup(self, pen, dom) {
+      self.activeDirection(self, pen, dom);
+      self.childrenGap = mindBoxPlugin.childrenGap;
+      self.levelGap = mindBoxPlugin.levelGap;
+      pen.locked = 1;
+    },
+    onCollapse: function onCollapse(self, pen) {
+      pen.locked = 0;
+    },
+    status: '已开启',
     // 设置下拉列表的样式和子元素布局
-    setChildrenDom: function setChildrenDom(self, pen) {
+    popup: function popup(self, pen) {
       var dom = createDom('div', {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        position: 'absolute',
-        visibility: 'hidden',
-        top: '50px',
-        backgroundColor: '#fff',
-        borderRadius: '5px',
-        padding: '16px',
-        zIndex: 999,
-        width: '170px',
-        boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
-      }, '', undefined, 'root');
-      var str = template(self, {
-        template: "\n          <div class=\"container\">\n              <div class=\"item\">\n                <div class=\"title\">\u5E03\u5C40\u65B9\u5411</div>\n                <div class=\"main\" >\n                    <div onclick=\"setDirection('right')\" >\n                        <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                          <title>\u5411\u53F3\u5E03\u5C40</title>\n                         <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                              <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-633.000000, -684.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                     <g id=\"\u5E03\u5C40\u5907\u4EFD-9\" transform=\"translate(108.000000, 261.000000)\">\n                                          <rect class=\"toolbox_direction_svg_base\" id=\"\u5077\u6478\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                          <g id=\"\u7F16\u7EC4-3\" transform=\"translate(20.000000, 7.000000)\">\n                                              <line class=\"toolbox_direction_svg\" x1=\"13.5\" y1=\"18.5\" x2=\"22.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"0.5\" y=\"15.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                              <path class=\"toolbox_direction_svg_line\" d=\"M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" x=\"25\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" x=\"25\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" x=\"25\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          </g>\n                                      </g>\n                                 </g>\n                              </g>\n                          </g>\n                        </svg>\n                    </div>\n                    \n                    <div onclick=\"setDirection('left')\"  >                    \n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                          <title>\u5411\u5DE6\u5E03\u5C40</title>\n                          <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                              <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-541.000000, -684.000000)\">\n                                  <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                      <g id=\"\u5E03\u5C40\u5907\u4EFD-8\" transform=\"translate(16.000000, 261.000000)\">\n                                          <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                          <g id=\"\u7F16\u7EC4-3\" transform=\"translate(37.500000, 25.500000) scale(-1, 1) translate(-37.500000, -25.500000) translate(20.000000, 7.000000)\">\n                                             <line class=\"toolbox_direction_svg\" x1=\"13.5\" y1=\"18.5\" x2=\"22.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"0.5\" y=\"15.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                              <path class=\"toolbox_direction_svg_line\" d=\"M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" x=\"25\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" x=\"25\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" x=\"25\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          </g>\n                                      </g>\n                                  </g>+\n                              </g>\n                          </g>\n                      </svg>                           \n                    </div>\n                    \n                    <div onclick=\"setDirection('top')\" >\n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                        <title>\u5411\u4E0A\u5E03\u5C40</title>\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-633.000000, -616.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                    <g id=\"\u5E03\u5C40\u5907\u4EFD-7\" transform=\"translate(108.000000, 193.000000)\">\n                                        <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                        <g id=\"\u7F16\u7EC4-3\" transform=\"translate(38.000000, 25.250000) scale(1, -1) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)\">\n                                            <line class=\"toolbox_direction_svg\" x1=\"6.06363636\" y1=\"25.5\" x2=\"15.5333333\" y2=\"25.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" transform=\"translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) \" x=\"-3.5\" y=\"23\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                            <path class=\"toolbox_direction_svg_line\" d=\"M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) \" x=\"17\" y=\"41.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) \" x=\"17\" y=\"22.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) \" x=\"17\" y=\"2.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                        </g>\n                                    </g>\n                                </g>\n                            </g>\n                        </g>\n                      </svg>\n                    </div>\n                    \n                    <div onclick=\"setDirection('bottom')\">                  \n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                        <title>\u5411\u4E0B\u5E03\u5C40</title>\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                           <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-725.000000, -480.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                    <g id=\"\u5E03\u5C40\u5907\u4EFD-2\" transform=\"translate(200.000000, 57.000000)\">\n                                        <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                        <g id=\"\u7F16\u7EC4-3\" transform=\"translate(38.000000, 25.250000) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)\">\n                                            <line x1=\"6.06363636\" y1=\"25.5\" x2=\"15.5333333\" y2=\"25.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" transform=\"translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) \" x=\"-3.5\" y=\"23\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                            <path class=\"toolbox_direction_svg_line\" d=\"M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) \" x=\"17\" y=\"41.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) \" x=\"17\" y=\"22.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) \" x=\"17\" y=\"2.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                        </g>\n                                   </g>\n                                </g>\n                            </g>\n                        </g>\n                      </svg>\n                    </div>\n                </div>\n              </div>\n              \n              <div class=\"item\">\n                <div class=\"title\">\u95F4\u9694\u8BBE\u7F6E</div>\n                <div class=\"main\">\n                    <div class=\"number_container\">\n                     <div class=\"number_item\">\n                        <div class=\"flag\">\u540C\u7EA7\u95F4\u9694</div>\n                        <div class=\"number\">                        \n                            <input type=\"number\" onchange=\"setChildGap(this.value)\" value=\"" + self.childrenGap + "\"/>\n                        </div>\n                    </div>\n                     <div class=\"number_item\">\n                        <div class=\"flag\">\u5B50\u7EA7\u95F4\u9694</div>\n                        <div class=\"number\">                        \n                            <input type=\"number\" onchange=\"setLevelGap(this.value)\" value=\"" + self.levelGap + "\"/>\n                        </div>\n                    </div>\n                  </div>\n                   \n                </div>\n              </div>\n          </div>",
-        scripts: {
+        style: {
+          display: 'flex',
+          flexDirection: 'row',
+          transformOrigin: 'top',
+          transition: 'all .3s',
+          flexWrap: 'wrap',
+          justifyContent: 'flex-start',
+          position: 'absolute',
+          top: '40px',
+          backgroundColor: '#fff',
+          borderRadius: '5px',
+          padding: '16px',
+          zIndex: 999,
+          width: '170px',
+          boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+        },
+        event: '',
+        func: undefined,
+        className: 'root'
+      });
+      var str = Scope(self, {
+        template: "\n          <div class=\"container\">\n              <div class=\"item\">\n                <div class=\"title\">\u5E03\u5C40\u65B9\u5411</div>\n                <div class=\"main\" >\n                    <div onclick=\"setDirection('right')\" >\n                        <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                          <title>\u5411\u53F3\u5E03\u5C40</title>\n                         <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                              <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-633.000000, -684.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                     <g id=\"\u5E03\u5C40\u5907\u4EFD-9\" transform=\"translate(108.000000, 261.000000)\">\n                                          <rect class=\"toolbox_direction_svg_base\" id=\"\u5077\u6478\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                          <g id=\"\u7F16\u7EC4-3\" transform=\"translate(20.000000, 7.000000)\">\n                                              <line class=\"toolbox_direction_svg\" x1=\"13.5\" y1=\"18.5\" x2=\"22.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"0.5\" y=\"15.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                              <path class=\"toolbox_direction_svg_line\" d=\"M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" x=\"25\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" x=\"25\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" x=\"25\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          </g>\n                                      </g>\n                                 </g>\n                              </g>\n                          </g>\n                        </svg>\n                    </div>\n                    \n                    <div onclick=\"setDirection('left')\"  >                    \n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                          <title>\u5411\u5DE6\u5E03\u5C40</title>\n                          <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                              <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-541.000000, -684.000000)\">\n                                  <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                      <g id=\"\u5E03\u5C40\u5907\u4EFD-8\" transform=\"translate(16.000000, 261.000000)\">\n                                          <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                          <g id=\"\u7F16\u7EC4-3\" transform=\"translate(37.500000, 25.500000) scale(-1, 1) translate(-37.500000, -25.500000) translate(20.000000, 7.000000)\">\n                                             <line class=\"toolbox_direction_svg\" x1=\"13.5\" y1=\"18.5\" x2=\"22.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"0.5\" y=\"15.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                              <path class=\"toolbox_direction_svg_line\" d=\"M28,35 C22.4771525,35 18,27.836556 18,19 C18,10.163444 22.4771525,3 28,3\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" x=\"25\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" x=\"25\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                              <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" x=\"25\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          </g>\n                                      </g>\n                                  </g>+\n                              </g>\n                          </g>\n                      </svg>                           \n                    </div>\n                    \n                    <div onclick=\"setDirection('top')\" >\n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                        <title>\u5411\u4E0A\u5E03\u5C40</title>\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                            <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-633.000000, -616.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                    <g id=\"\u5E03\u5C40\u5907\u4EFD-7\" transform=\"translate(108.000000, 193.000000)\">\n                                        <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                        <g id=\"\u7F16\u7EC4-3\" transform=\"translate(38.000000, 25.250000) scale(1, -1) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)\">\n                                            <line class=\"toolbox_direction_svg\" x1=\"6.06363636\" y1=\"25.5\" x2=\"15.5333333\" y2=\"25.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" transform=\"translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) \" x=\"-3.5\" y=\"23\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                            <path class=\"toolbox_direction_svg_line\" d=\"M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) \" x=\"17\" y=\"41.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) \" x=\"17\" y=\"22.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) \" x=\"17\" y=\"2.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                        </g>\n                                    </g>\n                                </g>\n                            </g>\n                        </g>\n                      </svg>\n                    </div>\n                    \n                    <div onclick=\"setDirection('bottom')\">                  \n                      <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                        <title>\u5411\u4E0B\u5E03\u5C40</title>\n                        <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                           <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-725.000000, -480.000000)\">\n                                <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                    <g id=\"\u5E03\u5C40\u5907\u4EFD-2\" transform=\"translate(200.000000, 57.000000)\">\n                                        <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                        <g id=\"\u7F16\u7EC4-3\" transform=\"translate(38.000000, 25.250000) rotate(-270.000000) translate(-38.000000, -25.250000) translate(25.750000, 0.750000)\">\n                                            <line x1=\"6.06363636\" y1=\"25.5\" x2=\"15.5333333\" y2=\"25.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" transform=\"translate(3.000000, 25.500000) rotate(-90.000000) translate(-3.000000, -25.500000) \" x=\"-3.5\" y=\"23\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                            <path class=\"toolbox_direction_svg_line\" d=\"M17.8386311,43 C15.0303966,40.513797 13,33.3135934 13,24.8187892 C13,16.7047472 14.8524591,9.77185117 17.465812,7\" id=\"\u8DEF\u5F84\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 44.000000) rotate(-90.000000) translate(-22.000000, -44.000000) \" x=\"17\" y=\"41.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 25.000000) rotate(-90.000000) translate(-22.000000, -25.000000) \" x=\"17\" y=\"22.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" transform=\"translate(22.000000, 5.000000) rotate(-90.000000) translate(-22.000000, -5.000000) \" x=\"17\" y=\"2.5\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                        </g>\n                                   </g>\n                                </g>\n                            </g>\n                        </g>\n                      </svg>\n                    </div>\n                   \n                    <div onclick=\"setDirection('butterfly')\">\n                    <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                      <title>\u8776\u5F62\u5E03\u5C40</title>\n                      <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                          <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-541.000000, -480.000000)\">\n                              <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                  <g id=\"\u5E03\u5C40\" transform=\"translate(16.000000, 57.000000)\">\n                                      <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0.5\" y=\"0.5\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                      <g id=\"\u7F16\u7EC4-3\" transform=\"translate(10.000000, 7.000000)\">\n                                          <line x1=\"12.5\" y1=\"18.5\" x2=\"21.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                          <line x1=\"35.5\" y1=\"18.5\" x2=\"44.969697\" y2=\"18.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD-2\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                          <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"22.5\" y=\"15.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-8\" fill=\"#DDDDE1\" x=\"0\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-11\" fill=\"#DDDDE1\" x=\"47\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-9\" fill=\"#DDDDE1\" x=\"0\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-12\" fill=\"#DDDDE1\" x=\"47\" y=\"16\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-10\" fill=\"#DDDDE1\" x=\"0\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-13\" fill=\"#DDDDE1\" x=\"47\" y=\"32\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                          <path class=\"toolbox_direction_svg_line\" d=\"M11,3 C18.5461417,3 24.8721456,8.22403061 26.5588129,15.2528929 M26.9076362,20.7292725 C26.0454005,28.7525241 19.2522884,35 11,35\" id=\"\u5F62\u72B6\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                          <path class=\"toolbox_direction_svg_line\" d=\"M30,3 C37.6543889,3 44.0533839,8.37497993 45.6285232,15.5564778 M45.9076362,20.7292725 C45.0454005,28.7525241 38.2522884,35 30,35\" id=\"\u5F62\u72B6\" stroke=\"#818187\" transform=\"translate(37.953818, 19.000000) scale(-1, 1) translate(-37.953818, -19.000000) \"/>\n                                      </g>\n                                  </g>\n                              </g>\n                          </g>\n                      </g>\n                    </svg>\n                    </div>\n                    \n                    <div onclick=\"setDirection('sandglass')\">\n                    <svg class=\"main_item\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"76px\" height=\"50px\" viewBox=\"0 0 76 50\" version=\"1.1\">\n                    <title>\u6C99\u6F0F\u5E03\u5C40</title>\n                    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                        <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-725.000000, -616.000000)\">\n                            <g id=\"\u7F16\u7EC4-6\u5907\u4EFD\" transform=\"translate(525.000000, 423.000000)\">\n                                <g id=\"\u7F16\u7EC4-10\" transform=\"translate(200.000000, 193.000000)\">\n                                    <rect class=\"toolbox_direction_svg_base\" id=\"\u900F\u660E\u5E95\u56FE\" fill=\"#F8F8FC\" x=\"0\" y=\"0\" width=\"76\" height=\"50\" rx=\"2\"/>\n                                    <g id=\"\u7F16\u7EC4-3\" transform=\"translate(17.000000, 6.000000)\">\n                                        <g id=\"\u7F16\u7EC4-9\" transform=\"translate(0.000000, 0.000000)\">\n                                            <line x1=\"21.5\" y1=\"7.5\" x2=\"21.5\" y2=\"16.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-8\" fill=\"#DDDDE1\" x=\"0\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-9\" fill=\"#DDDDE1\" x=\"16\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-10\" fill=\"#DDDDE1\" x=\"32\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <path d=\"M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5\" id=\"\u5F62\u72B6\" stroke=\"#818187\" stroke-linecap=\"round\" transform=\"translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) \"/>\n                                        </g>\n                                        <g id=\"\u7F16\u7EC4-9\" transform=\"translate(21.000000, 29.000000) scale(1, -1) translate(-21.000000, -29.000000) translate(0.000000, 20.000000)\">\n                                            <line x1=\"21.5\" y1=\"7.5\" x2=\"21.5\" y2=\"16.5\" id=\"\u76F4\u7EBF-12\u5907\u4EFD\" stroke=\"#818187\" stroke-linecap=\"round\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-8\" fill=\"#DDDDE1\" x=\"0\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-9\" fill=\"#DDDDE1\" x=\"16\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <rect class=\"toolbox_direction_svg\" id=\"\u77E9\u5F62\u5907\u4EFD-10\" fill=\"#DDDDE1\" x=\"32\" y=\"0\" width=\"10\" height=\"5\" rx=\"2\"/>\n                                            <path d=\"M15.5,-3.5 C20.402536,-3.5 24.6208608,0.196011148 26.5,5.5 M26.5,19.5 C24.5749169,24.8145404 20.3733294,28.5 15.5,28.5\" id=\"\u5F62\u72B6\" stroke=\"#818187\" stroke-linecap=\"round\" transform=\"translate(21.000000, 12.500000) rotate(-270.000000) translate(-21.000000, -12.500000) \"/>\n                                        </g>\n                                        <rect class=\"toolbox_direction_svg_line\" id=\"\u77E9\u5F62\" stroke=\"#818187\" x=\"14.5\" y=\"16.5\" width=\"13\" height=\"5\" rx=\"2\"/>\n                                    </g>\n                                </g>\n                            </g>\n                        </g>\n                    </g>\n                </svg>\n                    </div>\n                </div>\n              </div>\n              \n              <div class=\"item\">\n                <div class=\"title\">\u95F4\u9694\u8BBE\u7F6E</div>\n                <div class=\"main\">\n                    <div class=\"number_container\">\n                     <div class=\"number_item\" onclick=\"(e=>{e.stopPropagation()})(event)\">\n                        <div class=\"flag\">\u540C\u7EA7\u95F4\u9694</div>\n                        <div class=\"number\">                        \n                            <input type=\"number\" onchange=\"setChildGap(this.value)\" value=\"" + self.childrenGap + "\"/>\n                        </div>\n                    </div>\n                     <div class=\"number_item\" onclick=\"(e=>{e.stopPropagation()})(event)\">\n                        <div class=\"flag\">\u5B50\u7EA7\u95F4\u9694</div>\n                        <div class=\"number\">                        \n                            <input type=\"number\" onchange=\"setLevelGap(this.value)\" value=\"" + self.levelGap + "\"/>\n                        </div>\n                    </div>\n                     <div class=\"number_item\" onclick=\"(e=>{e.stopPropagation()})(event)\">\n                        <div class=\"flag\">\u662F\u5426\u5F00\u542F\u52A8\u753B</div>\n                        <div class=\"button\">                        \n                            <input type=\"button\" onclick=\"setAnimate()\" value=\"" + self.status + "\"/>\n                        </div>\n                    </div>\n                  </div>\n                   \n                </div>\n              </div>\n          </div>",
+        script: {
           // 能在这里面获取到dom
-          mounted: function mounted() {// 生命周期函数
+          status: '已开启',
+          setAnimate: function setAnimate() {
+            mindBoxPlugin.animate = !mindBoxPlugin.animate;
+            pen.mind.mindboxOption.animate = mindBoxPlugin.animate;
+            self.animate = mindBoxPlugin.animate;
+            self.animate ? self.status = '已开启' : self.status = '已关闭';
+            self.updateAll();
           },
           setChildGap: function setChildGap(value) {
             self.childrenGap = value;
-            toolBoxPlugin.childrenGap = value;
-            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
+            mindBoxPlugin.childrenGap = value;
+            pen.mind.mindboxOption.childrenGap = value;
+            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
           },
           setLevelGap: function setLevelGap(value) {
             self.levelGap = value;
-            toolBoxPlugin.levelGap = value;
-            toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
+            mindBoxPlugin.levelGap = value;
+            pen.mind.mindboxOption.levelGap = value;
+            mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
           },
           setDirection: function setDirection(e) {
+            mindBoxPlugin.record(pen);
             var root = window.meta2d.findOne(pen.mind.rootId);
-            toolBoxPlugin.resetLayOut(root, e, true);
-            toolBoxPlugin.update(root);
+            mindBoxPlugin.resetLayOut(root, e, true);
+            mindBoxPlugin.update(root);
             self.direction = e;
             self.activeDirection(self, pen, dom);
+            self.close();
           }
         },
-        style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .flag{\n            font-size: 14px;\n        }\n        .number{\n            height:30px;\n            display: flex;\n            border: 1px solid #f7f7f9;\n            border-radius: 5px;\n            justify-content: space-around;\n            align-items: center;\n            background-color: #f7f7f9;\n        }\n        .number_container{\n            display: flex;\n            width: 100%;\n            justify-content: space-between;\n            align-items: center;\n            flex-direction: column;\n        }\n        .number_item{\n            width: 100%;\n            display: flex;\n            flex-direction: row;\n            justify-content: space-between;\n            align-items: center;\n            margin-top: 14px;\n        }\n        .number input{\n            width: 70px;\n            height: 100%;\n            outline: none;\n            background-color:#f7f7f9;\n            border: 1px solid #f7f7f9;\n            border-radius: 5px;            \n            font-size: 16px;\n            text-indent: 10px;\n        }\n        .number_control{\n            width: 20%;\n            display: flex;\n            flex-direction: column;\n            transform: translateY(-3px);\n            margin-right: 6px;\n        }\n        .number_control_item{\n            display:block;\n            flex:1;\n            font-size: 25px;\n            width: 30px;\n            height: 15px;\n        }\n        .number_control_item:hover {\n            color: #484848;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            width: 100%;\n            flex-wrap: wrap;\n            justify-content: space-around;\n            align-content: center;\n        }\n        .main_item{\n            margin-top: 5px;\n        }\n        .main_item:hover{\n            outline: 3px solid rgba(87,87,243,0.51);\n        }\n        .active{\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
-      });
-      dom.innerHTML = str;
+        style: "<style>\n        .container {\n            overflow: hidden;\n        }\n        .flag{\n            font-size: 14px;\n        }\n        .number{\n            height:30px;\n            display: flex;\n            border: 1px solid #f7f7f9;\n            border-radius: 5px;\n            justify-content: space-around;\n            align-items: center;\n            background-color: #f7f7f9;\n        }\n        .button {\n        \n        }\n        .number_container{\n            display: flex;\n            width: 100%;\n            justify-content: space-between;\n            align-items: center;\n            flex-direction: column;\n        }\n        .number_item{\n            width: 100%;\n            display: flex;\n            flex-direction: row;\n            justify-content: space-between;\n            align-items: center;\n            margin-top: 14px;\n        }\n        .number input{\n            width: 70px;\n            height: 100%;\n            outline: none;\n            background-color:#f7f7f9;\n            border: 1px solid #f7f7f9;\n            border-radius: 5px;            \n            font-size: 16px;\n            text-indent: 10px;\n        }\n        .number_control{\n            width: 20%;\n            display: flex;\n            flex-direction: column;\n            transform: translateY(-3px);\n            margin-right: 6px;\n        }\n        .number_control_item{\n            display:block;\n            flex:1;\n            font-size: 25px;\n            width: 30px;\n            height: 15px;\n        }\n        .number_control_item:hover {\n            color: #484848;\n        }\n        .main {\n            display: flex;\n            flex-direction: row;\n            width: 100%;\n            flex-wrap: wrap;\n            justify-content: space-around;\n            align-content: center;\n        }\n        .main_item{\n            margin-top: 5px;\n        }\n        .main_item:hover{\n            outline: 3px solid rgba(87,87,243,0.51);\n        }\n        .active{\n        }\n       .item {\n          display:flex;\n          justify-content: flex-start;\n          align-items: flex-start;\n          flex-direction: column;\n          margin-bottom: 14px;\n       }\n       .title {\n          width: 100%;\n          height: 17px;\n          font-size: 16px;\n          display: flex;\n          justify-content: flex-start;\n          align-items: center;\n          font-family: PingFang SC, PingFang SC-Regular;\n          font-weight: 400;\n          text-align: left;\n          color: #7d7878;\n          line-height: 17px;\n          margin-bottom: 14px;\n        }\n    </style> \n        "
+      }, 'dom');
+      dom.appendChild(str);
       // dom.addEventListener('click',(e)=>{
       //   dom.childNodes.forEach((i)=>{
       //     if(i.tagName !== 'style' && i.nodeType == 1){
@@ -3014,42 +4119,93 @@
       //   e.target.classList.add('active');
       // });
       return dom;
-    },
-    closeChildDomEvent: 'none'
+    }
   }, {
     key: 'addSiblingNode',
-    name: '新增同级节点',
-    event: 'click',
-    func: function () {
-      var _func = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(self, pen) {
-        var parent, index;
-        return _regeneratorRuntime().wrap(function _callee$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              parent = window.meta2d.findOne(pen.mind.preNodeId);
-              index = parent.mind.children.indexOf(pen.id); // TODO 此处拿到的是父节点
-              _context2.next = 4;
-              return toolBoxPlugin.addNode(parent, index + 1, pen.name);
-            case 4:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee);
-      }));
-      function func(_x, _x2) {
-        return _func.apply(this, arguments);
+    description: '用于新增某节点的子级节点，默认位于该节点之下',
+    menu: {
+      text: '新增同级节点',
+      img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
+    },
+    // 监听事件名
+    // event: 'click',
+    /**
+     * @description 事件对应的回调函数
+     * @param self 返回该选项自身
+     * @param pen 返回当前操作的pen对象
+     * */
+    // func: async (self,pen)=>{
+    //   mindBoxPlugin.bottomChildren(pen,0);
+    //   },
+    popupEvent: 'mouseenter',
+    closeShadowDom: true,
+    collapseEventOnMenu: false,
+    // 是否在childrenDom中触发事件
+    stopPropagation: true,
+    collapseAnimate: function collapseAnimate(self, pen, dom) {
+      dom.style.transformOrigin = 'top';
+      dom.style.transition = 'all .3s';
+      dom.style.transform = 'scaleY(0)';
+      return true;
+    },
+    popupAnimate: function popupAnimate(self, pen, dom) {
+      dom.style.transform = 'scaleY(1)';
+      return true;
+    },
+    popup: [{
+      menu: {
+        name: '',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>'
+      },
+      event: 'click',
+      func: function func(self, pen, dom, father) {
+        var parent = window.meta2d.findOne(pen.mind.preNodeId);
+        var index = parent.mind.children.indexOf(pen.id);
+        mindBoxPlugin.addNode(parent, index + 1, 'mindNode2', {
+          width: 200,
+          height: 50
+        });
+        father.close();
       }
-      return func;
-    }(),
-    img: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzRweCIgaGVpZ2h0PSIzNHB4IiB2aWV3Qm94PSIwIDAgMzQgMzQiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+5ZCM57qn6IqC54K5PC90aXRsZT4KICAgIDxkZWZzPgogICAgICAgIDxyZWN0IGlkPSJwYXRoLTEiIHg9IjkiIHk9IjgiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3Ij48L3JlY3Q+CiAgICAgICAgPG1hc2sgaWQ9Im1hc2stMiIgbWFza0NvbnRlbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIG1hc2tVbml0cz0ib2JqZWN0Qm91bmRpbmdCb3giIHg9IjAiIHk9IjAiIHdpZHRoPSIxNiIgaGVpZ2h0PSI3IiBmaWxsPSJ3aGl0ZSI+CiAgICAgICAgICAgIDx1c2UgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgPC9tYXNrPgogICAgPC9kZWZzPgogICAgPGcgaWQ9Iumhtemdoi0xIiBzdHJva2U9Im5vbmUiIHN0cm9rZS13aWR0aD0iMSIgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyBpZD0i5Zu65a6aIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMjkwLjAwMDAwMCwgLTI3LjAwMDAwMCkiPgogICAgICAgICAgICA8ZyBpZD0i57yW57uELTLlpIfku70iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE4Mi4wMDAwMDAsIDI0LjAwMDAwMCkiPgogICAgICAgICAgICAgICAgPGcgaWQ9IuWQjOe6p+iKgueCuSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTA4LjAwMDAwMCwgMy4wMDAwMDApIj4KICAgICAgICAgICAgICAgICAgICA8cmVjdCBpZD0i6YCP5piO5bqV5Zu+IiBmaWxsLW9wYWNpdHk9IjAiIGZpbGw9IiNGRkZGRkYiIHg9IjAiIHk9IjAiIHdpZHRoPSIzNCIgaGVpZ2h0PSIzNCI+PC9yZWN0PgogICAgICAgICAgICAgICAgICAgIDxyZWN0IGlkPSLnn6nlvaIiIHN0cm9rZT0iIzgxODE4NyIgeD0iOS41IiB5PSIxOC41IiB3aWR0aD0iMTUiIGhlaWdodD0iNiIgcng9IjEiPjwvcmVjdD4KICAgICAgICAgICAgICAgICAgICA8bGluZSB4MT0iMTciIHkxPSIxNSIgeDI9IjE3IiB5Mj0iMTgiIGlkPSLnm7Tnur8tNiIgc3Ryb2tlPSIjODE4MTg3IiBzdHJva2UtbGluZWNhcD0icm91bmQiPjwvbGluZT4KICAgICAgICAgICAgICAgICAgICA8dXNlIGlkPSLnn6nlvaLlpIfku70tNCIgc3Ryb2tlPSIjOUM5Q0E1IiBtYXNrPSJ1cmwoI21hc2stMikiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiIgeGxpbms6aHJlZj0iI3BhdGgtMSI+PC91c2U+CiAgICAgICAgICAgICAgICA8L2c+CiAgICAgICAgICAgIDwvZz4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg=='
+    }, {
+      menu: {
+        name: '',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>'
+      },
+      event: 'click',
+      func: function func(self, pen, dom, father) {
+        var parent = window.meta2d.findOne(pen.mind.preNodeId);
+        var index = parent.mind.children.indexOf(pen.id);
+        mindBoxPlugin.addNode(parent, index + 1, 'diamond', {
+          width: 200,
+          height: 120
+        });
+        father.close();
+      }
+    }, {
+      menu: {
+        name: '',
+        icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+      },
+      event: 'click',
+      func: function func(self, pen, dom, father) {
+        var parent = window.meta2d.findOne(pen.mind.preNodeId);
+        var index = parent.mind.children.indexOf(pen.id);
+        mindBoxPlugin.addNode(parent, index + 1, 'circle', {
+          width: 200,
+          height: 75
+        });
+        father.close();
+      }
+    }]
   }
   // {
   //   name:'button',
   //   event: 'click',
   //   func(){
   //   },
-  //   openChildDomEvent:'mouseenter',
-  //   closeChildDomEvent: 'mouseleave',
+  //   popupEvent:'mouseenter',
+  //   collapseEvent: 'mouseleave',
   //
   //  setChildrenDom(){
   //    // return '<ele-button></ele-button'
@@ -3061,23 +4217,24 @@
   var defaultFuncs = {
     funcList: funcList,
     getAllFuncDocs: function getAllFuncDocs() {
-      return this.funcList.map(function (i) {
+      return defaultFuncs.funcList.filter(function (i) {
+        return i.menu;
+      }).map(function (i) {
         return {
-          name: i.name,
+          name: i.menu.text || '暂无名称',
           key: i.key,
           description: i.description || '暂无描述'
         };
       });
     },
     getFunc: function getFunc() {
-      var _this = this;
       var result = [];
       for (var _len = arguments.length, key = new Array(_len), _key = 0; _key < _len; _key++) {
         key[_key] = arguments[_key];
       }
       if (isArray$1(key)) {
         key.forEach(function (i) {
-          var func = _this.funcList.find(function (j) {
+          var func = defaultFuncs.funcList.find(function (j) {
             return j.key === i;
           });
           func ? result.push(func) : console.warn("[defaultFuncs warn]\uFF1ANo matching options " + i);
@@ -3090,152 +4247,886 @@
     'root': funcList.filter(function (i) {
       return i.key !== 'addSiblingNode';
     }),
-    'leaf': defaultFuncs.getFunc('addChildNode', 'addSiblingNode', 'relayout', 'relayoutNext', 'nodeStyle', 'lineStyle')
+    'leaf': defaultFuncs.getFunc('addChildNode', 'addSiblingNode', 'extra', 'relayout', 'relayoutNext', 'extra', 'nodeStyle', 'lineStyle')
   };
-  var childrenGap = 20;
-  var levelGap = 200;
-  var config = {
-    childrenGap: childrenGap,
-    levelGap: levelGap,
+  var toolboxDefault = {
+    offset: 80,
+    showControl: true
+  };
+  var pluginDefault = {
+    animate: true,
+    animateDuration: 200,
+    childrenGap: 20,
+    levelGap: 200,
+    showControl: true,
     funcList: funcList,
     colorList: colorList,
-    defaultFuncList: defaultFuncList
+    getFuncList: function getFuncList(pen) {
+      return pen.mind.isRoot ? mindBoxPlugin.funcList['root'] : mindBoxPlugin.funcList['leaf'];
+    }
+  };
+  var toolboxStyle = {
+    backgroundColor: '#fff',
+    borderRadius: '5px',
+    boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
+    transform: 'translateX(-50%)',
+    position: 'absolute',
+    outline: 'none',
+    userSelect: 'none',
+    visibility: 'visibility',
+    zIndex: 999,
+    display: 'flex',
+    flexDirection: 'row'
+  };
+  var funcListStyle = {
+    boxSizing: 'content-box',
+    width: 'max-content',
+    height: '30px',
+    padding: '6px',
+    display: 'flex',
+    alignItems: 'center'
+  };
+  var controlStyle = {
+    minWidth: '30px',
+    opacity: '0.5',
+    display: 'flex',
+    cursor: 'pointer',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999,
+    height: 'inherit',
+    backgroundColor: "#efefef",
+    flexDirection: 'column',
+    borderRadius: '5px 0 0 5px'
+  };
+  var extraStyle = {
+    width: '1px',
+    height: '60%',
+    borderRadius: '5px',
+    margin: '0 4px',
+    backgroundColor: 'rgba(18,17,42,.1)'
+  };
+  var basicFuncConfig = {
+    collapseEventOnMenu: true,
+    collapseEvent: 'click',
+    popupEvent: 'mouseenter'
+  };
+  var d = {
+    funcList: funcList,
+    colorList: colorList,
+    controlStyle: controlStyle,
+    extraStyle: extraStyle,
+    defaultFuncList: defaultFuncList,
+    basicFuncConfig: basicFuncConfig
   };
 
+  var extra = 'extra';
+  var mouseMoved = false;
+  var controlDom = {
+    control: null,
+    show: true
+  };
+  // 此列表为，可供用户配置的属性列表
+  var CONFIGS = ['showControl', 'offset', 'style'];
+  function configValid(config) {
+    if (config.key) return true;
+    return false;
+  }
+  var ToolBox = /*#__PURE__*/function () {
+    function ToolBox(parentHtml, config) {
+      if (config === void 0) {
+        config = {};
+      }
+      this.open = false;
+      this.offset = 80;
+      this.showControl = true;
+      this.parentHtml = null;
+      this.animate = false;
+      this.curItem = null;
+      this._freezePos = false;
+      // 单例模式
+      if (!ToolBox.instance) {
+        ToolBox.instance = this;
+      } else {
+        return ToolBox.instance;
+      }
+      this.parentHtml = parentHtml;
+      this._init();
+      this._loadOptions(config);
+      this.parentHtml.appendChild(this.box);
+    }
+    var _proto = ToolBox.prototype;
+    _proto._loadOptions = function _loadOptions(config) {
+      if (!isObjectLiteral(config) && !(config == null)) return;
+      config == null ? config = {} : '';
+      // 加载默认配置项
+      for (var conf in toolboxDefault) {
+        this[conf] = toolboxDefault[conf];
+      }
+
+      // 加载用户配置项
+      for (var _conf in config) {
+        if (CONFIGS.includes(_conf)) {
+          this[_conf] = config[_conf];
+        } else {}
+      }
+      this.setStyle(config.style);
+      this._setControl();
+    };
+    _proto._init = function _init() {
+      this.box = createDom('div', {
+        style: _extends({}, toolboxStyle, {
+          left: '-9999px'
+        }),
+        className: 'toolBox'
+      });
+      this.box.id = 'toolbox';
+      this._setControl();
+      var funcContainer = createDom('div', {
+        style: funcListStyle,
+        className: 'toolbox_func'
+      });
+      this.box.appendChild(funcContainer);
+      this._funcDom = funcContainer;
+      var stylesheet = document.styleSheets[0]; // 选择第一个样式表
+      // toolbox_item是否交给用户设置
+      stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "margin: 0 5px;" + "padding: 0 3px;" + "}", 0);
+      stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
+      stylesheet.insertRule(".toolbox_slider_item:hover {" + "background-color: #eee;" + "}", 0);
+      stylesheet.insertRule(".toolbox_control_move {\n            outline: solid 2px #8585ff !important;\n        }");
+    };
+    _proto._setControl = function _setControl() {
+      if (this.showControl) {
+        if (controlDom.show && controlDom.control) return;
+        if (!controlDom.show && controlDom.control) {
+          controlDom.show = true;
+          controlDom.control.style.display = 'flex';
+          return;
+        }
+        var self = this;
+        var control = createDom('div', {
+          style: controlStyle,
+          className: "toolbox_control"
+        });
+        var icon = Scope({
+          key: 'toolbox'
+        }, {
+          template: "\n<div style=\"display: flex;flex-direction: row\"\">\n<div style=\"display: flex;justify-content: center;align-items: center\"><svg style=\"margin: 0 10px\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"6px\" height=\"14px\" viewBox=\"0 0 6 14\" version=\"1.1\">\n                                <title>\u4E0A\u7EA7\u8282\u70B9\u5907\u4EFD</title>\n                                <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                                    <g id=\"\u672A\u56FA\u5B9A\" transform=\"translate(-266.000000, -148.000000)\" fill=\"#BCBCC4\">\n                                        <g id=\"\u7F16\u7EC4-2\" transform=\"translate(253.000000, 135.000000)\">\n                                            <g id=\"\u4E0A\u7EA7\u8282\u70B9\u5907\u4EFD\" transform=\"translate(13.000000, 13.000000)\">\n                                                <circle id=\"\u692D\u5706\u5F62\" cx=\"1\" cy=\"1\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-11\" cx=\"5\" cy=\"1\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-5\" cx=\"1\" cy=\"5\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-8\" cx=\"5\" cy=\"5\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-6\" cx=\"1\" cy=\"9\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-9\" cx=\"5\" cy=\"9\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-7\" cx=\"1\" cy=\"13\" r=\"1\"/>\n                                                <circle id=\"\u692D\u5706\u5F62\u5907\u4EFD-10\" cx=\"5\" cy=\"13\" r=\"1\"/>\n                                            </g>\n                                        </g>\n                                    </g>\n                                </g>\n                            </svg></div>\n                           <div id=\"rivet\" style=\"display: {{ rivetVisible }};margin: 0 10px 0 0;justify-content: center;align-items: center\" onclick=\"toggleFreeze(false)\">\n                               <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"8px\" height=\"16px\" viewBox=\"0 0 8 16\" version=\"1.1\">\n                                    <title>\u9489\u5B50</title>\n                                    <g id=\"\u9875\u9762-1\" stroke=\"none\" stroke-width=\"1\" fill=\"none\" fill-rule=\"evenodd\">\n                                        <g id=\"\u56FA\u5B9A\" transform=\"translate(-212.000000, -37.000000)\" fill=\"#4D4DFF\" fill-rule=\"nonzero\">\n                                            <g id=\"\u7F16\u7EC4-2\u5907\u4EFD\" transform=\"translate(182.000000, 24.000000)\">\n                                                <g id=\"\u56FA\u5B9A,\u56FE\u9489\" transform=\"translate(30.000000, 13.000000)\">\n                                                    <path d=\"M7.87291263,9.16048419 C7.77010858,9.29012105 7.61515755,9.36196798 7.45573678,9.36196798 L7.45126705,9.36196798 L4.82901885,9.3432253 L4.00658646,15.9500195 L4.0006268,16 L3.99466715,15.9500195 L3.17223476,9.3432253 L0.54998656,9.36196798 L0.545516831,9.36196798 C0.384606145,9.36196798 0.229655117,9.29012105 0.128340979,9.16048419 C0.0255369263,9.02928544 -0.00277143338,8.87465834 0.000208395526,8.73408825 C0.00616805333,8.52948067 0.0851334745,8.33424444 0.214755972,8.18117923 L1.13701259,7.0894182 C1.36645931,6.81764936 1.50651119,6.47559548 1.53332964,6.11323702 L1.83578213,2.20070284 C1.84472162,2.07887544 1.80300403,1.95704802 1.71956885,1.87114408 L1.14446216,1.26825459 C0.850949145,1.00741898 0.818171042,0.743459594 0.879257504,0.524795 C0.967162412,0.210855125 1.24726619,0 1.55865817,0 L1.56163799,0 L3.99466715,0.00780945312 L4.00658646,0.00780945312 L6.43961561,0 L6.44259544,0 C6.75398741,0 7.03409119,0.210855141 7.1219961,0.524795 C7.18308257,0.743459578 7.15030446,1.00741897 6.85679145,1.26825459 L6.28019484,1.87114408 C6.19675968,1.95860991 6.15504209,2.07887544 6.16398156,2.20070284 L6.46643406,6.11323702 C6.49474242,6.47559547 6.6333044,6.81764936 6.86275111,7.0894182 L7.78500772,8.18117923 C7.91463022,8.33424444 7.99210572,8.52948067 7.9995553,8.73408825 C8.00402504,8.87465834 7.97571668,9.02928544 7.87291263,9.16048419 Z\" id=\"\u8DEF\u5F84\"/>\n                                                </g>\n                                            </g>\n                                        </g>\n                                    </g>\n                                </svg>\n                            </div>\n                            </div>\n                           ",
+          script: {
+            rivetVisible: 'none',
+            toggleFreeze: function toggleFreeze(v) {
+              if (mouseMoved) return;
+              if (!v) {
+                self.freezePos(false);
+              }
+              if (self._freezePos) {
+                this.rivetVisible = 'flex';
+              } else {
+                this.rivetVisible = 'none';
+                self.translateWithPen(self.pen);
+              }
+              this.$update();
+            }
+          }
+        }, "dom");
+        control.addEventListener('mouseup', function () {
+          icon.expose.rivetVisible = 'flex';
+        });
+        control.addEventListener('click', function () {
+          icon.expose.$update();
+        });
+        control.appendChild(icon);
+        control.id = 'toolbox_control';
+        this.box.appendChild(control);
+        this._dragElement(control, icon);
+        controlDom.control = control;
+        controlDom.show = true;
+      } else {
+        if (controlDom.control) {
+          controlDom.control.style.display = 'none';
+        }
+        controlDom.show = false;
+      }
+    };
+    _proto.setStyle = function setStyle(style) {
+      var _this = this;
+      if (!style) {
+        style = toolboxStyle;
+      }
+      keys$1(style).forEach(function (i) {
+        _this.box.style[i] = style[i];
+      });
+    }
+    // 重写dom函数
+    ;
+    _proto._rewriteDom = function _rewriteDom(dom) {
+      this.dom = dom;
+      return dom;
+    };
+    _proto.hide = function hide() {
+      // this.box.style.visibility = 'hidden';
+      this.box.style.display = 'none';
+      this.open = false;
+    };
+    _proto.bindPen = function bindPen(pen) {
+      this.pen = pen;
+    };
+    _proto.show = function show() {
+      // this.box.style.visibility = 'visible';
+      this.box.style.display = 'flex';
+      this.open = true;
+    };
+    _proto.destroy = function destroy() {
+      this.box.parentNode.removeChild(this.box);
+    };
+    _proto.freezePos = function freezePos(freeze) {
+      this._freezePos = freeze;
+    };
+    _proto.translateWithPen = function translateWithPen(pen) {
+      if (!pen) pen = this.pen;
+      var store = pen.calculative.canvas.store;
+      var worldRect = pen.calculative.worldRect;
+      var pos = {
+        x: worldRect.x + store.data.x + worldRect.width / 2 + 'px',
+        y: worldRect.y + store.data.y + -this.offset + 'px'
+      };
+      this.translatePosition(pos);
+    };
+    _proto.translatePosition = function translatePosition(pos) {
+      if (this._freezePos) {
+        if (!this.animate) this.show();
+        return;
+      }
+      if (!this.animate) this.hide();
+      this.box.style.left = pos.x;
+      this.box.style.top = pos.y;
+      if (!this.animate) this.show();
+    };
+    _proto.renderFuncList = function renderFuncList() {
+      var _this2 = this;
+      var fragmentChild = new DocumentFragment();
+      this._funcDom.innerHTML = '';
+      this.funcList.forEach(function (i) {
+        // 预处理
+        preprocess(i, _this2.pen);
+        var extraEle = extraElement(i);
+        if (extraEle) {
+          fragmentChild.appendChild(extraEle);
+          return;
+        }
+        if (configValid(i)) {
+          var itemsSpan = _this2.setChildDom(_this2.pen, i);
+          itemsSpan.className = 'toolbox_item';
+          fragmentChild.appendChild(itemsSpan);
+        }
+      });
+      this._funcDom.appendChild(fragmentChild);
+    }
+    /**
+     * @description 创造子节点  设置样式 配置事件函数等；
+     * @param pen 操作的图元
+     * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
+     * */;
+    _proto.setChildDom = function setChildDom(pen, item) {
+      var dom = document.createElement('div');
+      // 构建update方法 用于局部更新
+      item.update = function (target, keepOpen) {
+        if (keepOpen === void 0) {
+          keepOpen = true;
+        }
+        // update 局部更新
+        if (target === 'menu') {
+          renderTitle(item, pen, dom.titleDom);
+          return;
+        } else if (target === 'popup') {
+          renderChildDom(item, pen, dom, dom.childrenDom, keepOpen);
+          return;
+        }
+        // 清空列表  初始化列表
+        renderInit(item, pen, dom);
+        // 执行配置项初始化函数
+        item.init == null || item.init(item, pen);
+
+        // 初始化titleDOM
+        var title = createDom('div', {
+          className: 'toolbox_title'
+        });
+        // 执行titleDom
+        title = renderTitle(item, pen, title);
+        item.dom = dom;
+        item.dom.titleDom = title;
+        if (item.popup) {
+          // 打开函数
+          var openFunc = function openFunc() {
+            // 关闭其他选项
+            if (toolbox.curItem !== item) {
+              toolbox.funcList.filter(function (i) {
+                return i.isOpen;
+              }).forEach(function (i) {
+                i.close();
+              });
+            }
+            if (toolbox.curItem === item && item.isOpen) return;
+            // 将打开逻辑交给用户 或者
+            (item.popupAnimate == null ? void 0 : item.popupAnimate(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
+
+            // 执行打开下拉菜单回调函数 TODO 传参应该怎么传
+            item.onPopup == null || item.onPopup(item, pen, item.dom.childrenDom);
+            item.isOpen = true;
+            toolbox.curItem = item;
+          };
+          title['on' + (item.popupEvent || basicFuncConfig.popupEvent)] = openFunc;
+        }
+
+        // titleDom添加到dom中
+        item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
+
+        // 渲染下拉列表
+        var containerDom = null;
+        renderChildDom(item, pen, dom, containerDom);
+        // 事件处理
+      };
+
+      item.updateAll = function (keepOpen) {
+        if (keepOpen === void 0) {
+          keepOpen = true;
+        }
+        item.update('menu');
+        item.update('popup', keepOpen);
+      };
+      item.update();
+      return dom;
+    };
+    _proto.setFuncList = function setFuncList(funcList) {
+      this.funcList = funcList;
+      this.renderFuncList();
+    }
+
+    // 点击控制按钮事件
+    ;
+    _proto.onControlClick = function onControlClick() {}
+    // 移动控制按钮事件
+    ;
+    _proto.onControlMove = function onControlMove() {
+      // 默认行为
+      this.box.classList.add('toolbox_control_move');
+      this.closeAll();
+    };
+    _proto.onControlUp = function onControlUp() {
+      this.box.classList.remove('toolbox_control_move');
+    };
+    _proto.closeAll = function closeAll() {
+      toolbox.funcList.filter(function (i) {
+        return i.isOpen;
+      }).forEach(function (i) {
+        i.close();
+      });
+    };
+    _proto.clearFuncList = function clearFuncList() {
+      this.setFuncList([]);
+    };
+    _proto._dragElement = function _dragElement(control, icon) {
+      var pos1 = 0,
+        pos2 = 0,
+        pos3 = 0,
+        pos4 = 0;
+      control.onmousedown = dragMouseDown;
+      var self = this;
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // 获取鼠标光标的初始位置
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        self.onControlClick == null || self.onControlClick();
+        document.addEventListener('mouseup', closeDragElement);
+        // 当鼠标光标移动时调用元素位置调整函数
+        document.addEventListener('mousemove', elementDrag);
+      }
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        mouseMoved = true;
+        // 计算鼠标的新位置
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        self.onControlMove == null || self.onControlMove();
+        self.freezePos(true);
+        // 设置元素的新位置
+        self.box.style.top = self.box.offsetTop - pos2 + "px";
+        self.box.style.left = self.box.offsetLeft - pos1 + "px";
+      }
+      function closeDragElement() {
+        self.onControlUp == null || self.onControlUp();
+        mouseMoved = false;
+        // 停止移动时，移除鼠标事件监听
+        document.removeEventListener('mouseup', closeDragElement);
+        document.removeEventListener('mousemove', elementDrag);
+      }
+    };
+    return ToolBox;
+  }();
+  ToolBox.instance = null;
+  function renderInit(item, pen, dom) {
+    if (dom.shadowRoot) {
+      // 清空
+      dom.shadowRoot.innerHTML = '';
+    } else {
+      item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
+        mode: "open"
+      });
+    }
+
+    //设置样式与事件
+    typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
+
+    // 绑定事件，绑定在dom上
+    if (item.event) {
+      var eventFunc = function eventFunc(e) {
+        // 绑定事件
+        if (item.closeOther) {
+          toolbox.funcList.filter(function (i) {
+            return i.isOpen;
+          }).forEach(function (i) {
+            i.close();
+          });
+        }
+        item.func(item, this, dom, e);
+      };
+      dom.addEventListener(item.event, eventFunc.bind(pen));
+    }
+    return dom;
+  }
+  function renderTitle(item, pen, title) {
+    var _item$menu;
+    title.innerHTML = '';
+    if (typeof ((_item$menu = item.menu) == null ? void 0 : _item$menu.dom) === 'function') {
+      var _item$menu2;
+      // 根据dom渲染 menu?Title
+      var re = (_item$menu2 = item.menu) == null ? void 0 : _item$menu2.dom(item, pen, title);
+      switch (typeof re) {
+        case "string":
+          title.innerHTML = re;
+          break;
+        case "object":
+          title.appendChild(re);
+          break;
+        default:
+          throw new Error('function setDom must return string or node object');
+      }
+    } else {
+      var _item$menu3, _item$menu4, _item$menu5, _item$menu6, _item$menu7, _item$menu8;
+      title.innerHTML = (_item$menu3 = item.menu) != null && _item$menu3.icon ? (_item$menu4 = item.menu) == null ? void 0 : _item$menu4.icon : (_item$menu5 = item.menu) != null && _item$menu5.img ? "<img src=\"" + ((_item$menu6 = item.menu) == null ? void 0 : _item$menu6.img) + "\" title=\"" + (((_item$menu7 = item.menu) == null ? void 0 : _item$menu7.text) || '图标') + "\" />" : (_item$menu8 = item.menu) == null ? void 0 : _item$menu8.text;
+    }
+    return title;
+  }
+  function renderChildDom(item, pen, dom, containerDom, keepOpen) {
+    if (keepOpen === void 0) {
+      keepOpen = false;
+    }
+    if (dom.childrenDom) dom.shadowRoot ? dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom);
+    if (item.popup) {
+      // 是否重写dom
+      if (typeof item.popup === 'function') {
+        // 重新childDom
+
+        var childDom = item.popup(item, pen, dom);
+
+        /**
+         * @description 若返回的是字符串，则在外部包裹一层div作为其container
+         * */
+        if (typeof childDom === 'string') {
+          var div = document.createElement('div');
+          // 默认隐藏节点
+          if (typeof keepOpen === 'boolean') {
+            keepOpen ? (item.popupAnimate == null ? void 0 : item.popupAnimate(item, pen, item.dom.childrenDom)) || (div.style.visibility = 'visible') : (item.collapseAnimate == null ? void 0 : item.collapseAnimate(item, pen, div)) || (div.style.visibility = 'hidden');
+          }
+          div.innerHTML = childDom;
+          dom.shadowRoot ? dom.shadowRoot.appendChild(div) : dom.appendChild(div);
+          containerDom = div;
+        } else {
+          containerDom = childDom;
+          if (typeof keepOpen == 'boolean') {
+            keepOpen ? (item.popupAnimate == null ? void 0 : item.popupAnimate(item, pen, item.dom.childrenDom)) || (childDom.style.visibility = 'visible') : (item.collapseAnimate == null ? void 0 : item.collapseAnimate(item, pen, childDom)) || (childDom.style.visibility = 'hidden');
+          }
+        }
+      } else {
+        containerDom = createDom('div', {
+          style: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            position: 'absolute',
+            top: '40px',
+            backgroundColor: '#fff',
+            borderRadius: '5px',
+            padding: '3px',
+            width: 'max-content',
+            boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)'
+          }
+        });
+        var gap = createDom('div', {
+          style: {
+            position: 'absolute',
+            height: '10px',
+            bottom: '-10px',
+            backgroundColor: '#eee',
+            width: '100%',
+            opacity: 0
+          },
+          className: 'toolbox_gap'
+        });
+        dom.shadowRoot ? dom.shadowRoot.appendChild(gap) : dom.appendChild(gap);
+        if (typeof keepOpen === 'boolean') {
+          keepOpen ? (item.popupAnimate == null ? void 0 : item.popupAnimate(item, pen, containerDom)) || (containerDom.style.visibility = 'visible') : (item.collapseAnimate == null ? void 0 : item.collapseAnimate(item, pen, containerDom)) || (containerDom.style.visibility = 'hidden');
+        }
+      }
+      if (isArray$1(item.popup)) {
+        var _containerDom;
+        var fragment = new DocumentFragment();
+        var _loop = function _loop() {
+          var _i$menu;
+          var i = _step.value;
+          var node = createDom('div', {
+            style: {
+              margin: '5px 8px'
+            },
+            event: i.event,
+            func: function (e) {
+              i.stopPropagation ? e.stopPropagation() : '';
+              i.func(i, this, dom, item, e);
+            }.bind(pen),
+            className: 'toolbox_item'
+          });
+
+          //TODO 执行时机是否正确？？？
+          i.init == null || i.init(i, pen, node);
+          if ((_i$menu = i.menu) != null && _i$menu.dom) {
+            var _i$menu2;
+            var re = (_i$menu2 = i.menu) == null ? void 0 : _i$menu2.dom(i, pen, node);
+            switch (typeof re) {
+              case "string":
+                node.innerHTML = re;
+                break;
+              case "object":
+                node.appendChild(re);
+                break;
+              default:
+                throw new Error('function setDom must return string or node object');
+            }
+          } else {
+            var _i$menu3, _i$menu4, _i$menu5, _i$menu6, _i$menu7, _i$menu8, _i$menu9, _i$menu10, _i$menu11;
+            node.innerHTML = (_i$menu3 = i.menu) != null && _i$menu3.icon && (_i$menu4 = i.menu) != null && _i$menu4.text || (_i$menu5 = i.menu) != null && _i$menu5.img && (_i$menu6 = i.menu) != null && _i$menu6.text ? '<span style="padding-right: 30px;width: max-content" >' + (((_i$menu7 = i.menu) == null ? void 0 : _i$menu7.icon) || "<img src=\"" + ((_i$menu8 = i.menu) == null ? void 0 : _i$menu8.img) + "\"/>") + '</span> <span>' + ((_i$menu9 = i.menu) == null ? void 0 : _i$menu9.text) + '</span>' : '<span>' + (((_i$menu10 = i.menu) == null ? void 0 : _i$menu10.text) || ((_i$menu11 = i.menu) == null ? void 0 : _i$menu11.icon)) + '</span>';
+          }
+          fragment.appendChild(node);
+        };
+        for (var _iterator = _createForOfIteratorHelperLoose(item.popup || []), _step; !(_step = _iterator()).done;) {
+          _loop();
+        }
+        (_containerDom = containerDom) == null || _containerDom.appendChild(fragment);
+      }
+      dom.style.position = 'relative';
+      containerDom.classList.add('toolbox_container');
+      // 下拉菜单默认为绝对定位
+      containerDom.style.position = 'absolute';
+      item.mounted == null || item.mounted(item, pen, containerDom);
+      item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
+      dom.childrenDom = containerDom;
+      // 添加样式到元素
+    }
+
+    if (item.popup || item.closeOther) {
+      // 关闭下拉菜单
+      if (!item.closeOther) {
+        var _item$collapseEventOn;
+        (((_item$collapseEventOn = item.collapseEventOnMenu) != null ? _item$collapseEventOn : basicFuncConfig.collapseEventOnMenu) ? item.dom.titleDom : dom.childrenDom)['on' + (item.collapseEvent || basicFuncConfig.collapseEvent)] = function () {
+          dom.offsetHeight;
+          // 可手动派发隐藏函数
+          item.close();
+          toolbox.curItem = null;
+        };
+      }
+    }
+    return containerDom;
+  }
+
+  // 配置项预处理
+  function preprocess(item, pen) {
+    // 分隔符则返回
+    if (item.key === extra) return;
+    if (item.openEventOnTitle == null) {
+      item.openEventOnTitle = true;
+    }
+    if (item.popup) {
+      item.isOpen = false;
+      item.closeOther = false;
+      item.close = function () {
+        if (!item.isOpen) return;
+        (item.collapseAnimate == null ? void 0 : item.collapseAnimate(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'hidden');
+        item.isOpen = false;
+        item.onCollapse == null || item.onCollapse(item, pen, item.dom.childrenDom);
+      };
+      item.open = function () {
+        if (item.isOpen) return;
+        (item.popupAnimate == null ? void 0 : item.popupAnimate(item, pen, item.dom.childrenDom)) || item.dom.childrenDom && (item.dom.childrenDom.style.visibility = 'visible');
+        item.isOpen = true;
+        item.onPopup == null || item.onPopup(item, pen.item.dom.childrenDom);
+      };
+    }
+  }
+  function extraElement(config) {
+    if (config.key === extra) {
+      // 设置分隔符
+      var node;
+      var style = deepMerge(d.extraStyle, config.style);
+      if (typeof config.dom === 'function') {
+        node = config.dom();
+      } else {
+        node = createDom('div', {
+          style: style
+        });
+      }
+      return node;
+    }
+  }
+
+  // 是否应当用面向切面的方式来暴露给用户
   function right(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
-    var childrenGap = toolBoxPlugin.childrenGap;
-    var levelGap = toolBoxPlugin.levelGap;
-    var children = pen.mind.children;
+    pen.mind.direction = 'right';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
+    var children = pen.mind.children || [];
     var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     var topHeight = 0;
     var topWidth = 0;
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     for (var i = 0; i < children.length; i++) {
-      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2;
       var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
       var childRect = meta2d.getPenRect(child);
       topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
       topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+      child.mind.connect = right.connectRule(pen, child);
       child.mind.x = worldReact.x + worldReact.width + +levelGap;
-      child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
-      if (child.mind.visible) {
-        meta2d.setValue({
-          id: child.id,
-          x: child.mind.x,
-          y: child.mind.y,
-          color: child.mind.color
-        }, {
-          render: false
-        });
-        meta2d.setVisible(child, true, false);
+      if (worldReact.height > pen.mind.childHeight) {
+        var _child$mind;
+        child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1 / 2 * pen.mind.childHeight + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
       } else {
-        meta2d.setVisible(child, false, false);
+        var _child$mind2;
+        child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
       }
+      meta2d.setValue({
+        id: child.id,
+        x: child.mind.x,
+        y: child.mind.y
+      }, {
+        render: false
+      });
       if (recursion) right(child, true);
     }
   }
+  right.connectRule = function (pen, child) {
+    return {
+      from: pen.id,
+      to: child.id,
+      startIndex: 1,
+      fromAnchor: pen.anchors[1],
+      endIndex: 3,
+      toAnchor: child.anchors[3]
+    };
+  };
 
   function left(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
-    var childrenGap = toolBoxPlugin.childrenGap;
-    var levelGap = toolBoxPlugin.levelGap;
-    var children = pen.mind.children;
+    pen.mind.direction = 'left';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
+    var children = pen.mind.children || [];
     var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     var topHeight = 0;
     var topWidth = 0;
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     for (var i = 0; i < children.length; i++) {
-      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2;
       var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
       var childRect = meta2d.getPenRect(child);
       topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
       topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
-      child.mind.connect = {
-        startIndex: 1,
-        fromAnchor: child.anchors[1],
-        endIndex: 3,
-        toAnchor: pen.anchors[3]
-      };
+      child.mind.connect = left.connectRule(pen, child);
       child.mind.x = worldReact.x - childRect.width - +levelGap;
-      child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
-      if (child.mind.visible) {
-        meta2d.setValue({
-          id: child.id,
-          x: child.mind.x,
-          y: child.mind.y,
-          color: child.mind.color
-        }, {
-          render: false
-        });
-        meta2d.setVisible(child, true, false);
+      if (worldReact.height > pen.mind.childHeight) {
+        var _child$mind;
+        child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1 / 2 * pen.mind.childHeight + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
       } else {
-        meta2d.setVisible(child, false, false);
+        var _child$mind2;
+        child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
       }
+      meta2d.setValue({
+        id: child.id,
+        x: child.mind.x,
+        y: child.mind.y,
+        color: child.mind.color
+      }, {
+        render: false
+      });
       if (recursion) left(child, true);
     }
   }
+  left.connectRule = function (pen, child) {
+    return {
+      from: pen.id,
+      to: child.id,
+      startIndex: 3,
+      fromAnchor: pen.anchors[3],
+      endIndex: 1,
+      toAnchor: child.anchors[1]
+    };
+  };
 
   function top(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
-    var childrenGap = toolBoxPlugin.childrenGap;
-    var levelGap = toolBoxPlugin.levelGap;
+    pen.mind.direction = 'top';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
     var children = pen.mind.children;
     var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     var topHeight = 0;
     var topWidth = 0;
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     for (var i = 0; i < children.length; i++) {
-      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2;
       var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
       var childRect = meta2d.getPenRect(child);
       topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
       topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
-      child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
-      child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height - +levelGap;
-      if (child.mind.visible) {
-        meta2d.setValue({
-          id: child.id,
-          x: child.mind.x,
-          y: child.mind.y,
-          color: child.mind.color
-        }, {
-          render: false
-        });
-        meta2d.setVisible(child, true, false);
+      child.mind.connect = top.connectRule(pen, child);
+      if (worldReact.width > pen.mind.childWidth) {
+        var _child$mind;
+        child.mind.x = worldReact.x + 1 / 2 * pen.mind.maxWidth + topWidth - 1 / 2 * pen.mind.childWidth + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
       } else {
-        meta2d.setVisible(child, false, false);
+        var _child$mind2;
+        child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
       }
+      // child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1/2 * worldReact.width + ((child.mind?.maxWidth / 2 - 1 / 2 * childRect.width) || 0);
+      child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height - +levelGap;
+      meta2d.setValue({
+        id: child.id,
+        x: child.mind.x,
+        y: child.mind.y,
+        color: child.mind.color
+      }, {
+        render: false
+      });
       if (recursion) top(child, true);
     }
   }
+  top.connectRule = function (pen, child) {
+    return {
+      from: pen.id,
+      to: child.id,
+      startIndex: 0,
+      fromAnchor: pen.anchors[0],
+      endIndex: 2,
+      toAnchor: child.anchors[2]
+    };
+  };
 
   function bottom(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
-    var childrenGap = toolBoxPlugin.childrenGap;
-    var levelGap = toolBoxPlugin.levelGap;
-    var children = pen.mind.children;
+    pen.mind.direction = 'bottom';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
+    var children = pen.mind.children || [];
     var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
     var topHeight = 0;
     var topWidth = 0;
-    toolBoxPlugin.calcChildWandH(pen);
+    mindBoxPlugin.calcChildWandH(pen);
     for (var i = 0; i < children.length; i++) {
-      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+      var _meta2d$store$pens$ch, _meta2d$store$pens$ch2;
       var child = meta2d.store.pens[children[i]];
       var childRect = meta2d.getPenRect(child);
       topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
       topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
-      child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
-      child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height + +levelGap;
-      if (child.mind.visible) {
+      child.mind.connect = bottom.connectRule(pen, child);
+      if (worldReact.width > pen.mind.childWidth) {
+        var _child$mind;
+        child.mind.x = worldReact.x + 1 / 2 * pen.mind.maxWidth + topWidth - 1 / 2 * pen.mind.childWidth + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+      } else {
+        var _child$mind2;
+        child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+      }
+      child.mind.y = worldReact.y + worldReact.height - 1 / 2 * meta2d.getPenRect(child).height + +levelGap;
+      meta2d.setValue({
+        id: child.id,
+        x: child.mind.x,
+        y: child.mind.y,
+        color: child.mind.color
+      }, {
+        render: false
+      });
+      if (recursion) bottom(child, true);
+    }
+  }
+  bottom.connectRule = function (pen, child) {
+    return {
+      from: pen.id,
+      to: child.id,
+      startIndex: 2,
+      fromAnchor: pen.anchors[2],
+      endIndex: 0,
+      toAnchor: child.anchors[0]
+    };
+  };
+
+  var $JSON$1 = _core.JSON || (_core.JSON = { stringify: JSON.stringify });
+  var stringify = function stringify(it) { // eslint-disable-line no-unused-vars
+    return $JSON$1.stringify.apply($JSON$1, arguments);
+  };
+
+  var stringify$1 = stringify;
+
+  function butterfly(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    pen.mind.direction = 'butterfly';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
+    var children = JSON.parse(stringify$1(pen.mind.children || []));
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    var rightChildren = pen.mind.children.splice(0, butterfly.MAXLENGTH);
+    var leftChildren = pen.mind.children;
+    pen.mind.children = rightChildren;
+    mindBoxPlugin.calcChildWandH(pen);
+    // let childrenLen = children.length;
+    // let cutValue = childrenLen / 2
+    for (var i = 0; i < children.length; i++) {
+      var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
+      var childRect = meta2d.getPenRect(child);
+      if (i < butterfly.MAXLENGTH) {
+        var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+        topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        child.mind.connect = butterfly.connectRule(pen, child, i);
+        child.mind.x = worldReact.x + worldReact.width + +levelGap;
+        child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
         meta2d.setValue({
           id: child.id,
           x: child.mind.x,
@@ -3244,22 +5135,128 @@
         }, {
           render: false
         });
-        meta2d.setVisible(child, true, false);
+        if (recursion) right(child, recursion);
+        if (i === butterfly.MAXLENGTH - 1) {
+          topHeight = 0;
+          topWidth = 0;
+          pen.mind.children = leftChildren;
+          mindBoxPlugin.calcChildWandH(pen);
+        }
       } else {
-        meta2d.setVisible(child, false, false);
+        var _meta2d$store$pens$ch3, _meta2d$store$pens$ch4, _child$mind2;
+        topHeight += (((_meta2d$store$pens$ch3 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch3 = _meta2d$store$pens$ch3.mind) == null ? void 0 : _meta2d$store$pens$ch3.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        topWidth += (((_meta2d$store$pens$ch4 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch4 = _meta2d$store$pens$ch4.mind) == null ? void 0 : _meta2d$store$pens$ch4.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        if (i === butterfly.MAXLENGTH) {
+          topHeight = 0;
+          topWidth = 0;
+        }
+        child.mind.connect = butterfly.connectRule(pen, child, i);
+        child.mind.x = worldReact.x - childRect.width - +levelGap;
+        child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1 / 2 * worldReact.height + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxHeight) / 2 - 1 / 2 * childRect.height || 0);
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        if (recursion) left(child, recursion);
       }
-      if (recursion) bottom(child, true);
+      pen.mind.children = children;
     }
   }
+  butterfly.connectRule = function (pen, child, index) {
+    return index < butterfly.MAXLENGTH ? right.connectRule(pen, child) : left.connectRule(pen, child);
+  };
+  butterfly.MAXLENGTH = 8;
+
+  function sandglass(pen, recursion) {
+    if (recursion === void 0) {
+      recursion = true;
+    }
+    pen.mind.direction = 'sandglass';
+    var childrenGap = mindBoxPlugin.childrenGap;
+    var levelGap = mindBoxPlugin.levelGap;
+    var children = JSON.parse(stringify$1(pen.mind.children || []));
+    var worldReact = meta2d.getPenRect(pen); //获取该节点的世界坐标宽度信息
+    var topHeight = 0;
+    var topWidth = 0;
+    var bottomChildren = pen.mind.children.splice(0, sandglass.MAXLENGTH);
+    var leftChildren = pen.mind.children;
+    pen.mind.children = bottomChildren;
+    mindBoxPlugin.calcChildWandH(pen);
+    // let childrenLen = children.length;
+    // let cutValue = childrenLen / 2
+    for (var i = 0; i < children.length; i++) {
+      var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
+      var childRect = meta2d.getPenRect(child);
+      if (i < sandglass.MAXLENGTH) {
+        var _meta2d$store$pens$ch, _meta2d$store$pens$ch2, _child$mind;
+        child.mind.connect = sandglass.connectRule(pen, child, i);
+        topHeight += (((_meta2d$store$pens$ch = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch = _meta2d$store$pens$ch.mind) == null ? void 0 : _meta2d$store$pens$ch.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        topWidth += (((_meta2d$store$pens$ch2 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch2 = _meta2d$store$pens$ch2.mind) == null ? void 0 : _meta2d$store$pens$ch2.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind = child.mind) == null ? void 0 : _child$mind.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+        child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height + +levelGap;
+        meta2d.setValue({
+          id: child.id,
+          x: child.mind.x,
+          y: child.mind.y,
+          color: child.mind.color
+        }, {
+          render: false
+        });
+        if (recursion) bottom(child, recursion);
+        if (i === sandglass.MAXLENGTH - 1) {
+          topHeight = 0;
+          topWidth = 0;
+          pen.mind.children = leftChildren;
+          mindBoxPlugin.calcChildWandH(pen);
+        }
+      } else {
+        var _meta2d$store$pens$ch3, _meta2d$store$pens$ch4, _child$mind2;
+        topHeight += (((_meta2d$store$pens$ch3 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch3 = _meta2d$store$pens$ch3.mind) == null ? void 0 : _meta2d$store$pens$ch3.maxHeight) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        topWidth += (((_meta2d$store$pens$ch4 = meta2d.store.pens[children[i - 1]]) == null || (_meta2d$store$pens$ch4 = _meta2d$store$pens$ch4.mind) == null ? void 0 : _meta2d$store$pens$ch4.maxWidth) || 0) + (meta2d.store.pens[children[i - 1]] ? +childrenGap : 0);
+        if (i === sandglass.MAXLENGTH) {
+          topHeight = 0;
+          topWidth = 0;
+        }
+        child.mind.connect = sandglass.connectRule(pen, child, i);
+        child.mind.x = worldReact.x - 1 / 2 * pen.mind.maxWidth + topWidth + 1 / 2 * worldReact.width + (((_child$mind2 = child.mind) == null ? void 0 : _child$mind2.maxWidth) / 2 - 1 / 2 * childRect.width || 0);
+        child.mind.y = worldReact.y - 1 / 2 * meta2d.getPenRect(child).height - +levelGap;
+        if (child.mind.visible) {
+          meta2d.setValue({
+            id: child.id,
+            x: child.mind.x,
+            y: child.mind.y,
+            color: child.mind.color
+          }, {
+            render: false
+          });
+          // meta2d.setVisible(child,true,false);
+        } else {
+          meta2d.setVisible(child, false, false);
+        }
+        if (recursion) top(child, recursion);
+      }
+      pen.mind.children = children;
+    }
+  }
+  sandglass.connectRule = function (pen, child, index) {
+    return index < sandglass.MAXLENGTH ? bottom.connectRule(pen, child) : top.connectRule(pen, child);
+  };
+  sandglass.MAXLENGTH = 8;
 
   function defaultColorRule(pen, recursion) {
     if (recursion === void 0) {
       recursion = true;
     }
-    var children = pen.mind.children;
+    var children = pen.mind.children || [];
     var generateColorFunc = generateColor();
     for (var i = 0; i < children.length; i++) {
       var child = meta2d.store.pens[children[i]];
+      if (!child) continue;
       var nodeColor = undefined;
       if (pen.mind.level === 0) {
         var nextColor = generateColorFunc.next().value;
@@ -3267,65 +5264,84 @@
       } else {
         nodeColor = child.mind.color || pen.mind.color || pen.color;
       }
-      if (child.mind.visible) {
-        meta2d.setValue({
-          id: child.id,
-          color: nodeColor
-        }, {
-          render: false
-        });
-        meta2d.setVisible(child, true, false);
-      } else {
-        meta2d.setVisible(child, false, false);
-      }
+      meta2d.setValue({
+        id: child.id,
+        color: nodeColor
+      }, {
+        render: false
+      });
       if (recursion) defaultColorRule(child, true);
     }
   }
 
-  var toolBoxPlugin = {
-    name: 'toolBox',
+  var CONFIGS$1 = ['animate', 'animateDuration', 'childrenGap', 'levelGap', 'colorList'];
+  var destroyRes = null;
+  var mindBoxPlugin = {
+    name: 'mindBox',
+    target: [],
+    // 已经绑定该插件的图元
     status: false,
-    colorList: colorList,
-    childrenGap: config.childrenGap,
+    colorList: pluginDefault.colorList,
+    childrenGap: pluginDefault.childrenGap,
     // 子节点间的间距
-    levelGap: config.levelGap,
+    levelGap: pluginDefault.levelGap,
     // 子级间的间距
     layoutFunc: new map$1(),
     // 布局位置函数map
     colorFunc: new map$1(),
-    // 布局颜色函数map  TODO 目前只支持默认颜色规则
+    // 布局颜色函数map
+    _history: [],
+    animate: true,
+    _colorRule: 'default',
+    animateDuration: 1000,
+    // 重新设置颜色规则
+    resetColorRule: function resetColorRule(pen, rule, recursion) {
+      if (rule === void 0) {
+        rule = 'default';
+      }
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      mindBoxPlugin._colorRule = rule;
+      mindBoxPlugin.calcChildrenColor(pen, rule, recursion);
+      mindBoxPlugin.resetLinesColor(pen, true);
+      mindBoxPlugin.render(pen);
+    },
     // 计算子节点的颜色和位置
-    calcChildrenPosAndColor: function calcChildrenPosAndColor(pen, position, recursion) {
+    calcChildrenPosAndColor: function calcChildrenPosAndColor(pen, position, color, recursion) {
       if (position === void 0) {
         position = pen.mind.direction || 'right';
+      }
+      if (color === void 0) {
+        color = mindBoxPlugin._colorRule;
       }
       if (recursion === void 0) {
         recursion = true;
       }
       if (!pen) return;
-      var layoutFunc = toolBoxPlugin.layoutFunc.get(position);
-      var colorFunc = toolBoxPlugin.colorFunc.get('default');
-      if (!layoutFunc) throw new Error('toolBoxPlugin error : The layout function does not exist');
+      var layoutFunc = mindBoxPlugin.layoutFunc.get(position);
+      var colorFunc = mindBoxPlugin.colorFunc.get(color);
+      if (!layoutFunc) throw new Error('mindBoxPlugin error : The layout function does not exist');
       try {
         layoutFunc(pen, recursion);
         colorFunc(pen, recursion);
       } catch (e) {
-        throw new Error("toolBoxPlugin error : " + e.message);
+        throw new Error("mindBoxPlugin error : " + e.message);
       }
     },
     calcChildrenColor: function calcChildrenColor(pen, type, recursion) {
       if (type === void 0) {
-        type = 'default';
+        type = mindBoxPlugin._colorRule;
       }
       if (recursion === void 0) {
         recursion = true;
       }
-      var colorFunc = toolBoxPlugin.colorFunc.get(type);
+      var colorFunc = mindBoxPlugin.colorFunc.get(type);
       if (!colorFunc) return;
       try {
         colorFunc(pen, recursion);
       } catch (e) {
-        throw new Error("toolBoxPlugin error : " + e.message);
+        throw new Error("mindBoxPlugin error : " + e.message);
       }
     },
     calcChildrenPos: function calcChildrenPos(pen, position, recursion) {
@@ -3335,36 +5351,45 @@
       if (recursion === void 0) {
         recursion = true;
       }
-      var layoutFunc = toolBoxPlugin.layoutFunc.get(position);
+      var layoutFunc = mindBoxPlugin.layoutFunc.get(position);
       if (!layoutFunc) return;
       try {
         layoutFunc(pen, recursion);
       } catch (e) {
-        throw new Error("toolBoxPlugin error : " + e.message);
+        throw new Error("[mindBoxPlugin calcChildrenPos] error : " + e.message);
       }
     },
-    connectLine: function connectLine(pen, newPen, option) {
-      if (option === void 0) {
-        option = {
-          position: 'top',
-          style: 'polyline'
-        };
+    connectLine: function connectLine(pen, newPen, style) {
+      if (style === void 0) {
+        style = 'mind';
       }
-      var line = null;
-      switch (option.position) {
-        case 'right':
-          line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
-          break;
-        case 'left':
-          line = meta2d.connectLine(newPen, pen, newPen.anchors[1], pen.anchors[3], false);
-          break;
-        case 'bottom':
-          line = meta2d.connectLine(pen, newPen, pen.anchors[2], newPen.anchors[0], false);
-          break;
-        case 'top':
-          line = meta2d.connectLine(newPen, pen, newPen.anchors[2], pen.anchors[0], false);
-          break;
-      }
+      // let line = null;
+      // switch (option.position){
+      //     case 'right':
+      //         line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
+      //         break;
+      //     case 'left':
+      //         line = meta2d.connectLine(newPen, pen, newPen.anchors[1],pen.anchors[3] , false);
+      //         break;
+      //     case 'bottom':
+      //         line = meta2d.connectLine(pen, newPen, pen.anchors[2],newPen.anchors[0] , false);
+      //         break;
+      //     case 'top':
+      //         line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
+      //         break;
+      // }
+      var from = meta2d.store.pens[newPen.mind.connect.from];
+      var to = meta2d.store.pens[newPen.mind.connect.to];
+      var line = meta2d.connectLine(from, to, newPen.mind.connect.fromAnchor, newPen.mind.connect.toAnchor, false, false);
+      line.mind = {
+        type: 'line',
+        from: from.id,
+        fromAnchor: newPen.mind.connect.fromAnchor,
+        to: to.id,
+        toAnchor: newPen.mind.connect.toAnchor,
+        rootId: newPen.mind.rootId
+      };
+      newPen.mind.lineId = line.id;
       meta2d.setValue({
         id: line.id,
         lineWidth: meta2d.findOne(pen.mind.rootId).mind.lineWidth,
@@ -3372,7 +5397,8 @@
       }, {
         render: false
       });
-      meta2d.updateLineType(line, option.style);
+      meta2d.updateLineType(line, style);
+      return line;
     },
     // 重新设置线颜色
     resetLinesColor: function resetLinesColor(pen, recursion) {
@@ -3380,16 +5406,17 @@
         recursion = true;
       }
       var colors = generateColor();
-      var children = pen.mind.children;
+      var children = pen.mind.children || [];
       if (!children || children.length === 0) return;
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines;
         var child = meta2d.store.pens[children[i]];
+        if (!child) continue;
         var line = (_child$connectedLines = child.connectedLines) == null ? void 0 : _child$connectedLines[0];
         if (line) {
           line.mind ? '' : line.mind = {};
           if (child.mind.level > 1) {
-            line.mind.color = pen.mind.lineColor || pen.color;
+            line.mind.color = pen.mind.lineColor || pen.mind.color || pen.calculative.color;
           } else {
             line.mind.color = pen.mind.lineColor || colors.next().value;
           }
@@ -3401,7 +5428,7 @@
           });
         }
         if (recursion) {
-          toolBoxPlugin.resetLinesColor(child, true);
+          mindBoxPlugin.resetLinesColor(child, true);
         }
       }
     },
@@ -3410,12 +5437,15 @@
       if (recursion === void 0) {
         recursion = true;
       }
-      var children = pen.mind.children;
+      var children = pen.mind.children || [];
       if (!children || children.length === 0) return;
       var root = meta2d.findOne(pen.mind.rootId);
+      if (!root) return;
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines2;
         var child = meta2d.store.pens[children[i]];
+        if (!child) continue;
+        child.mind.lineStyle = pen.mind.lineStyle;
         var line = meta2d.findOne((_child$connectedLines2 = child.connectedLines) == null || (_child$connectedLines2 = _child$connectedLines2[0]) == null ? void 0 : _child$connectedLines2.lineId);
         if (line) {
           meta2d.updateLineType(line, meta2d.findOne(pen.mind.rootId).mind.lineStyle);
@@ -3427,100 +5457,134 @@
           });
         }
         if (recursion) {
-          toolBoxPlugin.resetLinesStyle(child, true);
+          mindBoxPlugin.resetLinesStyle(child, true);
         }
       }
     },
-    // 重新设置连线的位置 TODO 有问题 当元素只有两个锚点时，有问题  该方法只适用于四个锚点的图元
-    resetLayOut: function resetLayOut(pen, pos, recursion) {
+    disconnectLines: function disconnectLines(pen, recursion) {
       if (recursion === void 0) {
         recursion = true;
       }
-      var children = pen.mind.children;
+      var children = pen.mind.children || [];
       if (!children || children.length === 0) {
-        pen.mind.direction = pos;
         return;
       }
       for (var i = 0; i < children.length; i++) {
         var _child$connectedLines3;
         var child = meta2d.store.pens[children[i]];
+        if (!child) continue;
         if (!child.connectedLines || child.connectedLines.length === 0) return;
+        // 保留lineId
         var line = meta2d.findOne((_child$connectedLines3 = child.connectedLines[0]) == null ? void 0 : _child$connectedLines3.lineId);
-        var penAnchor = null;
+        if (!line) continue;
         var lineAnchor1 = line.anchors[0];
-        var childAnchor = null;
         var lineAnchor2 = line.anchors[line.anchors.length - 1];
+        var from = meta2d.store.pens[child.mind.connect.from];
+        var to = meta2d.store.pens[child.mind.connect.to];
+        var fromAnchor = child.mind.connect.fromAnchor;
+        var toAnchor = child.mind.connect.toAnchor;
 
-        // 改变之前是什么方向 来按要求断开
-        switch (pen.mind.direction) {
-          case 'right':
-            penAnchor = pen.anchors[1];
-            childAnchor = child.anchors[3];
-            core.disconnectLine(child, childAnchor, line, lineAnchor2);
-            core.disconnectLine(pen, penAnchor, line, lineAnchor1);
-            break;
-          case 'left':
-            penAnchor = pen.anchors[3];
-            childAnchor = child.anchors[1];
-            core.disconnectLine(child, childAnchor, line, lineAnchor1);
-            core.disconnectLine(pen, penAnchor, line, lineAnchor2);
-            break;
-          case 'bottom':
-            penAnchor = pen.anchors[2];
-            childAnchor = child.anchors[0];
-            core.disconnectLine(child, childAnchor, line, lineAnchor2);
-            core.disconnectLine(pen, penAnchor, line, lineAnchor1);
-            break;
-          case 'top':
-            penAnchor = pen.anchors[0];
-            childAnchor = child.anchors[2];
-            core.disconnectLine(child, childAnchor, line, lineAnchor1);
-            core.disconnectLine(pen, penAnchor, line, lineAnchor2);
-            break;
-        }
-        switch (pos) {
-          case 'right':
-            penAnchor = pen.anchors[1];
-            childAnchor = child.anchors[3];
-            core.connectLine(pen, penAnchor, line, lineAnchor1);
-            core.connectLine(child, childAnchor, line, lineAnchor2);
-            break;
-          case 'left':
-            penAnchor = pen.anchors[3];
-            childAnchor = child.anchors[1];
-            if (pen.mind.lineStyle === 'mind') {
-              core.connectLine(pen, penAnchor, line, lineAnchor2);
-              core.connectLine(child, childAnchor, line, lineAnchor1);
-            } else {
-              core.connectLine(pen, penAnchor, line, lineAnchor1);
-              core.connectLine(child, childAnchor, line, lineAnchor2);
-            }
-            break;
-          case 'bottom':
-            penAnchor = pen.anchors[2];
-            childAnchor = child.anchors[0];
-            core.connectLine(pen, penAnchor, line, lineAnchor1);
-            core.connectLine(child, childAnchor, line, lineAnchor2);
-            break;
-          case 'top':
-            penAnchor = pen.anchors[0];
-            childAnchor = child.anchors[2];
-            if (pen.mind.lineStyle === 'mind') {
-              core.connectLine(pen, penAnchor, line, lineAnchor2);
-              core.connectLine(child, childAnchor, line, lineAnchor1);
-            } else {
-              core.connectLine(pen, penAnchor, line, lineAnchor1);
-              core.connectLine(child, childAnchor, line, lineAnchor2);
-            }
-            break;
-        }
+        // 断开连线
+        core.disconnectLine(from, fromAnchor, line, lineAnchor1);
+        core.disconnectLine(to, toAnchor, line, lineAnchor2);
         if (recursion) {
-          toolBoxPlugin.resetLayOut(child, pos, true);
-          child.mind.direction = pos;
+          mindBoxPlugin.disconnectLines(child, true);
         }
       }
-      pen.mind.direction = pos;
+    },
+    reconnectLines: function reconnectLines(pen, recursion) {
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      var children = pen.mind.children || [];
+      if (!children || children.length === 0) {
+        return;
+      }
+      for (var i = 0; i < children.length; i++) {
+        var child = meta2d.store.pens[children[i]];
+        if (!child) continue;
+        var line = meta2d.findOne(child.mind.lineId);
+        if (!line) continue;
+        var lineAnchor1 = line.anchors[0];
+        var lineAnchor2 = line.anchors[line.anchors.length - 1];
+        var from = meta2d.store.pens[child.mind.connect.from];
+        var to = meta2d.store.pens[child.mind.connect.to];
+        var fromAnchor = child.mind.connect.fromAnchor;
+        var toAnchor = child.mind.connect.toAnchor;
+        core.connectLine(from, fromAnchor, line, lineAnchor1);
+        core.connectLine(to, toAnchor, line, lineAnchor2);
+        meta2d.canvas.updateLines(child);
+        // 设置line的层级为最低
+        meta2d.bottom(line);
+        if (recursion) {
+          mindBoxPlugin.reconnectLines(child, true);
+        }
+      }
       meta2d.canvas.updateLines(pen);
+    },
+    /**
+     * @description 根据连接关系来判断父子关系，目前在计算calcMAXWandH方法中会造成栈溢出
+     * */
+    collectChildNodes: function collectChildNodes(pen, recursion) {
+      var _pen$mind,
+        _this = this;
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      var lines = pen.connectedLines || [];
+      var children = ((_pen$mind = pen.mind) == null ? void 0 : _pen$mind.children) || [];
+      lines.forEach(function (i) {
+        var line = meta2d.store.pens[i.lineId];
+        var index = line.anchors.findIndex(function (j) {
+          return j.connectTo === pen.id;
+        });
+        if (index) {
+          // 被连接方，置为父级
+          var preNode = meta2d.store.pens[line.anchors[0].connectTo];
+          _this.initPen(preNode, meta2d.store.pens[meta2d.store.pens[pen.mind.preNodeId].mind.preNodeId]);
+          if (!preNode.children.includes(pen.id)) preNode.children.push(pen.id);
+        } else {
+          // 连接方
+          var childNode = meta2d.store.pens[line.anchors[0].connectTo];
+          if (!pen.mind.children.includes(childNode.id)) {
+            pen.mind.children.push(childNode.id);
+          }
+        }
+      });
+      if (recursion) {
+        children.forEach(function (child) {
+          _this.collectChildNodes(child, true);
+        });
+      }
+    },
+    // 重新设置连线的位置
+    resetLayOut: function resetLayOut(pen, pos, recursion) {
+      if (recursion === void 0) {
+        recursion = true;
+      }
+      if (!pen) return;
+      if (!pos) pos = pen.mind.direction;
+      // mindBoxPlugin.collectChildNodes(pen,true)
+      // 断开连线
+      mindBoxPlugin.disconnectLines(pen, recursion);
+      // 执行布局函数
+      // let layoutFunc = mindBoxPlugin.layoutFunc.get(pos)
+      // layoutFunc(pen,recursion)
+
+      // 计算子级节点位置
+      mindBoxPlugin.calcChildrenPos(pen, pos, recursion);
+
+      // 重新连线
+      mindBoxPlugin.reconnectLines(pen, recursion);
+
+      // 计算子级节点颜色  按默认颜色规则进行配置
+      mindBoxPlugin.calcChildrenColor(pen, mindBoxPlugin._colorRule, recursion);
+      // 重新设置连线样式
+      mindBoxPlugin.resetLinesStyle(pen, recursion);
+      mindBoxPlugin.resetLinesColor(pen, recursion);
+      mindBoxPlugin.render(pen.mind.rootId);
+
+      // 更新连线
     },
     // 递归修改子节点的direction属性
     // resetDirection(pen,direction,recursion = true){
@@ -3531,13 +5595,22 @@
     //         child.mind.direction = direction;
     //         this.connectLine()
     //         if(recursion){
-    //             toolBoxPlugin.resetDirection(child,direction,true);
+    //             mindBoxPlugin.resetDirection(child,direction,true);
     //         }
     //     }
     // },
-    // 删除连线
-    deleteLines: function deleteLines(pen) {
+    /**
+     * @description 删除连线
+     * @param pen {Object} 图元对象
+     * @param recursion {Boolean} 是否递归
+     * @example
+     * deleteLines(pen,true)
+     */
+    deleteLines: function deleteLines(pen, recursion) {
       var _pen$connectedLines;
+      if (recursion === void 0) {
+        recursion = false;
+      }
       if (!pen) return;
       var lines = [];
       (_pen$connectedLines = pen.connectedLines) == null || _pen$connectedLines.forEach(function (i) {
@@ -3546,31 +5619,42 @@
         line.locked = 0;
         line && lines.push(line);
       });
-      meta2d["delete"](lines, true);
+      meta2d["delete"](lines, false);
     },
-    // 删除node
-    deleteNode: function deleteNode(pen) {
+    getLines: function getLines(pen) {
+      var _pen$connectedLines2;
+      if (!pen) return;
+      var lines = [];
+      (_pen$connectedLines2 = pen.connectedLines) == null || _pen$connectedLines2.forEach(function (i) {
+        var line = meta2d.findOne(i.lineId);
+        if (!line) return;
+        line.locked = 0;
+        line && lines.push(line);
+      });
+      return lines;
+    },
+    // 删除node下的子节点
+    deleteChildrenNode: function deleteChildrenNode(pen) {
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var parent;
+        var _pen$mind2;
+        var lines, parent;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               // 删除与之相关的线
-              toolBoxPlugin.deleteLines(pen);
-
-              // 查找到对应的父级，删除其在父级中的子级列表数据
+              lines = mindBoxPlugin.getLines(pen); // 查找到对应的父级，删除其在父级中的子级列表数据
               parent = meta2d.findOne(pen.mind.preNodeId);
+              parent && (pen.mind.preNodeChildren = core.deepClone(parent.mind.children));
               parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id), 1);
 
               // 刷新界面
 
               // 删除meta2d数据
-              _context.next = 5;
-              return meta2d["delete"](pen.mind.children.map(function (i) {
+              // 删除数据单不追加到历史记录
+              _context.next = 6;
+              return meta2d["delete"](((_pen$mind2 = pen.mind) == null ? void 0 : _pen$mind2.children.map(function (i) {
                 return meta2d.store.pens[i];
-              }), true);
-            case 5:
-              toolBoxPlugin.update(meta2d.findOne(pen.mind.rootId));
+              }).filter(Boolean).concat(lines)) || [], true, false);
             case 6:
             case "end":
               return _context.stop();
@@ -3578,195 +5662,461 @@
         }, _callee);
       }))();
     },
-    install: function install() {
-      var toolbox = null;
-      if (!globalThis.toolbox) {
-        toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement, {});
-        globalThis.toolbox = toolbox;
+    getChildrenList: function getChildrenList(pen, recursion) {
+      if (recursion === void 0) {
+        recursion = true;
       }
-
-      // 初始化布局函数
-      toolBoxPlugin.layoutFunc.set('right', right);
-      toolBoxPlugin.layoutFunc.set('left', left);
-      toolBoxPlugin.layoutFunc.set('top', top);
-      toolBoxPlugin.layoutFunc.set('bottom', bottom);
-
-      // 设置颜色生成函数
-      toolBoxPlugin.colorFunc.set('default', defaultColorRule);
-      // 打开时进行初始化
-      meta2d.on('opened', function () {
-        var _meta2d$data = meta2d.data(),
-          pens = _meta2d$data.pens;
-        pens.forEach(function (i) {
-          if (i.mind) {
-            var pen = meta2d.findOne(i.id);
-            toolBoxPlugin.combineToolBox(pen);
-            i.mind.isRoot ? window.MindManager.rootIds.push(pen.id) : '';
-            i.mind.children.forEach(function (i) {});
-          }
-        });
+      if (pen || !pen.mind) return [];
+      var childrenId = pen.mind.children;
+      if (!childrenId || childrenId.length === 0) return [];
+      var collect = [];
+      childrenId.forEach(function (i) {
+        var child = meta2d.store.pens[i];
+        if (!child) return;
+        collect.push(child);
+        if (recursion) collect.concat(mindBoxPlugin.getChildrenList(child));
       });
-
-      // 添加根节点
-      meta2d.on('add', function (pens) {
-        if (pens && pens.length === 1 && (pens[0].target === 'mind' || pens[0].name === 'mindNode2') && !pens[0].mind) {
-          var pen = pens[0];
-          pen.mind = {
-            isRoot: true,
-            preNodeId: null,
-            rootId: pen.id,
-            children: [],
-            width: 0,
-            // 包含了自己和子节点的最大宽度
-            height: 0,
-            // 包含了自己和子节点的最大高度
-            direction: 'right',
-            lineStyle: 'mind',
-            lineColor: '',
-            childrenVisible: true,
-            visible: true,
-            lineWidth: 2,
-            level: 0
-          };
-          window.MindManager.rootIds.push(pen.id);
-          // 跟随移动
-          toolBoxPlugin.combineToolBox(pen);
-        }
-      });
-      meta2d.on('inactive', function (targetPen) {
-        var _globalThis$toolbox;
-        (_globalThis$toolbox = globalThis.toolbox) == null || _globalThis$toolbox.hide();
-      });
+      return collect;
     },
-    uninstall: function uninstall() {
-      var _window$MindManager$r,
-        _this = this;
-      globalThis.toolbox.destroy();
-      globalThis.toolbox = null;
-      // 解绑生命周期
-      (_window$MindManager$r = window.MindManager.rootIds) == null || _window$MindManager$r.forEach(function (i) {
-        var root = meta2d.findOne(i);
-        _this.unCombineToolBox(root);
-      });
+    // 初始化pen
+    initPen: function initPen(pen, prePen) {
+      if (pen.mind) return;
+      var rootId = prePen ? prePen.mind.rootId : pen.id;
+      var preNodeId = prePen ? prePen.id : '';
+      var direction = prePen ? prePen.mind.direction : '';
+      var lineStyle = prePen ? prePen.mind.lineStyle : 'mind';
+      var level = prePen ? 0 : prePen.mind.level + 1;
+      if (pen.mind) return;
+      pen.disableRotate = true;
+      pen.mind = {
+        type: 'node',
+        isRoot: false,
+        rootId: rootId,
+        preNodeId: preNodeId,
+        children: [],
+        width: undefined,
+        height: undefined,
+        maxHeight: 0,
+        // 包含了自己和子节点的最大高度
+        maxWidth: 0,
+        // 包含了自己和子节点的最大宽度
+        direction: direction,
+        childrenVisible: true,
+        visible: true,
+        lineStyle: lineStyle,
+        lineColor: '',
+        level: level
+      };
+      if (!prePen) {
+        var root = meta2d.store.pens[prePen.mind.rootId];
+        pen.mind.mindboxOption = core.deepClone(root.mind.mindboxOption);
+      }
+      // 跟随移动
+      mindBoxPlugin.combineToolBox(pen);
+      mindBoxPlugin.combineLifeCircle(pen);
+    },
+    install: function () {
+      // 是否是第一次安装，第一次安装则进行初始化
+      var isInit = false;
+      var addCallback = null;
+      var optionMap = new map$1();
+      return function (pen, options) {
+        if (!isInit) {
+          // 初始化布局函数
+          mindBoxPlugin.layoutFunc.set('right', right);
+          mindBoxPlugin.layoutFunc.set('left', left);
+          mindBoxPlugin.layoutFunc.set('top', top);
+          mindBoxPlugin.layoutFunc.set('bottom', bottom);
+          mindBoxPlugin.layoutFunc.set('butterfly', butterfly);
+          mindBoxPlugin.layoutFunc.set('sandglass', sandglass);
+
+          // 设置颜色生成函数
+          mindBoxPlugin.colorFunc.set('default', defaultColorRule);
+          // 打开时进行初始化
+          document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+              // 阻止默认的撤销行为
+              e.preventDefault();
+              console.log('Ctrl + Z 被按下');
+
+              // 在这里执行你想要的操作
+            }
+          });
+
+          meta2d.on('opened', function () {
+            console.log('opened');
+            var pens = meta2d.store.data.pens;
+            pens.forEach(function (pen) {
+              var _pen$mind3;
+              var t = meta2d.findOne((_pen$mind3 = pen.mind) == null ? void 0 : _pen$mind3.rootId) || {};
+              var isAdd = mindBoxPlugin.target.includes(t.tag) || mindBoxPlugin.target.includes(t.name) || pen.mind;
+              if (isAdd && pen.mind.type === 'node') {
+                window.meta2d.emit('plugin:open', pen);
+                mindBoxPlugin.combineToolBox(pen);
+                mindBoxPlugin.combineLifeCircle(pen);
+              }
+            });
+          });
+          meta2d.on('scale', function () {
+            if (toolbox.open) toolbox.translateWithPen();
+          });
+          meta2d.on('undo', function (e) {
+            // TODO 删除顺序有问题
+            // e.pens.reverse().forEach(i=>{
+            //     if(i.mind){
+            //         // 撤回节点
+            //         if(i.mind.type === 'node'){
+            //             let preNode = meta2d.findOne(i.mind.preNodeId)
+            //             preNode && (preNode.mind.children.push(i.id))
+            //             mindBoxPlugin.update(preNode)
+            //         }else{
+            //             let preNode = meta2d.findOne(i.mind.from)
+            //             mindBoxPlugin.update(preNode)
+            //         }
+            //     }
+            // })
+          });
+          // meta2d.on('connectLine',(e)=>{
+          //     console.log('cccc')
+          //     if(e.line.calculative.worldAnchors.every(i=>i.connectTo)){
+          //         let start = meta2d.store.pens[e.line.calculative.worldAnchors[0].connectTo]
+          //         let end = meta2d.store.pens[e.line.calculative.worldAnchors[1].connectTo]
+          //         if(!(start.mind && end.mind)){
+          //          //
+          //         }
+          //     }
+          // })
+          meta2d.on('inactive', function (targetPen) {
+            var _globalThis$toolbox;
+            (_globalThis$toolbox = globalThis.toolbox) == null || _globalThis$toolbox.hide();
+          });
+          isInit = true;
+        }
+        var target = null;
+        if (pen.name) {
+          target = pen.name;
+        } else if (pen.tag) {
+          target = pen.tag;
+        } else if (pen.pen) {
+          target = pen;
+        }
+        var toolbox = null;
+        if (!globalThis.toolbox) {
+          toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement, options);
+          globalThis.toolbox = toolbox;
+        }
+        // 当前图元已经绑定了此插件后，不做任何处理。
+        if (mindBoxPlugin.target.includes(target)) return;
+        optionMap.set(target, core.deepClone(options || {}));
+        mindBoxPlugin.target.push(target);
+        if (typeof target === 'object') {
+          var _pen = target;
+          mindBoxPlugin.combineToolBox(_pen);
+          mindBoxPlugin.combineLifeCircle(_pen);
+          meta2d.emit('plugin:open', _pen);
+          mindBoxPlugin.record(_pen.id);
+          meta2d.render();
+          return;
+        } else {
+          if (typeof addCallback === "function") {
+            meta2d.off('add', addCallback);
+          }
+          addCallback = function addCallback(pens) {
+            // TODO 此处还未考虑name与tag相等的情况
+            var isAdd = mindBoxPlugin.target.includes(pens[0].tag) || mindBoxPlugin.target.includes(pens[0].name);
+            if (isAdd && pens && pens.length === 1 && !pens[0].mind) {
+              var _pen2 = pens[0];
+              _pen2.disableAnchor = true;
+              _pen2.disableRotate = true;
+              _pen2.mind = {
+                isRoot: true,
+                type: 'node',
+                preNodeId: null,
+                rootId: _pen2.id,
+                children: [],
+                width: 0,
+                height: 0,
+                maxWidth: 0,
+                // 包含了自己和子节点的最大宽度
+                maxHeight: 0,
+                // 包含了自己和子节点的最大高度
+                direction: 'right',
+                lineStyle: 'mind',
+                lineColor: '',
+                childrenVisible: true,
+                visible: true,
+                lineWidth: 2,
+                level: 0
+              };
+              // 跟随移动
+              _pen2.mind.mindboxOption = optionMap.get(pens[0].tag || pens[0].name);
+              mindBoxPlugin.combineToolBox(_pen2);
+              mindBoxPlugin.combineLifeCircle(_pen2);
+              meta2d.emit('plugin:open', _pen2);
+              mindBoxPlugin.record(_pen2.id);
+              meta2d.render();
+            }
+          };
+          meta2d.on('add', addCallback);
+          // 添加根节点
+        }
+      };
+    }(),
+    // 卸载插件
+    uninstall: function uninstall(pen, options) {
+      var _this2 = this;
+      var target = null;
+      if (pen.name) {
+        target = pen.name;
+      } else if (pen.tag) {
+        target = pen.tag;
+      } else if (pen.pen) {
+        target = pen;
+      }
+      if (mindBoxPlugin.target.includes(pen.tag) || mindBoxPlugin.target.includes(pen.name) || mindBoxPlugin.target.includes(pen)) {
+        if (typeof target === "string") {
+          // 不能只清理当前pen上的内容，还应当清理所有的内容
+          var pens = meta2d.store.data.pens.filter(function (pen) {
+            return pen.tag === target;
+          });
+          pens.forEach(function (i) {
+            if (i.mind) _this2.unCombineToolBox(i);
+          });
+        } else {
+          this.unCombineToolBox(target);
+        }
+        mindBoxPlugin.target.splice(mindBoxPlugin.target.indexOf(target), 1);
+      }
     },
     unCombineToolBox: function unCombineToolBox(pen) {
-      var _this2 = this;
-      if (!pen.mind.children || pen.mind.children.length === 0) return;
+      var _this3 = this;
+      if (!pen.mind.children) return;
       this.combineToolBox(pen, true);
       pen.mind.children.forEach(function (i) {
         var child = meta2d.store.pens[i];
-        _this2.unCombineToolBox(child);
+        _this3.unCombineToolBox(child);
       });
     },
     funcList: defaultFuncList,
     setFuncList: function setFuncList(funcList) {
       if (Object.prototype.toString.call(funcList) !== '[object Object]') {
-        throw new Error('The setFuncList function must take function arguments\n');
+        throw new Error("The setFuncList function must take function arguments, get " + funcList + "\n");
       }
       this.funcList = funcList;
     },
     calcChildWandH: function calcChildWandH(pen) {
+      if (!pen || !pen.mind) return {
+        maxHeight: 0,
+        childHeight: 0,
+        childWidth: 0,
+        maxWidth: 0
+      };
       var position = pen.mind.direction;
       var children = pen.mind.children || [];
       var worldRect = meta2d.getPenRect(pen);
       if (children.length === 0 || !pen.mind.childrenVisible) {
-        pen.mind.maxHeight = worldRect.height;
-        pen.mind.maxWidth = worldRect.width;
+        var _pen$mind$height, _pen$mind$width;
+        pen.mind.maxHeight = (_pen$mind$height = pen.mind.height) != null ? _pen$mind$height : worldRect.height;
+        pen.mind.maxWidth = (_pen$mind$width = pen.mind.width) != null ? _pen$mind$width : worldRect.width;
         return {
-          maxHeight: worldRect.height,
-          maxWidth: worldRect.width
+          maxHeight: pen.mind.maxHeight,
+          maxWidth: pen.mind.maxWidth,
+          childHeight: 0,
+          childWidth: 0
         };
       }
       var maxHeight = 0;
       var maxWidth = 0;
       var maxH = 0;
       var maxW = 0;
-      if (position === 'right' || position === 'left') {
+      if (position === 'right' || position === 'left' || position === 'butterfly') {
         for (var i = 0; i < children.length; i++) {
           var child = meta2d.store.pens[children[i]];
-          var maxObj = toolBoxPlugin.calcChildWandH(child, position);
+          var maxObj = mindBoxPlugin.calcChildWandH(child, position);
           maxHeight += maxObj.maxHeight;
           maxWidth = maxWidth > maxObj.maxWidth ? maxWidth : maxObj.maxWidth;
         }
-        maxHeight += +toolBoxPlugin.childrenGap * (children.length - 1);
+        maxHeight += +mindBoxPlugin.childrenGap * (children.length - 1);
         maxH = maxHeight > worldRect.height ? maxHeight : worldRect.height;
         pen.mind.maxWidth = maxWidth;
         pen.mind.maxHeight = maxH;
+        pen.mind.childHeight = maxHeight;
+        pen.mind.childWidth = maxWidth;
         return {
           maxHeight: maxH,
-          maxWidth: maxWidth
+          maxWidth: maxWidth,
+          childHeight: maxHeight,
+          childWidth: maxWidth
         };
       } else {
         for (var _i = 0; _i < children.length; _i++) {
           var _child = meta2d.store.pens[children[_i]];
-          var _maxObj = toolBoxPlugin.calcChildWandH(_child, position);
+          var _maxObj = mindBoxPlugin.calcChildWandH(_child, position);
           maxWidth += _maxObj.maxWidth;
           maxHeight = maxHeight > _maxObj.maxHeight ? maxHeight : _maxObj.maxHeight;
         }
-        maxWidth += +toolBoxPlugin.childrenGap * (children.length - 1);
+        maxWidth += +mindBoxPlugin.childrenGap * (children.length - 1);
         maxW = maxWidth > worldRect.width ? maxWidth : worldRect.width;
         pen.mind.maxHeight = maxHeight;
         pen.mind.maxWidth = maxW;
+        pen.mind.childWidth = maxWidth;
         return {
           maxHeight: maxHeight,
-          maxWidth: maxW
+          maxWidth: maxW,
+          childWidth: maxWidth,
+          childHeight: maxHeight
         };
       }
     },
     /**
      * @description 自定义获取功能列表函数  返回值为最终展示的列表
-     * @param target 当前pen图元*/
-    getFuncList: function getFuncList(target) {
-      return target.mind.isRoot ? toolBoxPlugin.funcList['root'] : toolBoxPlugin.funcList['leaf'];
+     * @param pen 当前pen图元*/
+    getFuncList: function getFuncList(pen) {
+      return pen.mind.isRoot ? mindBoxPlugin.funcList['root'] : mindBoxPlugin.funcList['leaf'];
     },
     /**
      * @description 动态添加方法函数
-     * @param kind 添加到目标种类上
+     * @param tag 添加到目标种类上
      * @param func 方法函数
+     * @param pos 插入的目标位置
      * */
-    appendFuncList: function appendFuncList(kind) {
-      if (typeof kind !== "string" || typeof func !== "function") {
+    appendFuncList: function appendFuncList(tag, func, pos) {
+      if (typeof tag !== "string" || typeof func !== "object") {
         throw new Error('appendFuncList error: appendFuncList parma error ');
       }
-      var funcList = this.funcList[kind];
+      var funcList = this.funcList[tag];
       if (Object.prototype.toString.call(funcList) === '[object Array]') {
-        funcList.push(func);
+        if (pos == null) {
+          funcList.push(func);
+        } else {
+          funcList.splice(pos, 0, func);
+        }
       } else {
-        throw new Error('appendFuncList error: no such kind');
+        throw new Error('appendFuncList error: no such tag');
       }
     },
+    __debounceFirstOnly: debounceFirstOnly(function () {
+      destroyRes = new promise$1(function (resolve) {
+        resolve(core.deepClone(meta2d.store.data.pens.filter(function (pen) {
+          return pen.mind;
+        }), true));
+      });
+    }, 1000),
+    __debouncePushHistory: debounce(function () {
+      destroyRes.then(function (res) {
+        var newPens = core.deepClone(meta2d.store.data.pens.filter(function (pen) {
+          return pen.mind;
+        }), true);
+        // meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
+      });
+    }, 2000),
     //
-    combineToolBox: function combineToolBox(target, del) {
-      var _this3 = this;
+    combineLifeCircle: function combineLifeCircle(target, del) {
+      var _this4 = this;
       if (del === void 0) {
         del = false;
       }
-      var toolbox = globalThis.toolbox;
-      // const onMove = (targetPen)=>{
-      //     toolbox.hide();
-      // };
       var onDestroy = function onDestroy(targetPen) {
-        toolbox.hide();
-        toolBoxPlugin.deleteNode(targetPen);
-        if (targetPen.mind.isRoot) {
-          var index = MindManager.rootIds.indexOf(targetPen.id);
-          if (index === -1) return;
-          MindManager.rootIds.splice(index, 1);
+        var _toolbox;
+        (_toolbox = toolbox) == null || _toolbox.hide();
+        mindBoxPlugin.deleteChildrenNode(targetPen);
+        _this4.__debounceFirstOnly();
+        _this4.__debouncePushHistory();
+
+        // mindBoxPlugin.deleteNodeOnlyOnce(targetPen);
+        // if(targetPen.mind.isRoot){
+        //     let index = meta2dPluginManager.rootIds.indexOf(targetPen.id)
+        //     if(index === -1)return
+        //     meta2dPluginManager.rootIds.splice(index,1)
+        // }
+        mindBoxPlugin.update(meta2d.store.pens[targetPen.mind.rootId]);
+      };
+      // const onBeforeDestroy = (pen)=>{
+      //     if(pen.mind.isRoot)return
+      //    let parent = meta2d.store.pens[pen.mind.preNodeId]
+      //     parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
+      // }
+      var onAdd = function onAdd(targetPen) {
+        if (!meta2d.store.data.locked) {
+          toolbox.bindPen(targetPen);
+          toolbox.setFuncList(core.deepClone(_this4.getFuncList(target)));
+          toolbox.translateWithPen(targetPen);
+          toolbox.show();
         }
       };
+      var onResize = debounce(function (pen) {
+        mindBoxPlugin.record(pen.mind.rootId);
+      }, 500);
+      // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
+      core.setLifeCycleFunc(target, 'onAdd', onAdd, del);
+      core.setLifeCycleFunc(target, 'onDestroy', onDestroy, del);
+      core.setLifeCycleFunc(target, 'onResize', onResize);
+    },
+    deleteNodeOnlyOnce: debounceFirstOnly( /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(pen) {
+        var children;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              children = mindBoxPlugin.getChildrenList(pen);
+              if (!(!children || children.length === 0)) {
+                _context2.next = 3;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 3:
+              _context2.next = 5;
+              return mate2d["delete"](children, true, false);
+            case 5:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
+      }));
+      return function (_x) {
+        return _ref.apply(this, arguments);
+      };
+    }(), 1000),
+    combineToolBox: function combineToolBox(target, del) {
+      var _option$trigger,
+        _option$trigger2,
+        _this5 = this;
+      if (del === void 0) {
+        del = false;
+      }
+      var option = meta2d.store.pens[target.mind.rootId].mind.mindboxOption;
+      var showTrigger = ((_option$trigger = option.trigger) == null ? void 0 : _option$trigger.show) || 'onMouseUp';
+      var hideTrigger = ((_option$trigger2 = option.trigger) == null ? void 0 : _option$trigger2.hide) || 'onMouseDown';
+      var toolbox = globalThis.toolbox;
       var onMouseUp = function onMouseUp(targetPen) {
-        toolbox.bindPen(targetPen);
-        toolbox.setFuncList(_this3.getFuncList(target));
-        toolbox.translatePosition(targetPen);
-        toolbox.show();
+        if (!meta2d.store.data.locked) {
+          mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption);
+          if (toolbox) {
+            toolbox._loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption);
+          }
+          toolbox.bindPen(targetPen);
+          toolbox.setFuncList(core.deepClone(_this5.getFuncList(target)));
+          toolbox.translateWithPen(targetPen);
+          toolbox.show();
+        }
       };
       var onMouseDown = function onMouseDown(targetPen) {
         toolbox.hide();
       };
-      // setLifeCycleFunc(target,'onMove',onMove,del);
-      mindDiagram.setLifeCycleFunc(target, 'onDestroy', onDestroy, del);
-      mindDiagram.setLifeCycleFunc(target, 'onMouseUp', onMouseUp, del);
-      mindDiagram.setLifeCycleFunc(target, 'onMouseDown', onMouseDown, del);
+      // 保存方法的引用
+      if (del) {
+        onMouseUp = target.mind.onMouseUp;
+        onMouseDown = target.mind.onMouseDown;
+      } else {
+        target.mind.onMouseUp = onMouseUp;
+        target.mind.onMouseDown = onMouseDown;
+      } // setLifeCycleFunc(target,'onMove',onMove,del);
+      core.setLifeCycleFunc(target, showTrigger, onMouseUp, del);
+      core.setLifeCycleFunc(target, hideTrigger, onMouseDown, del);
+      if (del) {
+        target.mind.onMouseUp = null;
+        target.mind.onMouseDown = null;
+      }
     },
     // setDirection(pen,direction){
     //   return pen.mind?.direction? pen.mind.direction = direction:((pen.mind = {}) && (pen.mind.direction = direction));
@@ -3777,11 +6127,11 @@
      * @param pen 添加节点的目标节点
      * @param position 添加节点的位置 默认为追加*/
     addNode: function addNode(pen, position, type, option) {
-      var _this4 = this;
-      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var opt, scale, newPen, rootNode;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+      var _this6 = this;
+      return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var opt, scale, initPens, newPen, rootNode, line, newPens;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
               if (position === void 0) {
                 position = 0;
@@ -3794,21 +6144,30 @@
               }
               opt = {
                 name: type,
+                disableAnchor: true,
+                disableRotate: true,
                 mind: {
+                  type: 'node',
                   isRoot: false,
                   rootId: pen.mind.rootId,
                   preNodeId: pen.id,
                   children: [],
-                  width: 0,
-                  // 包含了自己和子节点的最大宽度
-                  height: 0,
+                  width: undefined,
+                  height: undefined,
+                  maxHeight: 0,
                   // 包含了自己和子节点的最大高度
+                  maxWidth: 0,
+                  // 包含了自己和子节点的最大宽度
                   direction: pen.mind.direction,
                   childrenVisible: true,
                   visible: true,
                   lineStyle: pen.mind.lineStyle || '',
                   lineColor: '',
                   level: pen.mind.level + 1
+                },
+                calculative: {
+                  x: pen.x,
+                  y: pen.y
                 },
                 x: pen.x,
                 y: pen.y,
@@ -3818,74 +6177,204 @@
                 // color:generateColor((pen.mind.children[pen.mind.children.length-1])?.calculative.color),
                 textColor: '#000',
                 lineWidth: 3,
-                fontSize: 16,
+                fontSize: 14,
                 borderRadius: pen.borderRadius
               };
               scale = pen.calculative.canvas.store.data.scale;
               option.width && (option.width *= scale);
               option.height && (option.height *= scale);
-              assign$1(opt, option);
-              _context2.next = 10;
-              return meta2d.addPen(opt);
-            case 10:
-              newPen = _context2.sent;
-              window.MindManager.pluginsMessageChannels.publish('addNode', newPen);
+              opt = deepMerge(opt, option);
+              initPens = core.deepClone(meta2d.store.data.pens, true);
+              _context3.next = 11;
+              return meta2d.addPen(opt, false);
+            case 11:
+              newPen = _context3.sent;
+              // 设置连接关系
+              newPen.mind.connect = pen.mind.level === 0 ? mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen, newPen) : pen.mind.connect;
+              meta2d.emit('plugin:addNode', {
+                plugin: 'toolBox',
+                pen: pen,
+                newPen: newPen
+              });
               // 添加节点
               if (position) {
                 pen.mind.children.splice(position, 0, newPen.id);
               } else {
                 pen.mind.children.push(newPen.id);
               }
-              toolBoxPlugin.combineToolBox(newPen); // 重写生命周期
-              rootNode = meta2d.findOne(pen.mind.rootId); // 连线
-              toolBoxPlugin.connectLine(pen, newPen, {
+              mindBoxPlugin.combineToolBox(newPen); // 重写生命周期
+              mindBoxPlugin.combineLifeCircle(newPen);
+              rootNode = meta2d.findOne(pen.mind.rootId); //TODO 这里似乎性能不太好 待优化
+              mindBoxPlugin.record(pen.mind.rootId);
+              // 连线
+              mindBoxPlugin.calcChildrenPos(pen, pen.mind.direction, true);
+              line = mindBoxPlugin.connectLine(pen, newPen, {
                 position: pen.mind.direction,
                 style: rootNode.mind.lineStyle
               });
-
+              mindBoxPlugin.resetLayOut(rootNode);
+              // mindBoxPlugin.resetLayOut(rootNode)
               // 从根节点更新
-              toolBoxPlugin.update(rootNode, true);
-              globalThis.toolbox.bindPen(newPen);
-              globalThis.toolbox.setFuncList(_this4.getFuncList(newPen));
-              globalThis.toolbox.translatePosition(newPen);
-            case 20:
+              // mindBoxPlugin.update(rootNode,true);
+              if (mindBoxPlugin.animate) {
+                setTimeout(function () {
+                  globalThis.toolbox.bindPen(newPen);
+                  globalThis.toolbox.setFuncList(core.deepClone(_this6.getFuncList(newPen)));
+                  globalThis.toolbox.translateWithPen(newPen);
+                }, mindBoxPlugin.animateDuration + 100);
+              } else {
+                globalThis.toolbox.bindPen(newPen);
+                globalThis.toolbox.setFuncList(core.deepClone(_this6.getFuncList(newPen)));
+                globalThis.toolbox.translateWithPen(newPen);
+              }
+
+              // mindBoxPlugin.update(rootNode)
+              // let list = [newPen,line]
+              // meta2d.canvas.pushHistory({ type: 1, pens: deepClone(list, true) });
+              newPens = core.deepClone(meta2d.store.data.pens, true);
+              meta2d.pushHistory({
+                type: 3,
+                pens: newPens,
+                initPens: initPens
+              });
+              return _context3.abrupt("return", newPen);
+            case 26:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     },
-    update: function update(pen, recursion) {
+    update: debounce(function (pen, recursion) {
       if (recursion === void 0) {
         recursion = true;
       }
       if (!pen) return;
-      toolBoxPlugin.calcChildrenPosAndColor(pen, pen.mind.direction, recursion);
-      toolBoxPlugin.resetLinesColor(pen, recursion);
-      toolBoxPlugin.resetLinesStyle(pen, recursion);
-      toolBoxPlugin.render();
-      mindDiagram.pluginsMessageChannels.publish('update');
+      mindBoxPlugin.record(pen);
+      mindBoxPlugin.resetLayOut(pen, pen.mind.direction, recursion);
+      meta2d.emit('plugin:update', {
+        form: 'toolBox'
+      });
+    }, 50),
+    // root 为根节点id
+    render: function render(root) {
+      if (mindBoxPlugin.animate) {
+        var pens = [];
+        if (root) {
+          pens = meta2d.store.data.pens.filter(function (i) {
+            var _i$mind;
+            return ((_i$mind = i.mind) == null ? void 0 : _i$mind.rootId) === root && i.mind.type === 'node';
+          });
+        } else {
+          pens = meta2d.store.data.pens.filter(function (i) {
+            return i.mind && i.mind.type === 'node';
+          });
+        }
+        var scale = meta2d.store.data.scale;
+        pens.forEach(function (pen) {
+          var source = core.deepClone(meta2d.getPenRect(pen));
+          var origin = meta2d.store.data.origin;
+          var x = source.x - pen.mind.oldWorldRect.x;
+          var y = source.y - pen.mind.oldWorldRect.y;
+          pen.calculative.worldRect.x = pen.mind.oldWorldRect.x * scale + origin.x;
+          pen.calculative.worldRect.y = pen.mind.oldWorldRect.y * scale + origin.y;
+          pen.calculative.worldRect.ex = pen.calculative.worldRect.x + pen.mind.oldWorldRect.width * scale;
+          pen.calculative.worldRect.ey = pen.calculative.worldRect.y + pen.mind.oldWorldRect.height * scale;
+          pen.animateCycle = 1;
+          pen.keepAnimateState = true;
+          pen.frames = [{
+            duration: mindBoxPlugin.animateDuration,
+            // 帧时长
+            x: x,
+            y: y // 变化属性,
+          }];
+
+          pen.showDuration = meta2d.calcAnimateDuration(pen);
+          //
+        });
+
+        meta2d.startAnimate(pens);
+        mindBoxPlugin.record(root);
+      } else {
+        meta2d.render();
+      }
+      meta2d.emit('plugin:render');
     },
-    render: function render() {
-      meta2d.render();
-      mindDiagram.pluginsMessageChannels.publish('render');
+    /**
+     * @description 该方法用于记录节点位置坐标信息，用于动画过渡的初始状态
+     * @param {string} root 根节点的id值*/
+    record: function record(root) {
+      var pens = [];
+      if (root) pens = meta2d.store.data.pens.filter(function (i) {
+        var _i$mind2;
+        return ((_i$mind2 = i.mind) == null ? void 0 : _i$mind2.rootId) === root && i.mind.type === 'node';
+      });else pens = meta2d.store.data.pens.filter(function (i) {
+        return i.mind && i.mind.type === 'node';
+      });
+      pens.forEach(function (i) {
+        i.mind.oldWorldRect = core.deepClone(meta2d.getPenRect(i));
+      });
+    },
+    //  TODO 逻辑重写
+    loadOptions: function loadOptions(options) {
+      //加载系统自带的配置项
+      for (var _i2 = 0, _Object$keys = keys$1(pluginDefault); _i2 < _Object$keys.length; _i2++) {
+        var optionsKey = _Object$keys[_i2];
+        this[optionsKey] = pluginDefault[optionsKey];
+      }
+      // 加载特定的配置并作相关处理
+      if (!options.funcList) {
+        this.setFuncList(defaultFuncList);
+      }
+      for (var option in options) {
+        if (option === 'funcList') {
+          this.setFuncList(core.deepClone(options.funcList));
+          continue;
+        }
+        if (option === 'getFuncList') {
+          this.getFuncList = options[option];
+          continue;
+        }
+        if (CONFIGS$1.includes(option)) {
+          this[option] = options[option];
+        }
+      }
     }
   };
 
-  exports.toolBoxPlugin = toolBoxPlugin;
+  exports.mindBoxPlugin = mindBoxPlugin;
   exports.ToolBox = ToolBox;
   exports.colorList = colorList;
   exports.generateColor = generateColor;
   exports.defaultFuncs = defaultFuncs;
   exports.defaultFuncList = defaultFuncList;
-  exports.childrenGap = childrenGap;
-  exports.levelGap = levelGap;
+  exports.toolboxDefault = toolboxDefault;
+  exports.pluginDefault = pluginDefault;
+  exports.toolboxStyle = toolboxStyle;
+  exports.funcListStyle = funcListStyle;
+  exports.controlStyle = controlStyle;
+  exports.extraStyle = extraStyle;
+  exports.basicFuncConfig = basicFuncConfig;
   exports.right = right;
   exports.left = left;
   exports.top = top;
   exports.bottom = bottom;
-  exports.template = template;
+  exports.butterfly = butterfly;
+  exports.sandglass = sandglass;
+  exports.Scope = Scope;
   exports.createDom = createDom;
+  exports.debounce = debounce;
+  exports.deepMerge = deepMerge;
+  exports.replaceAfterPosition = replaceAfterPosition;
+  exports.debounceFirstOnly = debounceFirstOnly;
+  exports.isObjectLiteral = isObjectLiteral;
+  exports.removeDuplicates = removeDuplicates;
+  exports.scopedEval = scopedEval;
+  exports.escapeRegExp = escapeRegExp;
+  exports.error = error;
+  exports.warn = warn;
+  exports.deepCopy = deepCopy;
+  exports.compareObjects = compareObjects;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

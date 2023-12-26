@@ -19,16 +19,16 @@ import { mindPens } from "@meta2d/mind-diagram"
 meta2d.register(mindPens())
 这样你就可以在meta2d中自由的使用脑图组件了。
 API
-MindManager
-在mindPens被注册后会向全局（window）创建MindManager对象，用于管理整个图纸的脑图系统，该对象上有以下属性：
+meta2dPluginManager
+在mindPens被注册后会向全局（window）创建meta2dPluginManager对象，用于管理整个图纸的脑图系统，该对象上有以下属性：
 属性	类型	描述	使用方法
 rootIds	array 	用于存放脑图根节点id的数组
 plugins	array	已安装的脑图插件对象
-installPlugin	function	安装插件，同下文的installPlugin	MindManager.installPlugin( plugin, ...arg)
-uninstallPlugin	function	卸载插件，同下文的uninstallPlugin	MindManager.uninstallPlugin( name, ...arg)
-pluginMessageChannel	object	脑图插件通讯管道，用于插件间数据通信，本质是发布订阅模式	发布：MindManager.pluginMessageChannel.publish('event', data)
+installPlugin	function	安装插件，同下文的installPlugin	meta2dPluginManager.installPlugin( plugin, ...arg)
+uninstallPlugin	function	卸载插件，同下文的uninstallPlugin	meta2dPluginManager.uninstallPlugin( name, ...arg)
+pluginMessageChannel	object	脑图插件通讯管道，用于插件间数据通信，本质是发布订阅模式	发布：meta2dPluginManager.pluginMessageChannel.publish('event', data)
 订阅：
-MindManager.pluginMessageChannel.subscribe('event', callback)
+meta2dPluginManager.pluginMessageChannel.subscribe('event', callback)
 
 installPlugin
 用于安装插件
@@ -39,14 +39,14 @@ installPlugin
 boolean：true则安装成功，false则安装失败
 示例：
 import { installPlugin } from "@meta2d/mind-diagram"
-import { toolBoxPlugin } from "@meta2d/mind-plugin-core"
-installPlugin(toolBoxPlugin, ...args)
+import { mindBoxPlugin } from "@meta2d/mind-plugin-core"
+installPlugin(mindBoxPlugin, ...args)
 若相关插件不需要接受参数，那么除了通过installPlugin显示安装插件，你还可以在注册mindPens时将插件对象作为mindPens的参数进行隐式的安装，示例如下：
 import { mindPens } from "@meta2d/mind-diagram"
-import { toolBoxPlugin } from "@meta2d/mind-plugin-core"
+import { mindBoxPlugin } from "@meta2d/mind-plugin-core"
 
 //注册mindPens同时安装相关插件
-meta2d.register(mindPens(toolBoxPlugin))
+meta2d.register(mindPens(mindBoxPlugin))
 
 uninstallPlugin
 用于卸载插件
@@ -57,8 +57,8 @@ uninstallPlugin
 boolean：true则卸载成功，false则卸载失败
 示例：
 import { uninstallPlugin } from "@meta2d/mind-diagram"
-import { toolBoxPlugin } from "@meta2d/mind-plugin-core"
-uninstallPlugin(toolBoxPlugin.name, ...args)
+import { mindBoxPlugin } from "@meta2d/mind-plugin-core"
+uninstallPlugin(mindBoxPlugin.name, ...args)
 在开发阶段一般都是根据需求安装插件，很少有插件卸载的需求，所以该方法用的较少。
 
 getPlugin

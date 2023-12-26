@@ -1409,8 +1409,11 @@ export let toolboxStyle = {
   userSelect:'none',
   visibility: 'visibility',
   zIndex:999,
+  height:'42px',
   display:'flex',
   flexDirection:'row',
+  justifyContent:'center',
+  alignItems:'center'
 }
 export let funcListStyle = {
   boxSizing: 'content-box',

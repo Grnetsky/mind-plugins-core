@@ -4,25 +4,6 @@ import { Scope} from "../parse";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 
-
-// export const colorList = [
-//   '#ea8554',
-//   '#d2c648',
-//   '#4ad38e',
-//   '#4ba7d5',
-//   '#e16b68',
-//   '#e18b63',
-//   '#e0a95d',
-//   '#e0bc5b',
-//   '#ded559',
-//   '#bad556',
-//   '#97e067',
-//   '#58d0c8',
-//   '#5ba5da',
-//   '#7794e5',
-//   '#a878dc',
-//   '#ec7bb2',
-// ];
 export function* generateColor(colorList) {
   if (colorList && !Array.isArray(colorList)){
     console.warn('mindBoxPlugin warn: generateColor must take array param')
@@ -1280,7 +1261,92 @@ let funcList =
   }
 ],
   },
- // {
+  {
+    key:'changeName',
+    menu: {
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' +
+          '    <title>节点类型</title>\n' +
+          '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+          '        <g id="未固定" transform="translate(-434.000000, -138.000000)" fill="#818187" fill-rule="nonzero">\n' +
+          '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' +
+          '                <g id="图元标记" transform="translate(181.000000, 3.000000)">\n' +
+          '                    <g id="编组-2" transform="translate(8.000000, 7.000000)">\n' +
+          '                        <path d="M1,5.29023514 C1.17996138,5.29023514 1.35658782,5.33879874 1.51125216,5.43080438 L8.81859469,9.77774525 C9.12163862,9.95801791 9.30734253,10.284566 9.30734253,10.637176 L9.30734253,19.1113447 C9.30734253,19.6636294 8.85962728,20.1113447 8.30734253,20.1113447 C8.13049278,20.1113447 7.95680621,20.0644449 7.80399333,19.9754278 L0.496650804,15.7187249 C0.189138547,15.5395916 0,15.2105245 0,14.8546418 L0,6.29023514 C0,5.73795039 0.44771525,5.29023514 1,5.29023514 Z M1,6.29023514 L1,14.8546418 L8.30734253,19.1113447 L8.30734253,10.637176 L1,6.29023514 Z" id="矩形"/>\n' +
+          '                        <path d="M9.13847274,5.15451573 C9.31746803,5.15451573 9.49318237,5.20255964 9.64727631,5.29363309 L16.9004891,9.58046661 C17.2049191,9.76039253 17.3916855,10.0877237 17.3916855,10.4413492 L17.3916855,19.1172325 C17.3916855,19.6695172 16.9439702,20.1172325 16.3916855,20.1172325 C16.21583,20.1172325 16.0430842,20.0708584 15.8908716,19.9827875 L8.63765889,15.7860475 C8.32871653,15.6072921 8.13847274,15.2774223 8.13847274,14.9204925 L8.13847274,6.15451573 C8.13847274,5.60223098 8.58618799,5.15451573 9.13847274,5.15451573 Z M9.13847274,6.15451573 L9.13847274,14.9204925 L16.3916855,19.1172325 L16.3916855,10.4413492 L9.13847274,6.15451573 Z" id="矩形" transform="translate(12.765079, 12.635874) scale(-1, 1) translate(-12.765079, -12.635874) "/>\n' +
+          '                        <path d="M9.23526615,0.136303242 L16.7563729,4.52525678 C17.2333795,4.80361472 17.3944161,5.41595868 17.1160581,5.89296528 C17.0252467,6.04858385 16.8940773,6.17677619 16.7364153,6.26399174 L9.24604725,10.4075176 C8.93653945,10.5787312 8.55960992,10.5737048 8.25477772,10.3942987 L0.733805872,5.96790268 C0.257836233,5.68777531 0.0990747117,5.07483757 0.379202089,4.59886793 C0.470610522,4.44355416 0.602291713,4.31582883 0.760320508,4.22919876 L8.25055366,0.123115448 C8.55835631,-0.0456193953 8.93209266,-0.0406141191 9.23526615,0.136303242 Z M8.73125451,1.0000001 L1.24102136,5.10608342 L8.76199321,9.53247945 L16.2523613,5.38895364 L8.73125451,1.0000001 Z" id="矩形备份-5" transform="translate(8.746693, 5.266240) scale(-1, 1) translate(-8.746693, -5.266240) "/>\n' +
+          '                    </g>\n' +
+          '                </g>\n' +
+          '            </g>\n' +
+          '        </g>\n' +
+          '    </g>\n' +
+          '</svg>'
+    },
+    description: '更改节点类型',
+    popupEvent: 'mouseenter',
+    shadowRoot:false,
+    // collapseEventOnMenu:true, // 是否在childrenDom中触发事件
+    stopPropagation:true,
+    collapseAnimate(self,pen,dom){
+      dom.style.transformOrigin = 'top';
+      dom.style.transition = 'all .3s'
+
+      dom.style.transform = 'scaleY(0)'
+      return true
+    },
+    popupAnimate(self,pen,dom){
+      dom.style.transform = 'scaleY(1)'
+      return true
+    },
+    popup:[
+      {
+        menu:{
+          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
+        },
+        event:'click',
+        name:'mindNode2',
+        func(self,pen,dom,father){
+          pen.name = self.name
+          pen.calculative.name = self.name
+          meta2d.setValue({id:pen.id,width:200,height:50})
+          father.close()
+        }
+      },
+      {
+        menu:{
+          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
+        },
+        event:'click',
+        name:'diamond',
+        func(self,pen,dom,father){
+          pen.name = self.name
+          pen.calculative.name = self.name
+          meta2d.setValue({id:pen.id,width:200,height:120})
+          father.close()
+        }
+      },
+      {
+        menu:{
+          icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' +
+              '    <title>椭圆形备份 12</title>\n' +
+              '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' +
+              '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' +
+              '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' +
+              '        </g>\n' +
+              '    </g>\n' +
+              '</svg>',
+        },
+        event:'click',
+        name:'circle',
+        func(self,pen,dom,father){
+          pen.name = self.name
+          pen.calculative.name = self.name
+          meta2d.setValue({id:pen.id,width:200,height:50})
+          father.close()
+        }
+      }
+    ],
+  }
+        // {
  //   name:'button',
  //   event: 'click',
  //   func(){
@@ -1312,8 +1378,8 @@ export var defaultFuncs = {
   }
 }
 export let defaultFuncList = {
-  'root':funcList.filter(i=>i.key!== 'addSiblingNode'),
-  'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','extra','relayout','relayoutNext','extra','nodeStyle','lineStyle',)
+  'root':funcList.filter(i=>i.key!== 'addSiblingNode' && i.key !== 'changeName' ),
+  'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','changeName','extra','relayout','relayoutNext','extra','nodeStyle','lineStyle',)
 };
 export const toolboxDefault = {
   offset: 80,
@@ -1361,7 +1427,7 @@ export let controlStyle = {
   cursor: 'pointer',
   alignItems:'center',
   justifyContent:'center',
-  zIndex:999,
+  zIndex:99,
   height:'inherit',
   backgroundColor:"#efefef",
   flexDirection:'column',
@@ -1392,5 +1458,6 @@ export default {
 
 export let DefaultCssVar = {
   '--toolboxItem-hover-backgroundColor':'#eee',
-  '--toolboxSliderItem-hover-backgroundColor':'#eee'
+  '--toolboxSliderItem-hover-backgroundColor':'#eee',
+  '--toolbox-move-outLine':'solid 2px #8585ff'
 }

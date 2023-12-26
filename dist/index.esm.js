@@ -3161,6 +3161,12 @@ function Scope(config, _ref, output, root, oldScript) {
   if (oldScript === void 0) {
     oldScript = null;
   }
+  var res = createDom('div');
+  if (!script) script = {};
+  if (!style) style = '';
+  var namespace = config.key;
+  window[env] ? '' : window[env] = {};
+  window[env][namespace] ? '' : window[env][namespace] = {};
   var symbols = getOwnPropertySymbols$1(window);
   var targetSymbol;
   for (var i = 0; i < symbols.length; i++) {
@@ -3170,11 +3176,7 @@ function Scope(config, _ref, output, root, oldScript) {
       break;
     }
   }
-  var res = createDom('div');
-  if (!script) script = {};
-  if (!style) style = '';
-  var namespace = config.key;
-  if (!namespace) error('Scope', 'The config parameter is invalid');
+  if (!namespace) error('Scope', 'The config parameter is invalid [have no key]');
   var duty = [];
   // dom的预处理
   template = addUniqueIdsToHtmlString(template);
@@ -3246,7 +3248,7 @@ function Scope(config, _ref, output, root, oldScript) {
   if (!root) {
     proxyScript.init == null || proxyScript.init();
     promise$1.resolve().then(function () {
-      proxyScript.mounted == null || proxyScript.mounted();
+      proxyScript.mounted == null || proxyScript.mounted(res);
     });
   }
   var funcOffset = 0;
@@ -3497,25 +3499,6 @@ function createDeepProxy(obj, onChange, path) {
 
 var _marked = /*#__PURE__*/_regeneratorRuntime().mark(generateColor);
 var colorList = ['#FF2318', '#9C64A2', '#B4C926', '#0191B3', '#6F6EB9', '#9C64A2', '#FF291B', '#F4AE3C'];
-
-// export const colorList = [
-//   '#ea8554',
-//   '#d2c648',
-//   '#4ad38e',
-//   '#4ba7d5',
-//   '#e16b68',
-//   '#e18b63',
-//   '#e0a95d',
-//   '#e0bc5b',
-//   '#ded559',
-//   '#bad556',
-//   '#97e067',
-//   '#58d0c8',
-//   '#5ba5da',
-//   '#7794e5',
-//   '#a878dc',
-//   '#ec7bb2',
-// ];
 function generateColor(colorList) {
   var index, list;
   return _regeneratorRuntime().wrap(function generateColor$(_context) {
@@ -3566,7 +3549,7 @@ var funcList = [
   //   mindBoxPlugin.bottomChildren(pen,0);
   //   },
   popupEvent: 'mouseenter',
-  closeShadowDom: true,
+  shadowRoot: false,
   collapseEventOnMenu: false,
   // 是否在childrenDom中触发事件
   stopPropagation: true,
@@ -3864,7 +3847,7 @@ var funcList = [
    * @param dom 返回此容器dom
    * */
   colorList: ['#f13097', '#5757F3', '#fa7878', '#8C8CFF', '#19f1cc', '#6ffd97', '#efe864', '#ff931a'],
-  closeShadowDom: true,
+  shadowRoot: false,
   collapseEventOnMenu: false,
   openEventOnTitle: true,
   popupEvent: 'mouseenter',
@@ -4134,7 +4117,7 @@ var funcList = [
   //   mindBoxPlugin.bottomChildren(pen,0);
   //   },
   popupEvent: 'mouseenter',
-  closeShadowDom: true,
+  shadowRoot: false,
   collapseEventOnMenu: false,
   // 是否在childrenDom中触发事件
   stopPropagation: true,
@@ -4194,6 +4177,75 @@ var funcList = [
       father.close();
     }
   }]
+}, {
+  key: 'changeName',
+  menu: {
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">\n' + '    <title>节点类型</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-434.000000, -138.000000)" fill="#818187" fill-rule="nonzero">\n' + '            <g id="编组-2" transform="translate(253.000000, 135.000000)">\n' + '                <g id="图元标记" transform="translate(181.000000, 3.000000)">\n' + '                    <g id="编组-2" transform="translate(8.000000, 7.000000)">\n' + '                        <path d="M1,5.29023514 C1.17996138,5.29023514 1.35658782,5.33879874 1.51125216,5.43080438 L8.81859469,9.77774525 C9.12163862,9.95801791 9.30734253,10.284566 9.30734253,10.637176 L9.30734253,19.1113447 C9.30734253,19.6636294 8.85962728,20.1113447 8.30734253,20.1113447 C8.13049278,20.1113447 7.95680621,20.0644449 7.80399333,19.9754278 L0.496650804,15.7187249 C0.189138547,15.5395916 0,15.2105245 0,14.8546418 L0,6.29023514 C0,5.73795039 0.44771525,5.29023514 1,5.29023514 Z M1,6.29023514 L1,14.8546418 L8.30734253,19.1113447 L8.30734253,10.637176 L1,6.29023514 Z" id="矩形"/>\n' + '                        <path d="M9.13847274,5.15451573 C9.31746803,5.15451573 9.49318237,5.20255964 9.64727631,5.29363309 L16.9004891,9.58046661 C17.2049191,9.76039253 17.3916855,10.0877237 17.3916855,10.4413492 L17.3916855,19.1172325 C17.3916855,19.6695172 16.9439702,20.1172325 16.3916855,20.1172325 C16.21583,20.1172325 16.0430842,20.0708584 15.8908716,19.9827875 L8.63765889,15.7860475 C8.32871653,15.6072921 8.13847274,15.2774223 8.13847274,14.9204925 L8.13847274,6.15451573 C8.13847274,5.60223098 8.58618799,5.15451573 9.13847274,5.15451573 Z M9.13847274,6.15451573 L9.13847274,14.9204925 L16.3916855,19.1172325 L16.3916855,10.4413492 L9.13847274,6.15451573 Z" id="矩形" transform="translate(12.765079, 12.635874) scale(-1, 1) translate(-12.765079, -12.635874) "/>\n' + '                        <path d="M9.23526615,0.136303242 L16.7563729,4.52525678 C17.2333795,4.80361472 17.3944161,5.41595868 17.1160581,5.89296528 C17.0252467,6.04858385 16.8940773,6.17677619 16.7364153,6.26399174 L9.24604725,10.4075176 C8.93653945,10.5787312 8.55960992,10.5737048 8.25477772,10.3942987 L0.733805872,5.96790268 C0.257836233,5.68777531 0.0990747117,5.07483757 0.379202089,4.59886793 C0.470610522,4.44355416 0.602291713,4.31582883 0.760320508,4.22919876 L8.25055366,0.123115448 C8.55835631,-0.0456193953 8.93209266,-0.0406141191 9.23526615,0.136303242 Z M8.73125451,1.0000001 L1.24102136,5.10608342 L8.76199321,9.53247945 L16.2523613,5.38895364 L8.73125451,1.0000001 Z" id="矩形备份-5" transform="translate(8.746693, 5.266240) scale(-1, 1) translate(-8.746693, -5.266240) "/>\n' + '                    </g>\n' + '                </g>\n' + '            </g>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+  },
+  description: '更改节点类型',
+  popupEvent: 'mouseenter',
+  shadowRoot: false,
+  // collapseEventOnMenu:true, // 是否在childrenDom中触发事件
+  stopPropagation: true,
+  collapseAnimate: function collapseAnimate(self, pen, dom) {
+    dom.style.transformOrigin = 'top';
+    dom.style.transition = 'all .3s';
+    dom.style.transform = 'scaleY(0)';
+    return true;
+  },
+  popupAnimate: function popupAnimate(self, pen, dom) {
+    dom.style.transform = 'scaleY(1)';
+    return true;
+  },
+  popup: [{
+    menu: {
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>'
+    },
+    event: 'click',
+    name: 'mindNode2',
+    func: function func(self, pen, dom, father) {
+      pen.name = self.name;
+      pen.calculative.name = self.name;
+      meta2d.setValue({
+        id: pen.id,
+        width: 200,
+        height: 50
+      });
+      father.close();
+    }
+  }, {
+    menu: {
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>'
+    },
+    event: 'click',
+    name: 'diamond',
+    func: function func(self, pen, dom, father) {
+      pen.name = self.name;
+      pen.calculative.name = self.name;
+      meta2d.setValue({
+        id: pen.id,
+        width: 200,
+        height: 120
+      });
+      father.close();
+    }
+  }, {
+    menu: {
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50px" height="30px" viewBox="0 0 140 53" version="1.1">\n' + '    <title>椭圆形备份 12</title>\n' + '    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">\n' + '        <g id="未固定" transform="translate(-372.000000, -738.000000)" stroke="#000000" stroke-width="2">\n' + '            <ellipse id="椭圆形备份-12" cx="442" cy="764.5" rx="69" ry="25.5"/>\n' + '        </g>\n' + '    </g>\n' + '</svg>'
+    },
+    event: 'click',
+    name: 'circle',
+    func: function func(self, pen, dom, father) {
+      pen.name = self.name;
+      pen.calculative.name = self.name;
+      meta2d.setValue({
+        id: pen.id,
+        width: 200,
+        height: 50
+      });
+      father.close();
+    }
+  }]
 }
 // {
 //   name:'button',
@@ -4241,16 +4293,16 @@ var defaultFuncs = {
 };
 var defaultFuncList = {
   'root': funcList.filter(function (i) {
-    return i.key !== 'addSiblingNode';
+    return i.key !== 'addSiblingNode' && i.key !== 'changeName';
   }),
-  'leaf': defaultFuncs.getFunc('addChildNode', 'addSiblingNode', 'extra', 'relayout', 'relayoutNext', 'extra', 'nodeStyle', 'lineStyle')
+  'leaf': defaultFuncs.getFunc('addChildNode', 'addSiblingNode', 'changeName', 'extra', 'relayout', 'relayoutNext', 'extra', 'nodeStyle', 'lineStyle')
 };
 var toolboxDefault = {
   offset: 80,
   showControl: true
 };
 var pluginDefault = {
-  animate: true,
+  animate: false,
   animateDuration: 200,
   childrenGap: 20,
   levelGap: 200,
@@ -4263,7 +4315,7 @@ var pluginDefault = {
 };
 var toolboxStyle = {
   backgroundColor: '#fff',
-  borderRadius: '5px',
+  borderRadius: '8px',
   boxShadow: '0px 6px 20px rgba(25,25,26,.06), 0px 2px 12px rgba(25,25,26,.04)',
   transform: 'translateX(-50%)',
   position: 'absolute',
@@ -4289,7 +4341,7 @@ var controlStyle = {
   cursor: 'pointer',
   alignItems: 'center',
   justifyContent: 'center',
-  zIndex: 999,
+  zIndex: 99,
   height: 'inherit',
   backgroundColor: "#efefef",
   flexDirection: 'column',
@@ -4305,7 +4357,8 @@ var extraStyle = {
 var basicFuncConfig = {
   collapseEventOnMenu: true,
   collapseEvent: 'click',
-  popupEvent: 'mouseenter'
+  popupEvent: 'mouseenter',
+  shadowRoot: true
 };
 var d = {
   funcList: funcList,
@@ -4315,8 +4368,17 @@ var d = {
   defaultFuncList: defaultFuncList,
   basicFuncConfig: basicFuncConfig
 };
+var DefaultCssVar = {
+  '--toolboxItem-hover-backgroundColor': '#eee',
+  '--toolboxSliderItem-hover-backgroundColor': '#eee',
+  '--toolbox-move-outLine': 'solid 2px #8585ff'
+};
 
 var extra = 'extra';
+var cssVarMap = {
+  itemHoverBackgroundColor: '--toolboxItem-hover-backgroundColor',
+  boxMoveOutLine: '--toolbox-move-outLine'
+};
 var mouseMoved = false;
 var controlDom = {
   control: null,
@@ -4386,10 +4448,18 @@ var ToolBox = /*#__PURE__*/function () {
     this._funcDom = funcContainer;
     var stylesheet = document.styleSheets[0]; // 选择第一个样式表
     // toolbox_item是否交给用户设置
-    stylesheet.insertRule(".toolbox_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "margin: 0 5px;" + "padding: 0 3px;" + "}", 0);
-    stylesheet.insertRule(".toolbox_item:hover {" + "background-color: #eee;" + "}", 0);
-    stylesheet.insertRule(".toolbox_slider_item:hover {" + "background-color: #eee;" + "}", 0);
-    stylesheet.insertRule(".toolbox_control_move {\n            outline: solid 2px #8585ff !important;\n        }");
+    stylesheet.insertRule(".toolbox_item,.toolbox_slider_item {" + "display: flex;" + "justify-content: center;" + "align-items: center;" + "height: 100%;" + "margin: 0 1px;" + "cursor: pointer;" + "border-radius: 5px;" + "margin: 0 5px;" + "padding: 0 3px;" + "}", 0);
+    stylesheet.insertRule(".toolbox_item:hover {" + "background-color: var(--toolboxItem-hover-backgroundColor);" + "}", 0);
+    stylesheet.insertRule(".toolbox_slider_item:hover {" + "background-color: var(--toolboxSliderItem-hover-backgroundColor)" + "}", 0);
+    stylesheet.insertRule(".toolbox_control_move {\n            outline: var(--toolbox-move-outLine) !important;\n        }");
+    this.setCssVar();
+  };
+  _proto.setCssVar = function setCssVar(cssVar) {
+    var cssVarObj;
+    cssVar ? cssVarObj = cssVar : cssVarObj = DefaultCssVar;
+    for (var key in cssVarObj) {
+      document.documentElement.style.setProperty(key, cssVarObj[key]);
+    }
   };
   _proto._setControl = function _setControl() {
     if (this.showControl) {
@@ -4446,12 +4516,24 @@ var ToolBox = /*#__PURE__*/function () {
   };
   _proto.setStyle = function setStyle(style) {
     var _this = this;
-    if (!style) {
-      style = toolboxStyle;
-    }
+    this._setDefaultStyle();
+    if (!style) return;
+    // 用戶未定義hover樣式
     keys$1(style).forEach(function (i) {
+      if (i in cssVarMap) {
+        var _this$setCssVar;
+        _this.setCssVar((_this$setCssVar = {}, _this$setCssVar[cssVarMap[i]] = style[i], _this$setCssVar));
+        return;
+      }
       _this.box.style[i] = style[i];
     });
+  };
+  _proto._setDefaultStyle = function _setDefaultStyle() {
+    var _this2 = this;
+    keys$1(toolboxStyle).forEach(function (i) {
+      _this2.box.style[i] = toolboxStyle[i];
+    });
+    this.setCssVar();
   }
   // 重写dom函数
   ;
@@ -4499,19 +4581,19 @@ var ToolBox = /*#__PURE__*/function () {
     if (!this.animate) this.show();
   };
   _proto.renderFuncList = function renderFuncList() {
-    var _this2 = this;
+    var _this3 = this;
     var fragmentChild = new DocumentFragment();
     this._funcDom.innerHTML = '';
     this.funcList.forEach(function (i) {
       // 预处理
-      preprocess(i, _this2.pen);
+      preprocess(i, _this3.pen);
       var extraEle = extraElement(i);
       if (extraEle) {
         fragmentChild.appendChild(extraEle);
         return;
       }
       if (configValid(i)) {
-        var itemsSpan = _this2.setChildDom(_this2.pen, i);
+        var itemsSpan = _this3.setChildDom(_this3.pen, i);
         itemsSpan.className = 'toolbox_item';
         fragmentChild.appendChild(itemsSpan);
       }
@@ -4575,7 +4657,7 @@ var ToolBox = /*#__PURE__*/function () {
       }
 
       // titleDom添加到dom中
-      item.closeShadowDom ? dom.appendChild(title) : dom.shadowRoot.appendChild(title);
+      item.shadowRoot ? dom.shadowRoot.appendChild(title) : dom.appendChild(title);
 
       // 渲染下拉列表
       var containerDom = null;
@@ -4670,13 +4752,13 @@ function renderInit(item, pen, dom) {
     // 清空
     dom.shadowRoot.innerHTML = '';
   } else {
-    item.closeShadowDom ? dom.innerHTML = '' : dom.attachShadow({
+    item.shadowRoot ? dom.attachShadow({
       mode: "open"
-    });
+    }) : dom.innerHTML = '';
   }
 
   //设置样式与事件
-  typeof item.style === 'object' && toolbox.setStyle(dom, item.style);
+  // typeof item.style === 'object' && toolbox.setStyle(item.style);
 
   // 绑定事件，绑定在dom上
   if (item.event) {
@@ -4794,7 +4876,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
             i.stopPropagation ? e.stopPropagation() : '';
             i.func(i, this, dom, item, e);
           }.bind(pen),
-          className: 'toolbox_item'
+          className: 'toolbox_slider_item'
         });
 
         //TODO 执行时机是否正确？？？
@@ -4828,7 +4910,7 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
     // 下拉菜单默认为绝对定位
     containerDom.style.position = 'absolute';
     item.mounted == null || item.mounted(item, pen, containerDom);
-    item.closeShadowDom ? dom.appendChild(containerDom) : dom.shadowRoot.appendChild(containerDom);
+    item.shadowRoot ? dom.shadowRoot.appendChild(containerDom) : dom.appendChild(containerDom);
     dom.childrenDom = containerDom;
     // 添加样式到元素
   }
@@ -4852,8 +4934,9 @@ function renderChildDom(item, pen, dom, containerDom, keepOpen) {
 function preprocess(item, pen) {
   // 分隔符则返回
   if (item.key === extra) return;
-  if (item.openEventOnTitle == null) {
-    item.openEventOnTitle = true;
+  // 默认为false
+  if (item.shadowRoot == null) {
+    item.shadowRoot = basicFuncConfig.shadowRoot;
   }
   if (item.popup) {
     item.isOpen = false;
@@ -5272,6 +5355,7 @@ function defaultColorRule(pen, recursion) {
 
 var CONFIGS$1 = ['animate', 'animateDuration', 'childrenGap', 'levelGap', 'colorList'];
 var destroyRes = null;
+var optionMap = new map$1();
 var mindBoxPlugin = {
   name: 'mindBox',
   target: [],
@@ -5287,7 +5371,7 @@ var mindBoxPlugin = {
   colorFunc: new map$1(),
   // 布局颜色函数map
   _history: [],
-  animate: true,
+  animate: false,
   _colorRule: 'default',
   animateDuration: 1000,
   // 重新设置颜色规则
@@ -5359,21 +5443,6 @@ var mindBoxPlugin = {
     if (style === void 0) {
       style = 'mind';
     }
-    // let line = null;
-    // switch (option.position){
-    //     case 'right':
-    //         line = meta2d.connectLine(pen, newPen, pen.anchors[1], newPen.anchors[3], false);
-    //         break;
-    //     case 'left':
-    //         line = meta2d.connectLine(newPen, pen, newPen.anchors[1],pen.anchors[3] , false);
-    //         break;
-    //     case 'bottom':
-    //         line = meta2d.connectLine(pen, newPen, pen.anchors[2],newPen.anchors[0] , false);
-    //         break;
-    //     case 'top':
-    //         line = meta2d.connectLine(newPen, pen, newPen.anchors[2],pen.anchors[0] , false);
-    //         break;
-    // }
     var from = meta2d.store.pens[newPen.mind.connect.from];
     var to = meta2d.store.pens[newPen.mind.connect.to];
     var line = meta2d.connectLine(from, to, newPen.mind.connect.fromAnchor, newPen.mind.connect.toAnchor, false, false);
@@ -5582,19 +5651,6 @@ var mindBoxPlugin = {
 
     // 更新连线
   },
-  // 递归修改子节点的direction属性
-  // resetDirection(pen,direction,recursion = true){
-  //     let children = pen.mind.children;
-  //     if(!children || children.length === 0 )return;
-  //     for(let i = 0 ;i<children.length;i++){
-  //         const child = children[i];
-  //         child.mind.direction = direction;
-  //         this.connectLine()
-  //         if(recursion){
-  //             mindBoxPlugin.resetDirection(child,direction,true);
-  //         }
-  //     }
-  // },
   /**
    * @description 删除连线
    * @param pen {Object} 图元对象
@@ -5642,11 +5698,6 @@ var mindBoxPlugin = {
             parent = meta2d.findOne(pen.mind.preNodeId);
             parent && (pen.mind.preNodeChildren = deepClone(parent.mind.children));
             parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id), 1);
-
-            // 刷新界面
-
-            // 删除meta2d数据
-            // 删除数据单不追加到历史记录
             _context.next = 6;
             return meta2d["delete"](((_pen$mind2 = pen.mind) == null ? void 0 : _pen$mind2.children.map(function (i) {
               return meta2d.store.pens[i];
@@ -5703,10 +5754,10 @@ var mindBoxPlugin = {
       lineColor: '',
       level: level
     };
-    if (!prePen) {
-      var root = meta2d.store.pens[prePen.mind.rootId];
-      pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
-    }
+    // if(!prePen){
+    //     let root = meta2d.store.pens[prePen.mind.rootId]
+    //     pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
+    // }
     // 跟随移动
     mindBoxPlugin.combineToolBox(pen);
     mindBoxPlugin.combineLifeCircle(pen);
@@ -5715,9 +5766,71 @@ var mindBoxPlugin = {
     // 是否是第一次安装，第一次安装则进行初始化
     var isInit = false;
     var addCallback = null;
-    var optionMap = new map$1();
     return function (pen, options) {
       if (!isInit) {
+        // TODO 进行撤销重做的重写操作
+        document.addEventListener('keydown', /*#__PURE__*/function () {
+          var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(e) {
+            var stopPropagation, collection, initPens, newPens;
+            return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+              while (1) switch (_context2.prev = _context2.next) {
+                case 0:
+                  if (meta2d.store.options.keydown) {
+                    _context2.next = 2;
+                    break;
+                  }
+                  return _context2.abrupt("return");
+                case 2:
+                  if (!(e.key === 'Backspace')) {
+                    _context2.next = 14;
+                    break;
+                  }
+                  stopPropagation = false; //判断是否有脑图组件
+                  collection = meta2d.store.active;
+                  meta2d.store.active.forEach(function (pen) {
+                    if (pen.mind) {
+                      var _pen$connectedLines3;
+                      stopPropagation = true;
+                      var lines = (_pen$connectedLines3 = pen.connectedLines) == null ? void 0 : _pen$connectedLines3.map(function (i) {
+                        return meta2d.findOne(i.LineId);
+                      });
+                      collection.concat(lines);
+                    }
+                  });
+                  if (stopPropagation) {
+                    _context2.next = 8;
+                    break;
+                  }
+                  return _context2.abrupt("return");
+                case 8:
+                  initPens = deepClone(meta2d.store.data.pens.map(function (pen) {
+                    pen.calculative.active = undefined;
+                    return pen;
+                  }), true);
+                  _context2.next = 11;
+                  return meta2d["delete"](collection, false, false);
+                case 11:
+                  newPens = deepClone(meta2d.store.data.pens.map(function (pen) {
+                    pen.calculative.active = undefined;
+                    return pen;
+                  }), true);
+                  meta2d.pushHistory({
+                    type: 3,
+                    pens: newPens,
+                    initPens: initPens
+                  });
+                  // 阻止触发meta2d的删除行为
+                  stopPropagation ? e.stopPropagation() : '';
+                case 14:
+                case "end":
+                  return _context2.stop();
+              }
+            }, _callee2);
+          }));
+          return function (_x) {
+            return _ref.apply(this, arguments);
+          };
+        }(), true);
         // 初始化布局函数
         mindBoxPlugin.layoutFunc.set('right', right);
         mindBoxPlugin.layoutFunc.set('left', left);
@@ -5728,26 +5841,14 @@ var mindBoxPlugin = {
 
         // 设置颜色生成函数
         mindBoxPlugin.colorFunc.set('default', defaultColorRule);
-        // 打开时进行初始化
-        document.addEventListener('keydown', function (e) {
-          if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-            // 阻止默认的撤销行为
-            e.preventDefault();
-            console.log('Ctrl + Z 被按下');
-
-            // 在这里执行你想要的操作
-          }
-        });
-
         meta2d.on('opened', function () {
-          console.log('opened');
           var pens = meta2d.store.data.pens;
           pens.forEach(function (pen) {
             var _pen$mind3;
             var t = meta2d.findOne((_pen$mind3 = pen.mind) == null ? void 0 : _pen$mind3.rootId) || {};
             var isAdd = mindBoxPlugin.target.includes(t.tag) || mindBoxPlugin.target.includes(t.name) || pen.mind;
             if (isAdd && pen.mind.type === 'node') {
-              window.meta2d.emit('plugin:open', pen);
+              window.meta2d.emit('plugin:mindBox:open', pen);
               mindBoxPlugin.combineToolBox(pen);
               mindBoxPlugin.combineLifeCircle(pen);
             }
@@ -5757,32 +5858,27 @@ var mindBoxPlugin = {
           if (toolbox.open) toolbox.translateWithPen();
         });
         meta2d.on('undo', function (e) {
-          // TODO 删除顺序有问题
-          // e.pens.reverse().forEach(i=>{
-          //     if(i.mind){
-          //         // 撤回节点
-          //         if(i.mind.type === 'node'){
-          //             let preNode = meta2d.findOne(i.mind.preNodeId)
-          //             preNode && (preNode.mind.children.push(i.id))
-          //             mindBoxPlugin.update(preNode)
-          //         }else{
-          //             let preNode = meta2d.findOne(i.mind.from)
-          //             mindBoxPlugin.update(preNode)
-          //         }
-          //     }
-          // })
+          var initPens = e.initPens;
+          var tag = false;
+          var target = null;
+          if (e.type === 3) {
+            initPens == null || initPens.forEach(function (pen) {
+              pen.calculative.active = false;
+              if (!tag) {
+                var _pen$mind4;
+                if ((_pen$mind4 = pen.mind) != null && _pen$mind4.rootId) {
+                  tag = true;
+                  target = pen;
+                }
+              }
+            });
+            if (tag) {
+              var root = meta2d.findOne(target.mind.rootId);
+              mindBoxPlugin.reconnectLines(root);
+            }
+          }
         });
-        // meta2d.on('connectLine',(e)=>{
-        //     console.log('cccc')
-        //     if(e.line.calculative.worldAnchors.every(i=>i.connectTo)){
-        //         let start = meta2d.store.pens[e.line.calculative.worldAnchors[0].connectTo]
-        //         let end = meta2d.store.pens[e.line.calculative.worldAnchors[1].connectTo]
-        //         if(!(start.mind && end.mind)){
-        //          //
-        //         }
-        //     }
-        // })
-        meta2d.on('inactive', function (targetPen) {
+        meta2d.on('inactive', function () {
           var _globalThis$toolbox;
           (_globalThis$toolbox = globalThis.toolbox) == null || _globalThis$toolbox.hide();
         });
@@ -5809,7 +5905,7 @@ var mindBoxPlugin = {
         var _pen = target;
         mindBoxPlugin.combineToolBox(_pen);
         mindBoxPlugin.combineLifeCircle(_pen);
-        meta2d.emit('plugin:open', _pen);
+        meta2d.emit('plugin:mindBox:open', _pen);
         mindBoxPlugin.record(_pen.id);
         meta2d.render();
         return;
@@ -5820,6 +5916,7 @@ var mindBoxPlugin = {
         addCallback = function addCallback(pens) {
           // TODO 此处还未考虑name与tag相等的情况
           var isAdd = mindBoxPlugin.target.includes(pens[0].tag) || mindBoxPlugin.target.includes(pens[0].name);
+          // 是否为根节点
           if (isAdd && pens && pens.length === 1 && !pens[0].mind) {
             var _pen2 = pens[0];
             _pen2.disableAnchor = true;
@@ -5844,11 +5941,11 @@ var mindBoxPlugin = {
               lineWidth: 2,
               level: 0
             };
-            // 跟随移动
-            _pen2.mind.mindboxOption = optionMap.get(pens[0].tag || pens[0].name);
+            // 在根节点上新增
+            _pen2.mind.mindboxOption = optionMap.get(pens[0].tag) || optionMap.get(pens[0].name);
             mindBoxPlugin.combineToolBox(_pen2);
             mindBoxPlugin.combineLifeCircle(_pen2);
-            meta2d.emit('plugin:open', _pen2);
+            meta2d.emit('plugin:mindBox:addRoot', _pen2);
             mindBoxPlugin.record(_pen2.id);
             meta2d.render();
           }
@@ -6003,7 +6100,11 @@ var mindBoxPlugin = {
       var newPens = deepClone(meta2d.store.data.pens.filter(function (pen) {
         return pen.mind;
       }), true);
-      // meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
+      meta2d.pushHistory({
+        type: 3,
+        pens: newPens,
+        initPens: res
+      });
     });
   }, 2000),
   //
@@ -6049,28 +6150,28 @@ var mindBoxPlugin = {
     setLifeCycleFunc(target, 'onResize', onResize);
   },
   deleteNodeOnlyOnce: debounceFirstOnly( /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(pen) {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(pen) {
       var children;
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
           case 0:
             children = mindBoxPlugin.getChildrenList(pen);
             if (!(!children || children.length === 0)) {
-              _context2.next = 3;
+              _context3.next = 3;
               break;
             }
-            return _context2.abrupt("return");
+            return _context3.abrupt("return");
           case 3:
-            _context2.next = 5;
+            _context3.next = 5;
             return mate2d["delete"](children, true, false);
           case 5:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
-      }, _callee2);
+      }, _callee3);
     }));
-    return function (_x) {
-      return _ref.apply(this, arguments);
+    return function (_x2) {
+      return _ref2.apply(this, arguments);
     };
   }(), 1000),
   combineToolBox: function combineToolBox(target, del) {
@@ -6086,9 +6187,16 @@ var mindBoxPlugin = {
     var toolbox = globalThis.toolbox;
     var onMouseUp = function onMouseUp(targetPen) {
       if (!meta2d.store.data.locked) {
-        mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption);
+        var _targetPen$mind;
+        var root = meta2d.findOne((_targetPen$mind = targetPen.mind) == null ? void 0 : _targetPen$mind.rootId);
+        var op = optionMap.get(root.tag) || optionMap.get(root.name) || optionMap.get(root.id);
+        mindBoxPlugin.loadOptions(op);
+        meta2d.emit('plugin:mindBox:loadOption', {
+          pen: targetPen,
+          options: op
+        });
         if (toolbox) {
-          toolbox._loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption);
+          toolbox._loadOptions(op);
         }
         toolbox.bindPen(targetPen);
         toolbox.setFuncList(deepClone(_this5.getFuncList(target)));
@@ -6124,10 +6232,10 @@ var mindBoxPlugin = {
    * @param position 添加节点的位置 默认为追加*/
   addNode: function addNode(pen, position, type, option) {
     var _this6 = this;
-    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
       var opt, scale, initPens, newPen, rootNode, line, newPens;
-      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-        while (1) switch (_context3.prev = _context3.next) {
+      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        while (1) switch (_context4.prev = _context4.next) {
           case 0:
             if (position === void 0) {
               position = 0;
@@ -6180,14 +6288,19 @@ var mindBoxPlugin = {
             option.width && (option.width *= scale);
             option.height && (option.height *= scale);
             opt = deepMerge(opt, option);
-            initPens = deepClone(meta2d.store.data.pens, true);
-            _context3.next = 11;
+            initPens = deepClone(meta2d.store.data.pens.filter(function (pen) {
+              return pen.mind;
+            }).map(function (i) {
+              i.calculative.active = false;
+              return i;
+            }), true);
+            _context4.next = 11;
             return meta2d.addPen(opt, false);
           case 11:
-            newPen = _context3.sent;
+            newPen = _context4.sent;
             // 设置连接关系
             newPen.mind.connect = pen.mind.level === 0 ? mindBoxPlugin.layoutFunc.get(pen.mind.direction).connectRule(pen, newPen) : pen.mind.connect;
-            meta2d.emit('plugin:addNode', {
+            meta2d.emit('plugin:mindBox:addNode', {
               plugin: 'toolBox',
               pen: pen,
               newPen: newPen
@@ -6223,22 +6336,24 @@ var mindBoxPlugin = {
               globalThis.toolbox.setFuncList(deepClone(_this6.getFuncList(newPen)));
               globalThis.toolbox.translateWithPen(newPen);
             }
-
-            // mindBoxPlugin.update(rootNode)
-            // let list = [newPen,line]
-            // meta2d.canvas.pushHistory({ type: 1, pens: deepClone(list, true) });
-            newPens = deepClone(meta2d.store.data.pens, true);
+            // TODO 此处是否应当局部替换
+            newPens = deepClone(meta2d.store.data.pens.filter(function (pen) {
+              return pen.mind;
+            }).map(function (i) {
+              i.calculative.active = false;
+              return i;
+            }), true);
             meta2d.pushHistory({
               type: 3,
               pens: newPens,
               initPens: initPens
             });
-            return _context3.abrupt("return", newPen);
+            return _context4.abrupt("return", newPen);
           case 26:
           case "end":
-            return _context3.stop();
+            return _context4.stop();
         }
-      }, _callee3);
+      }, _callee4);
     }))();
   },
   update: debounce(function (pen, recursion) {
@@ -6248,7 +6363,7 @@ var mindBoxPlugin = {
     if (!pen) return;
     mindBoxPlugin.record(pen);
     mindBoxPlugin.resetLayOut(pen, pen.mind.direction, recursion);
-    meta2d.emit('plugin:update', {
+    meta2d.emit('plugin:mindBox:update', {
       form: 'toolBox'
     });
   }, 50),
@@ -6294,7 +6409,7 @@ var mindBoxPlugin = {
     } else {
       meta2d.render();
     }
-    meta2d.emit('plugin:render');
+    meta2d.emit('plugin:mindBox:render');
   },
   /**
    * @description 该方法用于记录节点位置坐标信息，用于动画过渡的初始状态
@@ -6338,4 +6453,4 @@ var mindBoxPlugin = {
   }
 };
 
-export { mindBoxPlugin, ToolBox, colorList, generateColor, defaultFuncs, defaultFuncList, toolboxDefault, pluginDefault, toolboxStyle, funcListStyle, controlStyle, extraStyle, basicFuncConfig, right, left, top, bottom, butterfly, sandglass, Scope, createDom, debounce, deepMerge, replaceAfterPosition, debounceFirstOnly, isObjectLiteral, removeDuplicates, scopedEval, escapeRegExp, error, warn, deepCopy, compareObjects };
+export { mindBoxPlugin, ToolBox, colorList, generateColor, defaultFuncs, defaultFuncList, toolboxDefault, pluginDefault, toolboxStyle, funcListStyle, controlStyle, extraStyle, basicFuncConfig, DefaultCssVar, right, left, top, bottom, butterfly, sandglass, Scope, createDom, debounce, deepMerge, replaceAfterPosition, debounceFirstOnly, isObjectLiteral, removeDuplicates, scopedEval, escapeRegExp, error, warn, deepCopy, compareObjects };

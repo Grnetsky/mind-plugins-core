@@ -10,6 +10,10 @@ import d, {
 import { Scope } from "../parse";
 const extra = 'extra'
 
+let cssVarMap = {
+    itemHoverBackgroundColor:'--toolboxItem-hover-backgroundColor',
+    boxMoveOutLine:'--toolbox-move-outLine'
+}
 let mouseMoved = false;
 let controlDom = {
     control:null,
@@ -85,7 +89,7 @@ export class ToolBox {
             "background-color: var(--toolboxSliderItem-hover-backgroundColor)" +
             "}", 0);
         stylesheet.insertRule(`.toolbox_control_move {
-            outline: solid 2px #8585ff !important;
+            outline: var(--toolbox-move-outLine) !important;
         }`)
         this.setCssVar()
     }
@@ -190,9 +194,9 @@ export class ToolBox {
         if(!style)return
         // 用戶未定義hover樣式
         Object.keys(style).forEach(i=>{
-            if(i === 'itemHoverBackgroundColor') {
+            if(i in cssVarMap) {
                 this.setCssVar({
-                    '--toolboxItem-hover-backgroundColor':style[i]
+                    [cssVarMap[i]]:style[i]
                 })
                 return;
             }

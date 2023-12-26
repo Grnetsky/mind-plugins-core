@@ -110,7 +110,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
     if(!root){
         proxyScript.init?.()
         Promise.resolve().then(()=>{
-            proxyScript.mounted?.()
+            proxyScript.mounted?.(res)
         })
     }
     let funcOffset = 0;

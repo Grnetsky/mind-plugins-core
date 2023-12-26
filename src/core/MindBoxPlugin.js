@@ -698,7 +698,8 @@ export let mindBoxPlugin = {
         let toolbox = globalThis.toolbox;
         let onMouseUp = (targetPen)=>{
             if(!meta2d.store.data.locked){
-                let op = optionMap.get(targetPen.tag) || optionMap.get(targetPen.name) || optionMap.get(targetPen.id)
+                let root = meta2d.findOne(targetPen.mind?.rootId)
+                let op = optionMap.get(root.tag) || optionMap.get(root.name) || optionMap.get(root.id)
                 mindBoxPlugin.loadOptions(op)
                 meta2d.emit('plugin:mindBox:loadOption',{pen:targetPen,options:op})
                 if(toolbox){

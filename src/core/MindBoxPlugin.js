@@ -7,6 +7,8 @@ import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 
 let CONFIGS = ['animate','animateDuration','childrenGap','levelGap','colorList']
 let destroyRes = null
+let optionMap = new Map()
+
 export let mindBoxPlugin = {
     name:'mindBox',
     target:[],  // 已经绑定该插件的图元
@@ -17,7 +19,7 @@ export let mindBoxPlugin = {
     layoutFunc:new Map(), // 布局位置函数map
     colorFunc:new Map(), // 布局颜色函数map
     _history:[],
-    animate: true,
+    animate: false,
     _colorRule:'default',
     animateDuration:1000,
     // 重新设置颜色规则
@@ -328,10 +330,10 @@ export let mindBoxPlugin = {
             lineColor:'',
             level,
         }
-        if(!prePen){
-            let root = meta2d.store.pens[prePen.mind.rootId]
-            pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
-        }
+        // if(!prePen){
+        //     let root = meta2d.store.pens[prePen.mind.rootId]
+        //     pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
+        // }
         // 跟随移动
         mindBoxPlugin.combineToolBox(pen);
         mindBoxPlugin.combineLifeCircle(pen);
@@ -340,11 +342,11 @@ export let mindBoxPlugin = {
         // 是否是第一次安装，第一次安装则进行初始化
         let isInit = false
         let addCallback = null
-        let optionMap = new Map()
         return (pen,options)=>{
             if(!isInit){
                 // TODO 进行撤销重做的重写操作
                 document.addEventListener('keydown',async (e)=>{
+                    if(!meta2d.store.options.keydown)return
                     if(e.key === 'Backspace'){
                         let stopPropagation = false
                         //判断是否有脑图组件
@@ -405,36 +407,25 @@ export let mindBoxPlugin = {
 
                 meta2d.on('undo',(e)=>{
                     let { initPens } = e
-                    initPens?.forEach( pen =>{
-                        pen.calculative.active = false
-                        // pen.calculative.canvas = meta2d.canvas
-                    })
-                    // TODO 删除顺序有问题
-                    // e.pens.reverse().forEach(i=>{
-                    //     if(i.mind){
-                    //         // 撤回节点
-                    //         if(i.mind.type === 'node'){
-                    //             let preNode = meta2d.findOne(i.mind.preNodeId)
-                    //             preNode && (preNode.mind.children.push(i.id))
-                    //             mindBoxPlugin.update(preNode)
-                    //         }else{
-                    //             let preNode = meta2d.findOne(i.mind.from)
-                    //             mindBoxPlugin.update(preNode)
-                    //         }
-                    //     }
-                    // })
+                    let tag = false
+                    let target = null
+                    if(e.type === 3){
+                        initPens?.forEach( pen =>{
+                            pen.calculative.active = false
+                            if(!tag){
+                                if(pen.mind?.rootId){
+                                    tag = true;
+                                    target = pen
+                                }
+                            }
+                        })
+                        if(tag){
+                            let root = meta2d.findOne(target.mind.rootId)
+                            mindBoxPlugin.reconnectLines(root)
+                        }
+                    }
                 })
-                // meta2d.on('connectLine',(e)=>{
-                //     console.log('cccc')
-                //     if(e.line.calculative.worldAnchors.every(i=>i.connectTo)){
-                //         let start = meta2d.store.pens[e.line.calculative.worldAnchors[0].connectTo]
-                //         let end = meta2d.store.pens[e.line.calculative.worldAnchors[1].connectTo]
-                //         if(!(start.mind && end.mind)){
-                //          //
-                //         }
-                //     }
-                // })
-                meta2d.on('inactive',(targetPen)=>{
+                meta2d.on('inactive',()=>{
                     globalThis.toolbox?.hide();
                 });
                 isInit = true
@@ -707,10 +698,11 @@ export let mindBoxPlugin = {
         let toolbox = globalThis.toolbox;
         let onMouseUp = (targetPen)=>{
             if(!meta2d.store.data.locked){
-                mindBoxPlugin.loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
-                meta2d.emit('plugin:mindBox:loadOption',{pen:targetPen,options:meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption})
+                let op = optionMap.get(targetPen.tag) || optionMap.get(targetPen.name) || optionMap.get(targetPen.id)
+                mindBoxPlugin.loadOptions(op)
+                meta2d.emit('plugin:mindBox:loadOption',{pen:targetPen,options:op})
                 if(toolbox){
-                    toolbox._loadOptions(meta2d.store.pens[targetPen.mind.rootId].mind.mindboxOption)
+                    toolbox._loadOptions(op)
                 }
                 toolbox.bindPen(targetPen);
                 toolbox.setFuncList(deepClone(this.getFuncList(target)));

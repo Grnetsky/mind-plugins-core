@@ -1,6 +1,8 @@
 import {mindBoxPlugin} from "../core/MindBoxPlugin";
-export function left(pen,recursion = true,) {
-    pen.mind.direction = 'left'
+
+// 是否应当用面向切面的方式来暴露给用户
+export function right(pen:any,recursion = true,) {
+    pen.mind.direction = 'right'
     let childrenGap = mindBoxPlugin.childrenGap
     let levelGap = mindBoxPlugin.levelGap
     let children = pen.mind.children || [];
@@ -9,37 +11,34 @@ export function left(pen,recursion = true,) {
     let topWidth = 0;
     mindBoxPlugin.calcChildWandH(pen);
     for(let i = 0;i<children.length;i++){
-        let child =  meta2d.store.pens[children[i]]
+        let child:any =  meta2d.store.pens[children[i]]
         if(!child)continue
         let childRect = meta2d.getPenRect(child)
-        topHeight += ((meta2d.store.pens[children[i-1]]?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
-        topWidth += ((meta2d.store.pens[children[i-1]]?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
-        child.mind.connect = left.connectRule(pen,child)
-        child.mind.x = worldReact.x - childRect.width - +levelGap;
-
+        topHeight += (((meta2d.store.pens[children[i-1]] as any)?.mind?.maxHeight) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
+        topWidth += (((meta2d.store.pens[children[i-1]] as any)?.mind?.maxWidth) || 0) +(meta2d.store.pens[children[i-1]]?(+childrenGap):0) ;
+        child.mind.connect = right.connectRule(pen,child)
+        child.mind.x = worldReact.x + worldReact.width + +levelGap;
         if(worldReact.height > pen.mind.childHeight){
             child.mind.y = worldReact.y + 1 / 2 * pen.mind.maxHeight + topHeight - 1/2 * pen.mind.childHeight + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         }else {
             child.mind.y = worldReact.y - 1 / 2 * pen.mind.maxHeight + topHeight + 1/2 * worldReact.height + ((child.mind?.maxHeight / 2 - 1 / 2 * childRect.height) || 0);
         }
-            meta2d.setValue({
-                id: child.id,
-                x: child.mind.x,
-                y: child.mind.y,
-                color: child.mind.color
-            },{render:false});
+        meta2d.setValue({
+            id: child.id,
+            x: child.mind.x,
+            y: child.mind.y,
+        },{render:false});
 
-        if(recursion) left(child,true);
+        if(recursion) right(child,true);
     }
 }
-
-left.connectRule = (pen,child)=>{
+right.connectRule = (pen:any,child:any)=>{
     return {
         from:pen.id,
         to:child.id,
-        startIndex: 3,
-        fromAnchor: pen.anchors[3],
-        endIndex: 1,
-        toAnchor: child.anchors[1]
+        startIndex: 1,
+        fromAnchor: pen.anchors[1],
+        endIndex: 3,
+        toAnchor: child.anchors[3]
     }
 }

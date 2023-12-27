@@ -3,11 +3,12 @@ import d, {
     basicFuncConfig,
     controlStyle,
     DefaultCssVar,
-    funcListStyle,
+    funcListStyle, FuncOption,
     toolboxDefault,
     toolboxStyle
 } from "../config/default"
 import { Scope } from "../parse";
+import {Pen, Point} from "@meta2d/core";
 const extra = 'extra'
 
 let cssVarMap = {
@@ -15,23 +16,26 @@ let cssVarMap = {
     boxMoveOutLine:'--toolbox-move-outLine'
 }
 let mouseMoved = false;
-let controlDom = {
+let controlDom:any = {
     control:null,
     show:true,
 };
 // 此列表为，可供用户配置的属性列表
 let CONFIGS = ['showControl','offset','style']
-function configValid(config) {
+function configValid(config:any) {
     if(config.key)return true
     return false
 }
 export class ToolBox {
-    static instance = null
+    static instance:ToolBox
     open = false
     offset = 80
     showControl = true
-    parentHtml = null
-    constructor(parentHtml,config = {},) {
+    parentHtml!:HTMLElement
+    box:HTMLElement = createDom('div',{style:{...toolboxStyle,left:'-9999px'},className: 'toolBox'})
+    _funcDom:any
+    [key:string]:any
+    constructor(parentHtml:HTMLElement,config = {},) {
         // 单例模式
         if(!ToolBox.instance){
             ToolBox.instance = this
@@ -43,7 +47,7 @@ export class ToolBox {
         this._loadOptions(config)
         this.parentHtml.appendChild(this.box);
     }
-    _loadOptions(config){
+    _loadOptions(config:any){
         if(!isObjectLiteral(config) && !(config == null))return
         config == null ? config = {}:''
         // 加载默认配置项
@@ -63,7 +67,6 @@ export class ToolBox {
         this._setControl()
     }
     _init(){
-        this.box = createDom('div',{style:{...toolboxStyle,left:'-9999px'},className: 'toolBox'})
         this.box.id = 'toolbox'
         this._setControl()
         let funcContainer = createDom('div',{style: funcListStyle,className: 'toolbox_func'})
@@ -93,7 +96,7 @@ export class ToolBox {
         }`)
         this.setCssVar()
     }
-    setCssVar(cssVar){
+    setCssVar(cssVar?:any){
         let cssVarObj;
         cssVar?
             cssVarObj = cssVar
@@ -153,7 +156,7 @@ export class ToolBox {
                            `,
               script:{
                 rivetVisible: 'none',
-                toggleFreeze(v){
+                toggleFreeze(v:boolean){
                     if(mouseMoved)return
                     if(!v){
                         self.freezePos(false)
@@ -166,7 +169,8 @@ export class ToolBox {
                     }
                     this.$update()
                 }
-              }}
+              }
+              }
             ,"dom")
             control.addEventListener('mouseup',()=>{
                 icon.expose.rivetVisible = 'flex'
@@ -188,7 +192,7 @@ export class ToolBox {
             controlDom.show = false
         }
     }
-    setStyle(style){
+    setStyle(style:any){
         this._setDefaultStyle()
         if(!style)return
         // 用戶未定義hover樣式
@@ -210,7 +214,7 @@ export class ToolBox {
         this.setCssVar()
     }
     // 重写dom函数
-    _rewriteDom(dom){
+    _rewriteDom(dom:HTMLElement){
         this.dom = dom
         return dom
     }
@@ -219,7 +223,7 @@ export class ToolBox {
         this.box.style.display = 'none'
         this.open = false
     }
-    bindPen(pen){
+    bindPen(pen:Pen){
         this.pen = pen;
     }
     show(){// this.box.style.visibility = 'visible';
@@ -228,15 +232,15 @@ export class ToolBox {
         this.open = true
     }
     destroy(){
-        this.box.parentNode.removeChild(this.box)
+        this.box.parentNode!.removeChild(this.box)
     }
     animate = false
     curItem = null
     _freezePos = false
-    freezePos(freeze){
+    freezePos(freeze:boolean){
         this._freezePos = freeze
     }
-    translateWithPen(pen){
+    translateWithPen(pen:any){
         if(!pen)pen = this.pen;
         const store = pen.calculative.canvas.store;
         const worldRect = pen.calculative.worldRect;
@@ -246,7 +250,7 @@ export class ToolBox {
         }
         this.translatePosition(pos)
     }
-    translatePosition(pos){
+    translatePosition(pos:any){
         if(this._freezePos) {
             if(!this.animate)this.show();
             return
@@ -260,7 +264,7 @@ export class ToolBox {
     renderFuncList(){
         const fragmentChild = new DocumentFragment();
         this._funcDom.innerHTML = '';
-        this.funcList.forEach(i=>{
+        this.funcList.forEach((i:any)=>{
             // 预处理
             preprocess(i,this.pen)
             const extraEle = extraElement(i)
@@ -282,9 +286,9 @@ export class ToolBox {
      * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
      * */
     setChildDom(pen, item ){
-        const dom = document.createElement('div');
+        const dom:any = document.createElement('div');
         // 构建update方法 用于局部更新
-        item.update =(target,keepOpen = true)=> {
+        item.update =(target:string,keepOpen = true)=> {
             // update 局部更新
             if(target === 'menu'){
                 renderTitle(item,pen,dom.titleDom)
@@ -372,11 +376,11 @@ export class ToolBox {
     clearFuncList(){
         this.setFuncList([]);
     }
-    _dragElement(control,icon) {
+    _dragElement(control:HTMLElement,icon:string) {
         let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
         control.onmousedown = dragMouseDown;
         let self = this
-        function dragMouseDown(e) {
+        function dragMouseDown(e:MouseEvent) {
             e = e || window.event;
             e.preventDefault();
             // 获取鼠标光标的初始位置
@@ -388,7 +392,7 @@ export class ToolBox {
             document.addEventListener('mousemove',elementDrag)
         }
 
-        function elementDrag(e) {
+        function elementDrag(e:MouseEvent) {
             e = e || window.event;
             e.preventDefault();
             mouseMoved = true
@@ -413,7 +417,7 @@ export class ToolBox {
     }
 }
 
-function renderInit(item,pen,dom){
+function renderInit(item:FuncOption,pen:Pen,dom:HTMLElement){
     if(dom.shadowRoot){
         // 清空
         dom.shadowRoot.innerHTML = ''
@@ -426,11 +430,11 @@ function renderInit(item,pen,dom){
 
     // 绑定事件，绑定在dom上
     if(item.event){
-        let eventFunc = function (e){
+        let eventFunc = function (e:MouseEvent){
             // 绑定事件
             if(item.closeOther){
-                toolbox.funcList.filter(i=>i.isOpen).forEach(
-                    i=>{
+                toolbox.funcList.filter((i:any)=>i.isOpen).forEach(
+                  (i:any)=>{
                         i.close()
                     }
                 )
@@ -442,7 +446,7 @@ function renderInit(item,pen,dom){
     return dom
 }
 
-function renderTitle(item,pen,title) {
+function renderTitle(item:FuncOption,pen:Pen,title:HTMLElement) {
     title.innerHTML = ''
     if(typeof item.menu?.dom === 'function'){
         // 根据dom渲染 menu?Title
@@ -458,12 +462,12 @@ function renderTitle(item,pen,title) {
                 throw new Error('function setDom must return string or node object');
         }
     }else {
-        title.innerHTML = (item.menu?.icon? item.menu?.icon : (item.menu?.img?`<img src="${item.menu?.img}" title="${item.menu?.text || '图标'}" />` : item.menu?.text))
+        title.innerHTML = <string>(item.menu?.icon ? item.menu?.icon : (item.menu?.img ? `<img src="${item.menu?.img}" title="${item.menu?.text || '图标'}" />` : item.menu?.text))
     }
     return title
 }
 
-function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
+function renderChildDom(item:FuncOption,pen:Pen,dom:any,containerDom:HTMLElement,keepOpen = false) {
     if(dom.childrenDom)dom.shadowRoot?dom.shadowRoot.removeChild(dom.childrenDom) : dom.removeChild(dom.childrenDom)
     if(item.popup){
         // 是否重写dom
@@ -525,7 +529,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
                 let node = createDom('div',
                     {style:{
                             margin: '5px 8px'
-                        },event:i.event,func:function(e){
+                        },event:i.event,func:function(e:MouseEvent){
                             i.stopPropagation?e.stopPropagation():'';
                             i.func(i, this, dom, item,e);
                         }.bind(pen),className:'toolbox_slider_item'});
@@ -576,7 +580,7 @@ function renderChildDom(item,pen,dom,containerDom,keepOpen = false) {
 }
 
 // 配置项预处理
-function preprocess(item,pen) {
+function preprocess(item:FuncOption,pen:any) {
     // 分隔符则返回
     if(item.key === extra)return
     // 默认为false
@@ -602,7 +606,7 @@ function preprocess(item,pen) {
 
 }
 
-function extraElement(config) {
+function extraElement(config:any) {
     if(config.key === extra){
         // 设置分隔符
         let node

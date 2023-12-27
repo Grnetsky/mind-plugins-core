@@ -4,7 +4,7 @@ var common = require("./rollup")
 const nodeResolve = require("rollup-plugin-node-resolve");
 const commonjs = require("rollup-plugin-commonjs");
 module.exports = {
-    input:"index.js",
+    input:"index.ts",
     output:{
         file:"dist/index.esm.js",
         format:"es",

@@ -23,18 +23,26 @@ let LifeCycle = ['init','mounted']
  * @param root
  * @param oldScript
  * */
+interface ScriptType {
+    $update?:any,
+    [key:string]:any
+}
+
 
 let env = Symbol('env')
 
-export function Scope(config,{template,script,style},output = 'dom',root = null,oldScript = null){
-    let res = createDom('div')
-    if(!script)script = {}
-    if(!style)style = ''
+export function Scope(config:any,{template='',script = {
+},style=''}:{
+    template:string,
+    script?:ScriptType,
+    style?:string
+},output = 'dom',root?:HTMLElement,oldScript?:any){
+    let res:any = createDom('div')
     let namespace = config.key
     window[env]?'': window[env] = {}
     window[env][namespace]? '' :window[env][namespace] = {};
     let symbols = Object.getOwnPropertySymbols(window);
-    let targetSymbol;
+    let targetSymbol:number;
     for (let i = 0;i<symbols.length;i++) {
         let symbol = symbols[i]
         if (window[symbol] === window[env]) {
@@ -90,7 +98,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
         duty = []
     }
     // 代理模式查找更改数据项
-    let proxyScript = createDeepProxy(script,(p,v)=>{
+    let proxyScript:any = createDeepProxy(script,(p:string,v:any)=>{
         if(!['$update','init','mounted','__depMap'].includes(p)){
             if(p.includes('.')){
                 p = p.split('.')[0]
@@ -119,7 +127,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
         // 出现的函数在script中定义了 则转换
         if(keys.indexOf(i.name) !== -1){
             // 处理函数传参的变量
-            i.params.forEach(((j)=>{
+            i.params.forEach(((j:any)=>{
                 //TODO 应该还要过滤一遍字面量  此处仅仅处理了变量
                 if(!j.param.startsWith('this') && j.param!=='event' && !isLiteral(j.param)){
                     // TODO 此处应当根据字符的具体位置来替换，而非全部替换
@@ -135,7 +143,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
         }
     })
     window[env][namespace].__depMap = varObj
-    varObj.forEach(i=>{
+    varObj.forEach((i:any)=>{
         // 支持简单的表达式
         let res = scopedEval(window[env][namespace],i.name)
         // 将生成的结果保存在数据中
@@ -160,7 +168,7 @@ export function Scope(config,{template,script,style},output = 'dom',root = null,
 }
 
 
-function parse(html){
+function parse(html:string){
     // 函数匹配式
     let funcReg = new RegExp(`(${EVENTTAG.join('|')})(?<event>\\w+)\\s*=\\s*["'](?<name>[a-zA-Z][a-zA-Z0-9]*)\\s*\\(\\s*(?<param>[^)]*)\\s*\\)["']`, 'g');
     let varReg = /(?<prop>\w*)\s*=[^=]*\{\{\s*(?<variable>.+?)\s*\}\}/g
@@ -169,7 +177,7 @@ function parse(html){
     let reHtml = html.replaceAll('\n','').replaceAll(/@(\w+)="([^"]+)"/g, 'on$1="$2"');
 
 // 使用 matchAll 来匹配所有结果
-    let funcMatchs = reHtml.matchAll(funcReg);
+    let funcMatchs:any = reHtml.matchAll(funcReg);
     let varParseObj = variableParse(html);
 
 // 请注意，没有传递 'g' 标志给 matchAll，因为 reg 已经带有 'g' 标志
@@ -182,7 +190,7 @@ function parse(html){
 
         let params = param.replaceAll(/\s/g, '').split(',');
         let lastIndex = 0
-        params = params.map(i=>{
+        params = params.map((i:string)=>{
             let strIndex = match[0].indexOf(i,lastIndex);
             let index = match.index + strIndex
             lastIndex = strIndex + i.length
@@ -203,13 +211,13 @@ function parse(html){
 }
 
 
-function parseHtmlString(html) {
+function parseHtmlString(html:string) {
     let parser = new DOMParser()
-    let doc = parser.parseFromString(html)
+    let doc = parser.parseFromString(html,'text/html')
 }
 
 // 该数据是否为字面量
-function isLiteral(_) {
+function isLiteral(_:string) {
     // 判断是否为字符串
     if(_.startsWith('"') || _.startsWith("'"))return true
     // 判断是否为数字
@@ -224,7 +232,7 @@ function isLiteral(_) {
 
 // 解析变量表达式
 // TODO  该解释器不支持嵌套使用，是否应当使用DomPaser进行解析替换传统正则替换？？
-function variableParse(html) {
+function variableParse(html:string) {
     const results = [];
     // 匹配标签以及标签中的属性
     const tagRegex = /<\s*[\w-]+.*?>[\s\S]*?<\/[\w-]+>/g;
@@ -291,7 +299,7 @@ function variableParse(html) {
 
 
 
-function addUniqueIdsToHtmlString(htmlString) {
+function addUniqueIdsToHtmlString(htmlString:string) {
     // 解析HTML字符串为DOM对象
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, 'text/html');
@@ -306,7 +314,7 @@ function addUniqueIdsToHtmlString(htmlString) {
     }
 
     // 递归函数用于遍历并为每个元素添加唯一ID
-    function addUniqueIdToElement(element) {
+    function addUniqueIdToElement(element:any) {
         if (element.nodeType === 1) { // Element节点
             element.setAttribute('data-meta2d-id', generateUUID());
             Array.from(element.children).forEach(addUniqueIdToElement);
@@ -318,7 +326,7 @@ function addUniqueIdsToHtmlString(htmlString) {
 
     // 将更新后的DOM对象转换回字符串
     const serializer = new XMLSerializer();
-    let newHtmlString = serializer.serializeToString(doc);
+    let newHtmlString:any = serializer.serializeToString(doc);
 
     // 清除可能的编码问题
     newHtmlString = newHtmlString.replaceAll(/\?&quot;/g, '\"'); // 这里替换 '?&quot;' 为正常的双引号
@@ -328,7 +336,7 @@ function addUniqueIdsToHtmlString(htmlString) {
     return bodyContent;
 }
 
-function createDeepProxy(obj, onChange, path = []) {
+    function createDeepProxy(obj:any, onChange:Function, path: any[]= []):Promise<any>{
     return new Proxy(obj, {
         get(target, key, receiver) {
             const value = Reflect.get(target, key, receiver);

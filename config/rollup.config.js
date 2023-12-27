@@ -4,9 +4,9 @@ const nodeResolve = require("rollup-plugin-node-resolve");
 const commonjs = require("rollup-plugin-commonjs");
 
 module.exports = {
-    input:"./index.js",
+    input:"./index.ts",
     output:{
-        file:"dist/index.js",
+        file:"dist/index.ts",
         format:"cjs", //commonjs
         banner:common.banner
     },

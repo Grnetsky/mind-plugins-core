@@ -1,5 +1,11 @@
+import {Pen} from "@meta2d/core";
 
-export function createDom(tag,config = {
+export function createDom(tag:string,config:{
+    style?:object
+    event?:string,
+    func?:any,
+    className?:string
+} = {
     style :{},
     event: undefined,
     func: undefined,
@@ -27,9 +33,9 @@ export function createDom(tag,config = {
 }
 
 
-export function debounce(fn, delay) {
-    let timer = null;
-    return function(pen,recursion = true) {
+export function debounce(fn:Function, delay:number) {
+    let timer:any = null;
+    return function(pen:Pen,recursion = true) {
         clearTimeout(timer);
         timer = setTimeout(() => {
             fn.call(this, pen,recursion);
@@ -38,7 +44,7 @@ export function debounce(fn, delay) {
 }
 
 
-export function deepMerge(obj1, obj2) {
+export function deepMerge(obj1:any, obj2:any) {
     let newObj = Object.assign({}, obj1);
 
     for (let key in obj2) {
@@ -52,7 +58,7 @@ export function deepMerge(obj1, obj2) {
     return newObj;
 }
 
-export function replaceAfterPosition(str, position, regex, replacement) {
+export function replaceAfterPosition(str:string, position:number, regex:RegExp, replacement:string) {
     // 判断位置是否超出字符串长度
     if (position >= str.length) return str;
 
@@ -69,11 +75,11 @@ export function replaceAfterPosition(str, position, regex, replacement) {
 }
 
 
-export function debounceFirstOnly(func, wait) {
-    let timeout;
+export function debounceFirstOnly(func:Function, wait:number) {
+    let timeout:any;
     let executed = false; // 标志是否已经执行过一次
 
-    return function(...args) {
+    return function(...args:any[]) {
         const context = this;
 
         if (!executed) {
@@ -88,12 +94,12 @@ export function debounceFirstOnly(func, wait) {
     };
 }
 
-export function isObjectLiteral(value) {
+export function isObjectLiteral(value:object) {
     return Object.prototype.toString.call(value) === '[object Object]';
 }
 
 
-export function removeDuplicates(list){
+export function removeDuplicates(list:any[]){
     const uniqueResults = [];
     const uniqueNames = new Set();
     for (const res of list) {
@@ -106,7 +112,7 @@ export function removeDuplicates(list){
 }
 
 //沙盒
-export function scopedEval(scope, expr) {
+export function scopedEval(scope:object, expr:string) {
     const scopeKeys = Object.keys(scope);
     const scopeValues = Object.values(scope);
 
@@ -117,26 +123,26 @@ export function scopedEval(scope, expr) {
     try {
         let re = func(...scopeValues);
         return re
-    }catch (e) {
+    }catch (e:any) {
         error('[ScopedEval] Error: ',e.message)
     }
 }
 
-export function escapeRegExp(string) {
+export function escapeRegExp(string:string) {
     // RegExp.escape的提案用法，替换所有可能的特殊字符
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 
-export function error(scope,message) {
+export function error(scope:string,message:string) {
     throw new Error(`plugin-mind-core ${scope} Error: ${message}`)
 }
 
 
-export function warn(scope, message) {
+export function warn(scope:string, message:string) {
     console.warn(`mind-plugin-core ${scope} Warn: ${message}`)
 }
-export function deepCopy(obj, cache = new WeakMap()) {
+export function deepCopy(obj:any, cache = new WeakMap()) {
     // 基本数据类型直接返回
     if (obj === null || typeof obj !== 'object') {
         return obj;
@@ -163,7 +169,7 @@ export function deepCopy(obj, cache = new WeakMap()) {
     }
 
     // 处理数组和对象
-    let copy = Array.isArray(obj) ? [] : {};
+    let copy:any = Array.isArray(obj) ? [] : {};
 
     // 将拷贝的结果存入缓存
     cache.set(obj, copy);
@@ -183,13 +189,13 @@ export function deepCopy(obj, cache = new WeakMap()) {
 }
 
 
-function isObject(object) {
+function isObject(object:object) {
     return object != null && typeof object === 'object';
 }
 
-export function compareObjects(object1, object2) {
-    const diffs = {};
-    const compare = function(item1, item2, key) {
+export function compareObjects(object1:any, object2:any) {
+    const diffs:any = {};
+    const compare = function(item1:any, item2:any, key:string) {
         const type1 = Object.prototype.toString.call(item1);
         const type2 = Object.prototype.toString.call(item2);
         if (type1 !== type2) {

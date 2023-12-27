@@ -1,10 +1,28 @@
 import { createDom } from "../utils";
 import {mindBoxPlugin} from "../core";
 import { Scope} from "../parse";
+import {Pen} from "@meta2d/core";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 
-export function* generateColor(colorList) {
+export interface FuncOption {
+  key:string,
+  description?:string,
+  menu:{
+    text?:string,
+    icon?:string,
+    dom: (self: FuncOption, pen: Pen, dom: HTMLElement)=>string | HTMLElement
+  }
+  popup?:any[] | ((self:FuncOption,pen:Pen,dom:HTMLElement)=>(string|HTMLElement)),
+  popupEvent?:string,
+  shadowRoot?:boolean,
+  collapseEventOnMenu?:boolean,
+  stopPropagation?:boolean,
+  [key:string]:any
+}
+
+
+export function* generateColor(colorList?:string[]) {
   if (colorList && !Array.isArray(colorList)){
     console.warn('mindBoxPlugin warn: generateColor must take array param')
   }
@@ -45,7 +63,7 @@ let funcList =
     shadowRoot:false,
     collapseEventOnMenu:false, // 是否在childrenDom中触发事件
     stopPropagation:true,
-    collapseAnimate(self,pen,dom){
+    collapseAnimate(self:any,pen:any,dom:HTMLElement){
       // dom.style.height = 'max-height'
       // dom.style.visibility = 'hidden'
       // dom.style.overflow = 'hidden'
@@ -58,7 +76,7 @@ let funcList =
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    popupAnimate(self,pen,dom){
+    popupAnimate(self:any,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(1)'
       return true
     },
@@ -69,7 +87,7 @@ let funcList =
             icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698915834790" class="icon" viewBox="0 0 1365 1024" version="1.1" p-id="13181" width="50" height="30"><path d="M920.32924106 188.22098215H435.74469865c-178.43219866 0-323.49023438 145.05719866-323.49023438 323.49023436 0 178.43219866 145.05803572 323.49023438 323.49023438 323.49023439h484.58454241c178.43303572 0 323.49023438-145.05803572 323.49023437-323.49023439 0.14481026-178.28822544-144.91322544-323.49023438-323.49023437-323.49023436z m2.65345982 603.01339285H439.05440848c-145.05719866 0-281.40652902-137.4375-281.40652903-281.19475447 0-145.05803572 132.71735492-270.29966518 277.77455357-270.29966518h489.52064732c145.05803572 0 272.32700893 131.98995536 272.32700893 275.74720983 0 143.61328125-129.22935267 275.74720982-274.28738839 275.74720982z" p-id="13182"/></svg>',
           },
           event:'click',
-          func(self,pen,dom,father){
+          func(self:any,pen:any,dom:HTMLElement,father:any){
             mindBoxPlugin.addNode(pen,0,'mindNode2',{width:200,height:50})
             father.close()
           }
@@ -80,7 +98,7 @@ let funcList =
             icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
           },
           event:'click',
-          func(self,pen,dom,father){
+          func(self:any,pen:any,dom:HTMLElement,father:any){
             mindBoxPlugin.addNode(pen,0,'diamond',{width:200,height:120 })
             father.close()
           }
@@ -98,7 +116,7 @@ let funcList =
                 '</svg>',
           },
           event:'click',
-          func(self,pen,dom,father){
+          func(self:any,pen:Pen,dom:HTMLElement,father:any){
             mindBoxPlugin.addNode(pen,0,'circle',{width:200,height:75})
             father.close()
           }

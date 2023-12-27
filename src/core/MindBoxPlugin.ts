@@ -1,15 +1,15 @@
-import {disconnectLine,connectLine,deepClone,setLifeCycleFunc} from "@meta2d/core";
+import {disconnectLine, connectLine, deepClone, setLifeCycleFunc, Pen, Point, EditType} from "@meta2d/core";
 import {ToolBox} from "./toolbox";
-import {colorList, defaultFuncList, generateColor, pluginDefault} from "../config/default.js";
+import {colorList, defaultFuncList, FuncOption, generateColor, pluginDefault} from "../config/default";
 import {top,left,right,bottom,butterfly,sandglass}  from "../layout"
 import defaultColorRule from "../color/default";
 import {debounce, debounceFirstOnly, deepMerge} from "../utils"
 
 let CONFIGS = ['animate','animateDuration','childrenGap','levelGap','colorList']
-let destroyRes = null
+let destroyRes:any = null
 let optionMap = new Map()
 
-export let mindBoxPlugin = {
+export let mindBoxPlugin:any= {
     name:'mindBox',
     target:[],  // 已经绑定该插件的图元
     status: false,
@@ -23,14 +23,14 @@ export let mindBoxPlugin = {
     _colorRule:'default',
     animateDuration:1000,
     // 重新设置颜色规则
-    resetColorRule(pen,rule = 'default',recursion = true){
+    resetColorRule(pen:Pen,rule = 'default',recursion = true){
         mindBoxPlugin._colorRule = rule
         mindBoxPlugin.calcChildrenColor(pen,rule,recursion)
         mindBoxPlugin.resetLinesColor(pen,true)
         mindBoxPlugin.render(pen)
     },
     // 计算子节点的颜色和位置
-    calcChildrenPosAndColor(pen, position= pen.mind.direction || 'right',color = mindBoxPlugin._colorRule,recursion = true){
+    calcChildrenPosAndColor(pen:Pen, position= pen.mind.direction || 'right',color = mindBoxPlugin._colorRule,recursion = true){
         if(!pen)return;
         let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
         let colorFunc = mindBoxPlugin.colorFunc.get(color)
@@ -38,20 +38,20 @@ export let mindBoxPlugin = {
         try{
             layoutFunc(pen, recursion)
             colorFunc(pen, recursion)
-        }catch (e){
+        }catch (e:any){
             throw new Error(`mindBoxPlugin error : ${e.message}`)
         }
     },
-    calcChildrenColor(pen,type = mindBoxPlugin._colorRule,recursion = true){
+    calcChildrenColor(pen:Pen,type = mindBoxPlugin._colorRule,recursion = true){
         let colorFunc = mindBoxPlugin.colorFunc.get(type)
         if(!colorFunc)return
         try{
             colorFunc(pen,recursion)
-        }catch (e){
+        }catch (e:any){
             throw new Error(`mindBoxPlugin error : ${e.message}`)
         }
     },
-    calcChildrenPos(pen,position = pen.mind.direction || 'right',recursion = true){
+    calcChildrenPos(pen:any,position = pen.mind.direction || 'right',recursion = true){
         let layoutFunc = mindBoxPlugin.layoutFunc.get(position)
         if(!layoutFunc)return
         try{
@@ -60,10 +60,10 @@ export let mindBoxPlugin = {
             throw new Error(`[mindBoxPlugin calcChildrenPos] error : ${e.message}`)
         }
     },
-    connectLine(pen,newPen,style = 'mind'){
+    connectLine(pen:any,newPen:any,style = 'mind'){
         let from = meta2d.store.pens[newPen.mind.connect.from]
         let to = meta2d.store.pens[newPen.mind.connect.to]
-        let line = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,false)
+        let line:any = meta2d.connectLine(from,to,newPen.mind.connect.fromAnchor,newPen.mind.connect.toAnchor,false,false)
         line.mind = {
             type:'line',
             from:from.id,
@@ -75,7 +75,7 @@ export let mindBoxPlugin = {
         newPen.mind.lineId = line.id
         meta2d.setValue({
             id:line.id,
-            lineWidth:meta2d.findOne(pen.mind.rootId).mind.lineWidth,
+            lineWidth:(meta2d.findOne(pen.mind.rootId) as any).mind.lineWidth,
             locked: 2
         },{render:false})
         meta2d.updateLineType(line, style);
@@ -83,14 +83,14 @@ export let mindBoxPlugin = {
     },
 
     // 重新设置线颜色
-    resetLinesColor(pen,recursion = true){
+    resetLinesColor(pen:any,recursion = true){
         let colors = generateColor();
         let children = pen.mind.children || [];
         if(!children || children.length === 0 )return;
         for(let i = 0 ;i<children.length;i++){
-            const child = meta2d.store.pens[children[i]];
+            const child:any = meta2d.store.pens[children[i]];
             if(!child)continue
-            let line = child.connectedLines?.[0];
+            let line:any = child.connectedLines?.[0];
             if(line){
                 line.mind? '' : (line.mind = {});
                 if(child.mind.level > 1){
@@ -109,18 +109,18 @@ export let mindBoxPlugin = {
         }
     },
     // 重新递归设置连线的样式
-    resetLinesStyle(pen,recursion = true){
+    resetLinesStyle(pen:any,recursion = true){
         let children = pen.mind.children || [];
         if(!children || children.length === 0 )return;
-        let root = meta2d.findOne(pen.mind.rootId)
+        let root:any = meta2d.findOne(pen.mind.rootId)
         if(!root)return;
         for(let i = 0 ;i<children.length;i++){
-            const child = meta2d.store.pens[children[i]];
+            const child:any = meta2d.store.pens[children[i]];
             if(!child)continue;
             child.mind.lineStyle = pen.mind.lineStyle
-            let line = meta2d.findOne(child.connectedLines?.[0]?.lineId);
+            let line:any = meta2d.findOne(child.connectedLines?.[0]?.lineId);
             if(line){
-                meta2d.updateLineType(line,meta2d.findOne(pen.mind.rootId).mind.lineStyle);
+                meta2d.updateLineType(line,(meta2d.findOne(pen.mind.rootId)as any).mind.lineStyle);
                 meta2d.setValue({
                     id:line.id,
                     lineWidth: root.mind.lineWidth
@@ -133,17 +133,17 @@ export let mindBoxPlugin = {
             }
         }
     },
-    disconnectLines(pen,recursion = true){
+    disconnectLines(pen:any,recursion = true){
         let children = pen.mind.children || [];
         if(!children || children.length === 0 ){
             return;
         };
         for(let i = 0 ;i<children.length;i++){
-            const child = meta2d.store.pens[children[i]];
+            const child:any = meta2d.store.pens[children[i]];
             if(!child)continue;
             if(!child.connectedLines || child.connectedLines.length === 0)return;
             // 保留lineId
-            let line = meta2d.findOne(child.connectedLines[0]?.lineId);
+            let line:any = meta2d.findOne(child.connectedLines[0]?.lineId);
             if(!line)continue
             let lineAnchor1 = line.anchors[0];
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
@@ -160,15 +160,15 @@ export let mindBoxPlugin = {
             }
         }
     },
-    reconnectLines(pen,recursion = true){
+    reconnectLines(pen:any,recursion = true){
         let children = pen.mind.children || [];
         if(!children || children.length === 0 ){
             return;
         };
         for(let i = 0 ;i<children.length;i++){
-            const child = meta2d.store.pens[children[i]];
+            const child:any = meta2d.store.pens[children[i]];
             if(!child)continue;
-            let line = meta2d.findOne(child.mind.lineId);
+            let line:any = meta2d.findOne(child.mind.lineId);
             if(!line)continue
             let lineAnchor1 = line.anchors[0];
             let lineAnchor2 = line.anchors[line.anchors.length - 1];
@@ -192,16 +192,16 @@ export let mindBoxPlugin = {
     /**
      * @description 根据连接关系来判断父子关系，目前在计算calcMAXWandH方法中会造成栈溢出
      * */
-    collectChildNodes(pen,recursion = true){
+    collectChildNodes(pen:any,recursion = true){
         let lines = pen.connectedLines || []
         let children = pen.mind?.children || []
-        lines.forEach(i =>{
-            let line = meta2d.store.pens[i.lineId]
-            let index = line.anchors.findIndex(j=>j.connectTo === pen.id)
+        lines.forEach((i:any) =>{
+            let line:any = meta2d.store.pens[i.lineId]
+            let index = line.anchors.findIndex((j:Point)=>j.connectTo === pen.id)
             if(index){
                 // 被连接方，置为父级
-                let preNode = meta2d.store.pens[line.anchors[0].connectTo]
-                this.initPen(preNode,meta2d.store.pens[meta2d.store.pens[pen.mind.preNodeId].mind.preNodeId])
+                let preNode:any = meta2d.store.pens[line.anchors[0].connectTo]
+                this.initPen(preNode,meta2d.store.pens[(meta2d.store.pens[pen.mind.preNodeId] as any).mind.preNodeId])
                 if(!preNode.children.includes(pen.id))preNode.children.push(pen.id)
             }else {
                 // 连接方
@@ -212,14 +212,14 @@ export let mindBoxPlugin = {
             }
         })
         if(recursion){
-            children.forEach(child=>{
+            children.forEach((child:any)=>{
                 this.collectChildNodes(child,true)
             })
         }
 
     },
     // 重新设置连线的位置
-    resetLayOut(pen,pos,recursion = true){
+    resetLayOut(pen:any,pos:string|undefined,recursion = true){
         if(!pen)return
         if(!pos)pos = pen.mind.direction
         // mindBoxPlugin.collectChildNodes(pen,true)
@@ -251,11 +251,11 @@ export let mindBoxPlugin = {
      * @example
      * deleteLines(pen,true)
      */
-    deleteLines(pen,recursion = false){
+    deleteLines(pen:any,recursion = false){
         if(!pen)return;
-        let lines = [];
+        let lines:any[] = [];
         pen.connectedLines?.forEach((
-            i
+            i:any
         )=>{
 
             let line = meta2d.findOne(i.lineId);
@@ -265,9 +265,9 @@ export let mindBoxPlugin = {
         });
         meta2d.delete(lines,false);
     },
-    getLines(pen){
+    getLines(pen:Pen){
         if(!pen)return;
-        let lines = [];
+        let lines:Pen[] = [];
         pen.connectedLines?.forEach((
             i
         )=>{
@@ -280,21 +280,21 @@ export let mindBoxPlugin = {
     },
 
     // 删除node下的子节点
-    async deleteChildrenNode(pen){
+    async deleteChildrenNode(pen:any){
         // 删除与之相关的线
         let lines = mindBoxPlugin.getLines(pen);
         // 查找到对应的父级，删除其在父级中的子级列表数据
-        let parent = meta2d.findOne(pen.mind.preNodeId);
+        let parent:any = meta2d.findOne(pen.mind.preNodeId);
         parent && (pen.mind.preNodeChildren = deepClone(parent.mind.children))
         parent && parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
-        await meta2d.delete(pen.mind?.children.map(i=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,false);
+        await meta2d.delete(pen.mind?.children.map((i:any)=>meta2d.store.pens[i]).filter(Boolean).concat(lines) || [],true,false);
     },
-    getChildrenList(pen,recursion = true){
+    getChildrenList(pen:any,recursion = true){
         if (pen || !pen.mind)return [];
         let childrenId = pen.mind.children
         if(!childrenId || childrenId.length === 0)return []
-        let collect = []
-        childrenId.forEach((i)=>{
+        let collect:Pen[] = []
+        childrenId.forEach((i:any)=>{
             let child = meta2d.store.pens[i]
             if(!child)return
             collect.push(child)
@@ -304,7 +304,7 @@ export let mindBoxPlugin = {
         return collect
     },
     // 初始化pen
-    initPen(pen,prePen){
+    initPen(pen:any,prePen:any){
         if(pen.mind)return;
         let rootId = prePen?prePen.mind.rootId:pen.id;
         let preNodeId = prePen? prePen.id:'';
@@ -337,8 +337,8 @@ export let mindBoxPlugin = {
     install:(()=>{
         // 是否是第一次安装，第一次安装则进行初始化
         let isInit = false
-        let addCallback = null
-        return (pen,options)=>{
+        let addCallback:any = null
+        return (pen:any,options:FuncOption)=>{
             if(!isInit){
                 // TODO 进行撤销重做的重写操作
                 document.addEventListener('keydown',async (e)=>{
@@ -346,22 +346,22 @@ export let mindBoxPlugin = {
                     if(e.key === 'Backspace'){
                         let stopPropagation = false
                         //判断是否有脑图组件
-                        let collection = meta2d.store.active
-                        meta2d.store.active.forEach(pen=>{
+                        let collection:any = meta2d.store.active
+                        meta2d.store.active?.forEach((pen:any)=>{
                             if(pen.mind){
                                 stopPropagation = true
-                                let lines = pen.connectedLines?.map(i=>meta2d.findOne(i.LineId))
+                                let lines = pen.connectedLines?.map((i:any)=>meta2d.findOne(i.LineId))
                                 collection.concat(lines)
                             }
                         })
                         if(!stopPropagation)return
-                        let initPens = deepClone(meta2d.store.data.pens.map(pen=>{
+                        let initPens = deepClone(meta2d.store.data.pens.map((pen:any)=>{
                             pen.calculative.active = undefined;
                             return pen
                         }
                         ),true)
                         await meta2d.delete(collection,false,false)
-                        let newPens = deepClone(meta2d.store.data.pens.map(pen=>{
+                        let newPens = deepClone(meta2d.store.data.pens.map((pen:any)=>{
                             pen.calculative.active = undefined;
                             return pen
                         }
@@ -387,9 +387,9 @@ export let mindBoxPlugin = {
                 mindBoxPlugin.colorFunc.set('default',defaultColorRule)
                 meta2d.on('opened',()=>{
                     let pens= meta2d.store.data.pens
-                    pens.forEach(pen=>{
-                        let t = meta2d.findOne(pen.mind?.rootId) || {}
-                        let isAdd = mindBoxPlugin.target.includes(t.tag) || mindBoxPlugin.target.includes(t.name) || pen.mind
+                    pens.forEach((pen:any)=>{
+                        let t:Pen = meta2d.findOne(pen.mind?.rootId) || {}
+                        let isAdd = mindBoxPlugin.target.includes(t.tags) || mindBoxPlugin.target.includes(t.name) || pen.mind
                         if(isAdd && (pen.mind.type === 'node')){
                             window.meta2d.emit('plugin:mindBox:open',pen)
                             mindBoxPlugin.combineToolBox(pen)
@@ -422,7 +422,7 @@ export let mindBoxPlugin = {
                     }
                 })
                 meta2d.on('inactive',()=>{
-                    globalThis.toolbox?.hide();
+                    window.toolbox?.hide();
                 });
                 isInit = true
             }
@@ -436,10 +436,10 @@ export let mindBoxPlugin = {
             }else if(pen.pen){
                 target = pen
             }
-            let toolbox = null;
-            if(!globalThis.toolbox){
+            let toolbox:any = null;
+            if(!window.toolbox){
                 toolbox = new ToolBox(meta2d.canvas.externalElements.parentElement,options);
-                globalThis.toolbox = toolbox;
+                window.toolbox = toolbox;
             }
             // 当前图元已经绑定了此插件后，不做任何处理。
             if(mindBoxPlugin.target.includes(target))return;
@@ -458,7 +458,7 @@ export let mindBoxPlugin = {
                 if(typeof addCallback === "function"){
                     meta2d.off('add',addCallback)
                 }
-                addCallback = (pens)=>{
+                addCallback = (pens:any)=>{
                     // TODO 此处还未考虑name与tag相等的情况
                     let isAdd = mindBoxPlugin.target.includes(pens[0].tag) || mindBoxPlugin.target.includes(pens[0].name)
                     // 是否为根节点
@@ -498,8 +498,8 @@ export let mindBoxPlugin = {
         }
     }})(),
     // 卸载插件
-    uninstall(pen,options){
-        let target = null
+    uninstall(pen:any,options:FuncOption){
+        let target:string = ''
         let isTag = false
         if(pen.name){
             target = pen.name
@@ -513,7 +513,7 @@ export let mindBoxPlugin = {
             if(typeof target === "string"){
                 // 不能只清理当前pen上的内容，还应当清理所有的内容
                 let pens = meta2d.store.data.pens.filter(pen=>pen.tag === target)
-                pens.forEach(i=>{
+                pens.forEach((i:any)=>{
                     if(i.mind)this.unCombineToolBox(i)
                 })
             }else {
@@ -524,23 +524,23 @@ export let mindBoxPlugin = {
 
     },
 
-    unCombineToolBox(pen){
+    unCombineToolBox(pen:any){
         if(!pen.mind.children)return;
         this.combineToolBox(pen,true)
-        pen.mind.children.forEach(i=>{
+        pen.mind.children.forEach((i:any)=>{
             let child = meta2d.store.pens[i]
             this.unCombineToolBox(child)
         })
     },
 
     funcList: defaultFuncList,
-    setFuncList(funcList){
+    setFuncList(funcList:any[]){
         if(Object.prototype.toString.call(funcList) !== '[object Object]'){
             throw new Error(`The setFuncList function must take function arguments, get ${funcList}\n`)
         }
         this.funcList = funcList;
     },
-    calcChildWandH(pen){
+    calcChildWandH(pen:any){
         if(!pen || !pen.mind)return{
             maxHeight: 0,
             childHeight:0,
@@ -606,7 +606,7 @@ export let mindBoxPlugin = {
     /**
      * @description 自定义获取功能列表函数  返回值为最终展示的列表
      * @param pen 当前pen图元*/
-    getFuncList(pen){
+    getFuncList(pen:any){
         return pen.mind.isRoot?mindBoxPlugin.funcList['root']:mindBoxPlugin.funcList['leaf']
     },
 
@@ -616,7 +616,7 @@ export let mindBoxPlugin = {
      * @param func 方法函数
      * @param pos 插入的目标位置
      * */
-    appendFuncList(tag,func,pos){
+    appendFuncList(tag:string,func:any,pos:number){
         if(typeof tag !=="string" || typeof func !== "object"){
             throw new Error('appendFuncList error: appendFuncList parma error ')
         }
@@ -633,19 +633,19 @@ export let mindBoxPlugin = {
     },
     __debounceFirstOnly: (debounceFirstOnly(()=>{
         destroyRes = new Promise(resolve => {
-            resolve(deepClone(meta2d.store.data.pens.filter(pen=>pen.mind),true))
+            resolve(deepClone(meta2d.store.data.pens.filter((pen:any)=>pen.mind),true))
         })
     },1000)),
     __debouncePushHistory:(debounce(()=>{
-        destroyRes.then(res =>{
-            let newPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind),true)
+        destroyRes.then((res:any)=>{
+            let newPens = deepClone(meta2d.store.data.pens.filter((pen:any)=>pen.mind),true)
             meta2d.pushHistory({ type: 3, pens:newPens, initPens:res  });
         })
 
     },2000)),
     //
-    combineLifeCircle(target,del = false){
-        const onDestroy = (targetPen)=>{
+    combineLifeCircle(target:Pen,del = false){
+        const onDestroy = (targetPen:any)=>{
             toolbox?.hide();
             mindBoxPlugin.deleteChildrenNode(targetPen);
 
@@ -665,7 +665,7 @@ export let mindBoxPlugin = {
         //    let parent = meta2d.store.pens[pen.mind.preNodeId]
         //     parent.mind.children.splice(parent.mind.children.indexOf(pen.id),1);
         // }
-        const onAdd = (targetPen)=>{
+        const onAdd = (targetPen:any)=>{
             if(!meta2d.store.data.locked){
                 toolbox.bindPen(targetPen);
                 toolbox.setFuncList(deepClone(this.getFuncList(target)));
@@ -673,7 +673,7 @@ export let mindBoxPlugin = {
                 toolbox.show();
             }
         }
-        const onResize  = debounce((pen)=>{
+        const onResize  = debounce((pen:any)=>{
             mindBoxPlugin.record(pen.mind.rootId)
         },500)
         // setLifeCycleFunc(target,'onDestroy',onDestroy,del);
@@ -681,18 +681,18 @@ export let mindBoxPlugin = {
         setLifeCycleFunc(target,'onDestroy',onDestroy,del);
         setLifeCycleFunc(target, 'onResize',onResize );
     },
-    deleteNodeOnlyOnce: debounceFirstOnly(async(pen)=>{
+    deleteNodeOnlyOnce: debounceFirstOnly(async(pen:any)=>{
         let children = mindBoxPlugin.getChildrenList(pen)
         if(!children || children.length === 0 )return
         await mate2d.delete(children,true,false)
     },1000),
-    combineToolBox(target,del = false){
-        let option = meta2d.store.pens[target.mind.rootId].mind.mindboxOption
+    combineToolBox(target:any,del = false){
+        let option = (meta2d.store.pens[target.mind.rootId] as any).mind.mindboxOption
         let showTrigger = option.trigger?.show || 'onMouseUp'
         let hideTrigger = option.trigger?.hide || 'onMouseDown'
 
-        let toolbox = globalThis.toolbox;
-        let onMouseUp = (targetPen)=>{
+        let toolbox = window.toolbox;
+        let onMouseUp = (targetPen:any)=>{
             if(!meta2d.store.data.locked){
                 let root = meta2d.findOne(targetPen.mind?.rootId)
                 let op = optionMap.get(root.tag) || optionMap.get(root.name) || optionMap.get(root.id)
@@ -707,7 +707,7 @@ export let mindBoxPlugin = {
                 toolbox.show()
             }
         }
-        let onMouseDown = (targetPen)=>{
+        let onMouseDown = ()=>{
             toolbox.hide();
         }
         // 保存方法的引用
@@ -736,7 +736,7 @@ export let mindBoxPlugin = {
      * @description 添加节点
      * @param pen 添加节点的目标节点
      * @param position 添加节点的位置 默认为追加*/
-    async addNode(pen,position = 0, type = "mindNode2",option={}){
+    async addNode(pen:any,position = 0, type = "mindNode2",option:any={}){
         let opt = {
             name:type,
             disableAnchor: true,
@@ -778,8 +778,8 @@ export let mindBoxPlugin = {
         option.height && (option.height *= scale)
 
         opt = deepMerge(opt,option)
-        let initPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind).map(i=>{i.calculative.active = false;return i}),true)
-        let newPen = await meta2d.addPen(opt,false);
+        let initPens = deepClone(meta2d.store.data.pens.filter((pen:any)=>pen.mind).map((i:any)=>{i.calculative.active = false;return i}),true)
+        let newPen:any = await meta2d.addPen(opt,false);
 
         // 设置连接关系
         newPen.mind.connect =pen.mind.level === 0?
@@ -807,23 +807,23 @@ export let mindBoxPlugin = {
         // mindBoxPlugin.update(rootNode,true);
         if(mindBoxPlugin.animate){
             setTimeout(()=>{
-                globalThis.toolbox.bindPen(newPen);
-                globalThis.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
-                globalThis.toolbox.translateWithPen(newPen);
+                window.toolbox.bindPen(newPen);
+                window.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
+                window.toolbox.translateWithPen(newPen);
             },mindBoxPlugin.animateDuration +100)
 
         }else {
-            globalThis.toolbox.bindPen(newPen);
-            globalThis.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
-            globalThis.toolbox.translateWithPen(newPen);
+            window.toolbox.bindPen(newPen);
+            window.toolbox.setFuncList(deepClone(this.getFuncList(newPen)));
+            window.toolbox.translateWithPen(newPen);
         }
         // TODO 此处是否应当局部替换
-        let newPens = deepClone(meta2d.store.data.pens.filter(pen=>pen.mind).map(i=>{i.calculative.active = false;return i}),true)
+        let newPens = deepClone(meta2d.store.data.pens.filter((pen:any)=>pen.mind).map((i:any)=>{i.calculative.active = false;return i}),true)
         meta2d.pushHistory({ type: 3, pens:newPens, initPens  });
 
         return newPen
     },
-    update: debounce((pen,recursion = true)=>{
+    update: debounce((pen:any,recursion = true)=>{
         if(!pen)return;
         mindBoxPlugin.record(pen)
         mindBoxPlugin.resetLayOut(pen,pen.mind.direction,recursion)
@@ -831,17 +831,17 @@ export let mindBoxPlugin = {
     },50),
 
     // root 为根节点id
-    render(root){
+    render(root:string){
         if(mindBoxPlugin.animate){
             let pens = []
             if(root){
-                pens = meta2d.store.data.pens.filter(i=>i.mind?.rootId === root && i.mind.type === 'node')
+                pens = meta2d.store.data.pens.filter((i:any)=>i.mind?.rootId === root && i.mind.type === 'node')
             }
             else {
-                pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
+                pens = meta2d.store.data.pens.filter((i:any)=>i.mind && i.mind.type === 'node')
             }
             let scale = meta2d.store.data.scale
-            pens.forEach(pen=>{
+            pens.forEach((pen:any)=>{
                 let source = deepClone(meta2d.getPenRect(pen))
 
                 let origin = meta2d.store.data.origin;
@@ -877,17 +877,17 @@ export let mindBoxPlugin = {
     /**
      * @description 该方法用于记录节点位置坐标信息，用于动画过渡的初始状态
      * @param {string} root 根节点的id值*/
-    record(root){
+    record(root:string){
         let pens = [];
-        if(root)pens = meta2d.store.data.pens.filter(i=>i.mind?.rootId === root && i.mind.type === 'node')
-        else pens = meta2d.store.data.pens.filter(i=>i.mind && i.mind.type === 'node')
-        pens.forEach(i=>{
+        if(root)pens = meta2d.store.data.pens.filter((i:any)=>i.mind?.rootId === root && i.mind.type === 'node')
+        else pens = meta2d.store.data.pens.filter((i:any)=>i.mind && i.mind.type === 'node')
+        pens.forEach((i:any)=>{
             i.mind.oldWorldRect = deepClone(meta2d.getPenRect(i))
         })
     },
 
     //  TODO 逻辑重写
-    loadOptions(options){
+    loadOptions(options:any){
         //加载系统自带的配置项
         for (const optionsKey of Object.keys(pluginDefault)) {
             this[optionsKey] = pluginDefault[optionsKey]

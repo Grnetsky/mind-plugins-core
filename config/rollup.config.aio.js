@@ -1,12 +1,14 @@
 // rollup.config.js
 // umd
+let  typescript = require('rollup-plugin-typescript2');
+
 var nodeResolve = require('rollup-plugin-node-resolve');
 var commonjs = require('rollup-plugin-commonjs');
 
 var common = require('./rollup.js');
 
 module.exports = {
-    input: 'index.js',
+    input: 'index.ts',
     output: {
         file: 'dist/index.aio.js',
         format: 'umd',
@@ -15,12 +17,13 @@ module.exports = {
         name: common.name,
         banner: common.banner,
     },
-    external: ['mind-diagram','@meta2d/core'],
+    external: ['@meta2d/core'],
     plugins: [
         nodeResolve({
             main: true,
-            extensions: ['.js']
+            extensions: ['.ts']
         }),
+        typescript(),
         commonjs({
             include: 'node_modules/**',
         }),

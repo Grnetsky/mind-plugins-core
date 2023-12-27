@@ -330,10 +330,6 @@ export let mindBoxPlugin = {
             lineColor:'',
             level,
         }
-        // if(!prePen){
-        //     let root = meta2d.store.pens[prePen.mind.rootId]
-        //     pen.mind.mindboxOption = deepClone(root.mind.mindboxOption);
-        // }
         // 跟随移动
         mindBoxPlugin.combineToolBox(pen);
         mindBoxPlugin.combineLifeCircle(pen);

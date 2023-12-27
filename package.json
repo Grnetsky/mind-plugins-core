@@ -1,23 +1,36 @@
 {
   "name": "@meta2d/plugin-mind-core",
   "version": "0.1",
-  "description": "",
+  "description": "The mind-core plugin based on le5le meta2d.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
     "build:self": "rollup -c config/rollup.config.js",
     "build:esm": "rollup -c config/rollup.config.esm.js",
     "build:aio": "rollup -c config/rollup.config.aio.js",
-    "build": "npm run build:self && npm run build:esm && npm run build:aio",
-    "doc":"jsdoc -r src -d doc"
+    "build": "tsc && npm run build:self && npm run build:esm && npm run build:aio"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "meta2d",
+    "sequence",
+    "mind",
+    "plugin"
+  ],
+  "author": "Grnetsky",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/le5le-com/meta2d.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/le5le-com/meta2d.js/issues"
+  },
+  "homepage": "https://github.com/le5le-com/meta2d.js#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
-    "@meta2d/core": "^1.0.32"
+    "@meta2d/core": "^1.0.0"
   },
-
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/plugin-transform-runtime": "^7.1.0",

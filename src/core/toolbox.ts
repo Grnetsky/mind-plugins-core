@@ -19,7 +19,7 @@ let mouseMoved = false;
 let controlDom:any = {
     control:null,
     show:true,
-};
+}
 // 此列表为，可供用户配置的属性列表
 let CONFIGS = ['showControl','offset','style']
 function configValid(config:any) {
@@ -52,6 +52,7 @@ export class ToolBox {
         config == null ? config = {}:''
         // 加载默认配置项
         for (const conf in toolboxDefault) {
+            // @ts-ignore
             this[conf] = toolboxDefault[conf]
         }
 
@@ -199,16 +200,19 @@ export class ToolBox {
         Object.keys(style).forEach(i=>{
             if(i in cssVarMap) {
                 this.setCssVar({
+                    // @ts-ignore
                     [cssVarMap[i]]:style[i]
                 })
                 return;
             }
+            // @ts-ignore
             this.box.style[i] = style[i];
         });
     }
 
     _setDefaultStyle(){
         Object.keys(toolboxStyle).forEach(i=>{
+            // @ts-ignore
             this.box.style[i] = toolboxStyle[i];
         });
         this.setCssVar()
@@ -285,7 +289,7 @@ export class ToolBox {
      * @param pen 操作的图元
      * @param item 该toolItem配置项 包含 显示name 事件event 回调函数func 和该按钮的样式style 与setDom自定义样式
      * */
-    setChildDom(pen, item ){
+    setChildDom(pen:any, item:FuncOption ){
         const dom:any = document.createElement('div');
         // 构建update方法 用于局部更新
         item.update =(target:string,keepOpen = true)=> {
@@ -314,8 +318,8 @@ export class ToolBox {
                 let openFunc = ()=>{
                     // 关闭其他选项
                     if(toolbox.curItem !== item){
-                        toolbox.funcList.filter(i=>i.isOpen).forEach(
-                            i=>{
+                        toolbox.funcList.filter((i:any)=>i.isOpen).forEach(
+                          (i:any)=>{
                                 i.close()
                             }
                         )
@@ -329,7 +333,8 @@ export class ToolBox {
                     item.isOpen = true
                     toolbox.curItem = item
                 }
-                    title['on'+(item.popupEvent || basicFuncConfig.popupEvent)] = openFunc
+                    // @ts-ignore
+                title['on'+(item.popupEvent || basicFuncConfig.popupEvent)] = openFunc
             }
 
 
@@ -337,7 +342,7 @@ export class ToolBox {
             item.shadowRoot?dom.shadowRoot.appendChild(title):dom.appendChild(title)
 
             // 渲染下拉列表
-            let containerDom = null;
+            let containerDom:any = null;
             renderChildDom(item,pen,dom,containerDom)
             // 事件处理
         }
@@ -348,7 +353,7 @@ export class ToolBox {
         item.update()
         return dom;
     }
-    setFuncList(funcList){
+    setFuncList(funcList:any[]){
         this.funcList = funcList;
         this.renderFuncList();
     }
@@ -367,8 +372,8 @@ export class ToolBox {
         this.box.classList.remove('toolbox_control_move')
     }
     closeAll(){
-        toolbox.funcList.filter(i=>i.isOpen).forEach(
-            i=>{
+        toolbox.funcList.filter((i:any)=>i.isOpen).forEach(
+          (i:any)=>{
                 i.close()
             }
         )
@@ -439,6 +444,7 @@ function renderInit(item:FuncOption,pen:Pen,dom:HTMLElement){
                     }
                 )
             }
+            // @ts-ignore
             item.func(item,this,dom,e);
         };
         dom.addEventListener(item.event,eventFunc.bind(pen));
@@ -531,6 +537,7 @@ function renderChildDom(item:FuncOption,pen:Pen,dom:any,containerDom:HTMLElement
                             margin: '5px 8px'
                         },event:i.event,func:function(e:MouseEvent){
                             i.stopPropagation?e.stopPropagation():'';
+                            // @ts-ignore
                             i.func(i, this, dom, item,e);
                         }.bind(pen),className:'toolbox_slider_item'});
 

@@ -94,7 +94,7 @@ export function Scope(config:any,{template='',script = {
         //     globalRender ? root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML: ''
         // })
         // 组件全部更新
-        root.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
+        root!.innerHTML = Scope(config,{template,style,script:window[env][namespace]},output,root,oldScript).innerHTML
         duty = []
     }
     // 代理模式查找更改数据项

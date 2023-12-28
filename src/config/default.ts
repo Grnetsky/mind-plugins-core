@@ -1,7 +1,7 @@
 import { createDom } from "../utils";
 import {mindBoxPlugin} from "../core";
 import { Scope} from "../parse";
-import {Pen} from "@meta2d/core";
+import {Event, Pen} from "@meta2d/core";
 export let colorList =  ['#FF2318','#9C64A2','#B4C926','#0191B3',
   '#6F6EB9','#9C64A2','#FF291B','#F4AE3C'];
 
@@ -11,6 +11,7 @@ export interface FuncOption {
   menu:{
     text?:string,
     icon?:string,
+    img?:string,
     dom: (self: FuncOption, pen: Pen, dom: HTMLElement)=>string | HTMLElement
   }
   popup?:any[] | ((self:FuncOption,pen:Pen,dom:HTMLElement)=>(string|HTMLElement)),
@@ -150,7 +151,7 @@ let funcList =
          '</svg>',
    },
     event:'click',
-    func(self,pen,dom,e){
+    func(self:FuncOption,pen:any,dom:HTMLElement,e:MouseEvent){
       let children = pen.mind?.children || [];
       if(children.length >0){
         mindBoxPlugin.update(pen,true);
@@ -185,7 +186,7 @@ let funcList =
           '</svg>',
     },
     event:'click',
-    func(self,pen){
+    func(self:FuncOption,pen:any){
       let children = pen.mind?.children || [];
       if(children.length >0){
         mindBoxPlugin.update(pen,false);
@@ -198,7 +199,7 @@ let funcList =
     key:'nodeStyle',
     menu:{
       text:'边框样式',
-      dom(self){
+      dom(self:FuncOption){
         let color = self.color
         let dash = self.dash;
         let width = self.width;
@@ -229,22 +230,22 @@ let funcList =
      * @param self 配置项本身
      * @param pen 木匾画笔
      */
-    init(self,pen){
+    init(self:FuncOption,pen:any){
       self.dash = pen.lineDash ? `${pen.lineDash[0]},${pen.lineDash[1]}` : '0,0'
       self.width = (+ pen.lineWidth).toFixed(0);
       self.color =pen.mind.color || pen.calculative.color || '#000000'
     },
 
     stopPropagation:true,
-    collapseAnimate(self,pen,dom){
+    collapseAnimate(self:FuncOption,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    popupAnimate(self,pen,dom){
+    popupAnimate(self:FuncOption,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    popup(self, pen) {
+    popup(self:FuncOption, pen:any) {
         let dom = createDom('div',{
           style:{display: 'flex',
             flexDirection: 'row',
@@ -269,7 +270,7 @@ let funcList =
             top:'-10px',
             opacity:0
           }})
-        dom.shadowRoot.appendChild(gap)
+        dom.shadowRoot!.appendChild(gap)
         /**
          * @description 通过此函数你可以自由地自定义工具栏的样式 采用影子dom 使得style相互隔离
          * @param self 此配置项自身
@@ -333,7 +334,7 @@ let funcList =
                      <div class="main">
 
                      <div class="colorList" onclick="setColor(event)">
-                     ${self.colorList.map((i,index)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
+                     ${self.colorList.map((i:string,index:number)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
                      </div>
                 </div>
               </div>
@@ -353,7 +354,7 @@ let funcList =
             value:10,
             lineactive:'style_active',
             dashActive: '',
-            setOutLineStyle(style){
+            setOutLineStyle(style:string){
               let res = style?[0,0]:[5,5]
               meta2d.setValue({
                 id:pen.id,
@@ -363,7 +364,7 @@ let funcList =
               self.updateAll()
               // self.close()
             },
-            sliderChange: (value)=>{
+            sliderChange: (value:number)=>{
               self.width = value
               // toolbox.renderFuncList()
               meta2d.setValue({
@@ -374,18 +375,19 @@ let funcList =
               self.update('popup',true)
 
             },
-            setColor(e,value){
+            setColor(e:MouseEvent,value:string){
               let color = ''
               if(!value){
                 let t = e.target
-                let list = dom.shadowRoot.querySelector('.colorList')
+                let list = dom.shadowRoot!.querySelector('.colorList')
                 if(t === list)return
+                // @ts-ignore
                 color = t.dataset.color
               }else {
                 color = value
               }
               if(color === self.color){
-                color = undefined
+                color = ''
               }else{
                 meta2d.setValue({
                   id:pen.id,
@@ -477,7 +479,7 @@ let funcList =
     </style> 
         `
         },'dom')
-        dom.shadowRoot.appendChild(str)
+        dom.shadowRoot!.appendChild(str)
         return dom
       }
 
@@ -507,7 +509,7 @@ let funcList =
     description: '用于重新设置线条样式',
     menu:{
       text:'线条样式',
-      dom(self,pen) {
+      dom(self:FuncOption,pen:any) {
         let html = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="34px" height="34px" viewBox="0 0 34 34" version="1.1">
         <title>连线样式</title>
         <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -527,10 +529,10 @@ let funcList =
     color:'#4D4DFF',
     lineStyle: 'mind',
     width: 3,
-    init(self,pen){
+    init(self:FuncOption,pen:any){
       self.color = pen.mind.lineColor || pen.calculative.color || '#000000';
-      self.lineStyle = pen.mind.lineStyle || meta2d.findOne(pen.mind.rootId).mind.lineStyle;
-      self.width = meta2d.findOne(pen.mind.rootId).mind.lineWidth
+      self.lineStyle = pen.mind.lineStyle || (meta2d.findOne(pen.mind.rootId) as any).mind.lineStyle;
+      self.width = (meta2d.findOne(pen.mind.rootId)as any).mind.lineWidth
     },
 
     /**
@@ -546,16 +548,16 @@ let funcList =
     openEventOnTitle:true,
     popupEvent: 'mouseenter',
     collapseEvent:'click',
-    collapseAnimate(self,pen,dom){
+    collapseAnimate(self:FuncOption,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    popupAnimate(self,pen,dom){
+    popupAnimate(self:FuncOption,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    popup(self, pen){
-        let dom = createDom('div',{style:{
+    popup(self:FuncOption, pen:any){
+        let dom:any = createDom('div',{style:{
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -624,13 +626,13 @@ let funcList =
                      <div class="main">
 
                      <div class="colorList" onclick="setColor(event)">
-                     ${self.colorList.map((i,index)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
+                     ${self.colorList.map((i:string,index:number)=>`<span class="color_item ${self.color === i?'active':''}" style="background-color: ${i};border: 3px solid ${i}" data-color="${i}"></span>`).join('')}
                      </div>
                 </div>
               </div>
           </div>`,
           script:{
-            sliderChange: (value)=>{
+            sliderChange: (value:number)=>{
               dom.shadowRoot.querySelector('#t').innerHTML = value
               self.width = value
               // toolbox.renderFuncList()
@@ -640,12 +642,12 @@ let funcList =
               //     lineWidth: value
               //   })
               // })
-              let root = meta2d.findOne(pen.mind.rootId)
+              let root:any = meta2d.findOne(pen.mind.rootId)
               root.mind.lineWidth = value
               mindBoxPlugin.resetLinesStyle(root);
               self.update('menu')
             },
-            setLineStyle(value){
+            setLineStyle(value:string){
               let res = value?'mind':'polyline'
               // toolbox.renderFuncList()
 
@@ -656,7 +658,7 @@ let funcList =
               // mindBoxPlugin.update(root);
               self.updateAll()
             },
-            setColor(e,value){
+            setColor(e:any,value:string){
               let color = ''
               if(!value){
                 let t = e.target
@@ -667,10 +669,10 @@ let funcList =
                 color = value
               }
               if(color === self.color){
-                color = undefined
+                color = ''
               }
 
-              pen.connectedLines?.forEach(i=>{
+              pen.connectedLines?.forEach((i:any)=>{
                 meta2d.setValue({
                   id:pen.id,
                   'mind.lineColor':color
@@ -771,7 +773,7 @@ let funcList =
         return dom ;
     },
     event: 'mouseenter',
-    func(self,pen,dom){
+    func(self:FuncOption,pen:any,dom:HTMLElement){
       self.open = true
     }
   },{
@@ -787,7 +789,7 @@ let funcList =
     direction:'right',
     childrenGap:20,
     levelGap: 0,
-    init(self,pen){
+    init(self:FuncOption,pen:any){
       self.direction = pen.mind.direction
       self.childrenGap = mindBoxPlugin.childrenGap
       self.levelGap = mindBoxPlugin.levelGap
@@ -795,9 +797,9 @@ let funcList =
       pen.locked = 0
       self.status = self.animate?'已开启':'已关闭'
     },
-    activeDirection(self,pen,dom){
+    activeDirection(self:FuncOption,pen:any,dom:HTMLElement){
       let rootDom = dom.querySelector('.main');
-      let divs = rootDom.querySelectorAll('div');
+      let divs = rootDom!.querySelectorAll('div');
       let index = ['right','left','top','bottom','butterfly','sandglass'].findIndex(i=>i === self.direction)
       divs.forEach(i=>{
         i.querySelectorAll('.toolbox_direction_svg').forEach(i=>{
@@ -811,7 +813,9 @@ let funcList =
         });
       });
 
+      // @ts-ignore
       divs[index].querySelector('.toolbox_direction_svg_base').setAttribute('fill','#CDCDFC');
+      // @ts-ignore
       divs[index].querySelector('.toolbox_direction_svg_line').setAttribute('stroke','#7878FF');
       divs[index].querySelectorAll('.toolbox_direction_svg').forEach(i=>i.setAttribute('fill','#7878FF'));
     },
@@ -820,29 +824,29 @@ let funcList =
     collapseEvent:'none',
     stopPropagation:true,
     animate:false,
-    collapseAnimate(self,pen,dom){
+    collapseAnimate(self:FuncOption,pen:any,dom:HTMLElement){
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    mounted(self,pen,dom){
+    mounted(self:FuncOption,pen:Pen,dom:HTMLElement){
       self.activeDirection(self,pen,dom)
     },
-    popupAnimate(self,pen,dom){
+    popupAnimate(self:FuncOption,pen:Pen,dom:HTMLElement){
       dom.style.transform = 'scaleY(1)'
       return true
     },
-    onPopup(self,pen,dom){
+    onPopup(self:FuncOption,pen:Pen,dom:HTMLElement){
       self.activeDirection(self,pen,dom);
       self.childrenGap = mindBoxPlugin.childrenGap
       self.levelGap = mindBoxPlugin.levelGap
       pen.locked = 1
     },
-    onCollapse(self,pen){
+    onCollapse(self:FuncOption,pen:Pen){
       pen.locked = 0
     },
     status:'已开启',
     // 设置下拉列表的样式和子元素布局
-    popup(self,pen){
+    popup(self:FuncOption,pen:any){
         let dom = createDom('div',{style:{
             display: 'flex',
             flexDirection: 'row',
@@ -1058,19 +1062,19 @@ let funcList =
                   self.status = '已关闭'
               self.updateAll()
             },
-            setChildGap(value){
+            setChildGap(value:number){
               self.childrenGap = value;
               mindBoxPlugin.childrenGap = value;
               pen.mind.mindboxOption.childrenGap = value
               mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
             },
-            setLevelGap(value){
+            setLevelGap(value:number){
               self.levelGap = value;
               mindBoxPlugin.levelGap = value;
               pen.mind.mindboxOption.levelGap = value;
               mindBoxPlugin.update(meta2d.findOne(pen.mind.rootId))
             },
-            setDirection(e){
+            setDirection(e:string){
               mindBoxPlugin.record(pen)
 
               let root = (window).meta2d.findOne(pen.mind.rootId);
@@ -1218,14 +1222,14 @@ let funcList =
   shadowRoot:false,
   collapseEventOnMenu:false, // 是否在childrenDom中触发事件
   stopPropagation:true,
-  collapseAnimate(self,pen,dom){
+  collapseAnimate(self:FuncOption,pen:Pen,dom:HTMLElement){
     dom.style.transformOrigin = 'top';
     dom.style.transition = 'all .3s'
 
     dom.style.transform = 'scaleY(0)'
     return true
   },
-  popupAnimate(self,pen,dom){
+  popupAnimate(self:FuncOption,pen:Pen,dom:HTMLElement){
     dom.style.transform = 'scaleY(1)'
     return true
   },
@@ -1237,7 +1241,7 @@ let funcList =
 
     },
     event:'click',
-    func(self,pen,dom,father){
+    func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
       let parent = (window).meta2d.findOne(pen.mind.preNodeId);
       let index = parent.mind.children.indexOf(pen.id);
       mindBoxPlugin.addNode(parent,index+1,'mindNode2',{width:200,height:50})
@@ -1250,7 +1254,7 @@ let funcList =
       icon:'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" t="1698916220010" class="icon" viewBox="0 0 1024 1024" version="1.1" p-id="13326" width="50" height="30"><path d="M485.213 869.904c6.744 4.822 18.199 8.603 26.787 8.603 8.588 0 21.779-2.476 28.32-7.442l467.957-336.878c13.427-9.665 13.47-26.284 0-35.915l-469.49-335.716c-6.726-4.81-19.733-10.927-28.321-10.927-8.588 0-23.313 7.122-29.855 12.088L15.723 498.272c-13.43 9.664-13.47 26.284 0 35.915z m23.719-671.51l452.01 322.481L512 835.227 63.058 518.553z" p-id="13327"/></svg>',
     },
     event:'click',
-    func(self,pen,dom,father){
+    func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
       let parent = (window).meta2d.findOne(pen.mind.preNodeId);
       let index = parent.mind.children.indexOf(pen.id);
       mindBoxPlugin.addNode(parent,index+1,'diamond',{width:200,height:120 })
@@ -1270,7 +1274,7 @@ let funcList =
           '</svg>',
     },
     event:'click',
-    func(self,pen,dom,father){
+    func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
       let parent = (window).meta2d.findOne(pen.mind.preNodeId);
       let index = parent.mind.children.indexOf(pen.id);
       mindBoxPlugin.addNode(parent,index+1,'circle',{width:200,height:75})
@@ -1304,14 +1308,14 @@ let funcList =
     shadowRoot:false,
     // collapseEventOnMenu:true, // 是否在childrenDom中触发事件
     stopPropagation:true,
-    collapseAnimate(self,pen,dom){
+    collapseAnimate(self:FuncOption,pen:Pen,dom:HTMLElement){
       dom.style.transformOrigin = 'top';
       dom.style.transition = 'all .3s'
 
       dom.style.transform = 'scaleY(0)'
       return true
     },
-    popupAnimate(self,pen,dom){
+    popupAnimate(self:FuncOption,pen:Pen,dom:HTMLElement){
       dom.style.transform = 'scaleY(1)'
       return true
     },
@@ -1322,7 +1326,7 @@ let funcList =
         },
         event:'click',
         name:'mindNode2',
-        func(self,pen,dom,father){
+        func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
           pen.name = self.name
           pen.calculative.name = self.name
           meta2d.setValue({id:pen.id,width:200,height:50})
@@ -1335,7 +1339,7 @@ let funcList =
         },
         event:'click',
         name:'diamond',
-        func(self,pen,dom,father){
+        func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
           pen.name = self.name
           pen.calculative.name = self.name
           meta2d.setValue({id:pen.id,width:200,height:120})
@@ -1355,7 +1359,7 @@ let funcList =
         },
         event:'click',
         name:'circle',
-        func(self,pen,dom,father){
+        func(self:FuncOption,pen:any,dom:HTMLElement,father:FuncOption){
           pen.name = self.name
           pen.calculative.name = self.name
           meta2d.setValue({id:pen.id,width:200,height:50})
@@ -1382,10 +1386,10 @@ let funcList =
 export var defaultFuncs = {
   funcList,
   getAllFuncDocs(){
-    return defaultFuncs.funcList.filter(i=>i.menu).map(i=>({name:i.menu.text || '暂无名称',key:i.key,description:i.description||'暂无描述'}))
+    return defaultFuncs.funcList.filter(i=>i.menu).map(i=>({name:i.menu!.text || '暂无名称',key:i.key,description:i.description||'暂无描述'}))
   },
-  getFunc(...key){
-    let result = []
+  getFunc(...key:any[]){
+    let result:any[] = []
     if(Array.isArray(key)){
       key.forEach((i)=>{
         let func =defaultFuncs.funcList.find(j=> j.key === i)
@@ -1395,7 +1399,7 @@ export var defaultFuncs = {
     return result
   }
 }
-export let defaultFuncList = {
+export let defaultFuncList:any = {
   'root':funcList.filter(i=>i.key!== 'addSiblingNode' && i.key !== 'changeName' ),
   'leaf':defaultFuncs.getFunc('addChildNode','addSiblingNode','changeName','extra','relayout','relayoutNext','extra','nodeStyle','lineStyle',)
 };
@@ -1411,7 +1415,7 @@ export let pluginDefault = {
   showControl: true,
   funcList,
   colorList:colorList,
-  getFuncList(pen){
+  getFuncList(pen:any){
     return pen.mind.isRoot?mindBoxPlugin.funcList['root']:mindBoxPlugin.funcList['leaf']
   }
 }

@@ -39,6 +39,6 @@ function getCompiler(opt){
         ]
     })
 }
-exports.name = 'clone';
+exports.name = 'plugin-mind-core';
 
 exports.getCompiler = getCompiler

@@ -3,6 +3,9 @@ var common = require("./rollup")
 
 const nodeResolve = require("rollup-plugin-node-resolve");
 const commonjs = require("rollup-plugin-commonjs");
+const typescript = require("rollup-plugin-typescript2");
+let defaults = { compilerOptions: { declaration: true } };
+let override = { compilerOptions: { declaration: false } };
 module.exports = {
     input:"index.ts",
     output:{
@@ -18,6 +21,11 @@ module.exports = {
     }),
         commonjs({
             include: 'node_modules/**',
-        }),common.getCompiler()]
+        }),common.getCompiler(),
+        typescript({
+            tsconfigDefaults: defaults,
+            tsconfig: "tsconfig.json",
+            tsconfigOverride: override
+        }),]
 
 }

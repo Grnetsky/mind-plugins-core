@@ -38,6 +38,7 @@ export function debounce(fn:Function, delay:number) {
     return function(pen:Pen,recursion = true) {
         clearTimeout(timer);
         timer = setTimeout(() => {
+            // @ts-ignore
             fn.call(this, pen,recursion);
         }, delay);
     };
@@ -80,6 +81,7 @@ export function debounceFirstOnly(func:Function, wait:number) {
     let executed = false; // 标志是否已经执行过一次
 
     return function(...args:any[]) {
+        // @ts-ignore
         const context = this;
 
         if (!executed) {
@@ -228,4 +230,23 @@ export function compareObjects(object1:any, object2:any) {
     }
 
     return diffs;
+}
+
+export function isIntersection(arr1:string[], arr2:string[]) {
+    // 将两个数组转换为 Set 集合
+    const set1 = new Set(arr1);
+    const set2 = new Set(arr2);
+    let isIntersection = false;
+    // 创建一个空数组来存储交集元素
+    // const intersection = [];
+
+    // 遍历一个数组，并检查另一个数组是否有相同元素
+    for (const item of set1) {
+        if (set2.has(item)) {
+            // intersection.push(item);
+            isIntersection = true
+            break
+        }
+    }
+    return isIntersection;
 }

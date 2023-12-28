@@ -1,9 +1,9 @@
 import {generateColor} from "../config/default";
-function defaultColorRule(pen,recursion = true) {
+function defaultColorRule(pen:any,recursion = true) {
     let children = pen.mind.children || [];
     let generateColorFunc = generateColor();
     for(let i = 0;i<children.length;i++){
-        let child = meta2d.store.pens[children[i]]
+        let child:any = meta2d.store.pens[children[i]]
         if(!child)continue
         let nodeColor = undefined
         if(pen.mind.level === 0){
